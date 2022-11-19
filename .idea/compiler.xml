@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile default="true" name="Default" enabled="true" />
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="impl" />
+        <module name="social-service-impl" />
+        <module name="domain" />
+        <module name="social-service-domain" />
+        <module name="api" />
+        <module name="social-service-api" />
+        <module name="social-service-db" />
+        <module name="db" />
+      </profile>
+    </annotationProcessing>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="api" options="-parameters" />
+      <module name="db" options="-parameters" />
+      <module name="domain" options="-parameters" />
+      <module name="impl" options="-parameters" />
+      <module name="social-service" options="" />
+      <module name="social-service-api" options="-parameters" />
+      <module name="social-service-db" options="-parameters" />
+      <module name="social-service-domain" options="-parameters" />
+      <module name="social-service-impl" options="-parameters" />
+    </option>
+  </component>
+</project>
