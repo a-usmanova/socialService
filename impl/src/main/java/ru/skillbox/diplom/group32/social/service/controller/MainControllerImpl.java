@@ -25,9 +25,30 @@ public class MainControllerImpl implements MainController {
     }
 
     @Override
-    public UserDto getUser(@PathVariable Integer value) {
-        UserDto result = userService.getUser(value);
+    public UserDto getUser(Long id) {
+        UserDto result = userService.getUser(id);
         log.info("User from DB - " + result);
         return result;
+    }
+
+    @Override
+    public void deleteUser(UserDto userDto) {
+        log.info("Send User to delete - " + userDto);
+        userService.deleteUser(userDto);
+    }
+
+    @Override
+    public void deleteUserById(Long id) {
+        userService.deleteUserById(id);
+    }
+
+    @Override
+    public void hardDeleteUser(UserDto userDto) {
+        userService.hardDeleteUser(userDto);
+    }
+
+    @Override
+    public void hardDeleteUserById(Long id) {
+        userService.hardDeleteUserById(id);
     }
 }
