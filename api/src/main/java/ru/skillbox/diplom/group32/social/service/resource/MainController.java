@@ -1,29 +1,15 @@
+/*
 package ru.skillbox.diplom.group32.social.service.resource;
 
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import ru.skillbox.diplom.group32.social.service.model.SearchDto;
 import ru.skillbox.diplom.group32.social.service.model.UserDto;
+import ru.skillbox.diplom.group32.social.service.resource.base.BaseController;
 
 @RequestMapping("/user")
-public interface MainController {
-
-    @PostMapping(value = "/create")
-    UserDto createUser(@RequestParam(value = "name") String title, @RequestParam(value = "age") Integer age);
+public interface MainController extends BaseController<UserDto, SearchDto> {
 
 
-    @GetMapping(value = "/get/{id}")
-    UserDto getUser(@PathVariable Long id);
-
-
-    @DeleteMapping(value = "/delete")
-    void deleteUser(UserDto userDto);
-
-    @DeleteMapping(value = "/delete/{id}")
-    void deleteUserById(@PathVariable Long id);
-
-    @DeleteMapping(value = "/hard-delete")
-    void hardDeleteUser(UserDto userDto);
-
-    @DeleteMapping(value = "/hard-delete/{id}")
-    void hardDeleteUserById(@PathVariable Long id);
 
 }
+*/

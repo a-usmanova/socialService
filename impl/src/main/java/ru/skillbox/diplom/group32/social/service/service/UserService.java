@@ -2,6 +2,7 @@ package ru.skillbox.diplom.group32.social.service.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import ru.skillbox.diplom.group32.social.service.model.User;
 import ru.skillbox.diplom.group32.social.service.model.UserDto;
@@ -31,26 +32,14 @@ public class UserService {
         return new UserDto(userFromDB.getId(), userFromDB.getName(), userFromDB.getAge());
     }
 
-    public void deleteUser(UserDto userDto) {
-        User userForDel = new User(userDto.getId(), userDto.getName(), userDto.getAge());
-        log.info("User to del - " + userForDel);
-        userRepository.delete(userForDel);
-    }
+//    public Page<UserDto> getAllUser(Sea) {
+//        User userFromDB = userRepository.findById(id).get();
+//        return new UserDto(userFromDB.getId(), userFromDB.getName(), userFromDB.getAge());
+//    }
 
     public void deleteUserById(Long id) {
         log.info("User ID to del - " + id);
         userRepository.deleteById(id);
-    }
-
-    public void hardDeleteUser(UserDto userDto) {
-        User userForDel = new User(userDto.getId(), userDto.getName(), userDto.getAge());
-        log.info("User to hard del - " + userForDel);
-        userRepository.hardDelete(userForDel);
-    }
-
-    public void hardDeleteUserById(Long id) {
-        log.info("User ID to hard del - " + id);
-        userRepository.hardDeleteById(id);
     }
 
 

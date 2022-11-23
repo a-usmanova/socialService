@@ -23,7 +23,7 @@ public class BaseRepositoryImpl<Entity extends BaseEntity>
     @Transactional
     @Override
     public void deleteById(Long id) {
-        super.findById(id).ifPresent(x ->  {
+        super.findById(id).ifPresent(x -> {
             x.setIsDeleted(true);
             super.save(x);
         });
@@ -38,7 +38,7 @@ public class BaseRepositoryImpl<Entity extends BaseEntity>
 
     @Transactional
     public void deleteAll(Iterable<? extends Entity> entities) {
-        entities.forEach( entity -> entity.setIsDeleted(true));
+        entities.forEach(entity -> entity.setIsDeleted(true));
         super.saveAll(entities);
     }
 

@@ -7,5 +7,4 @@ import ru.skillbox.diplom.group32.social.service.repository.base.BaseRepository;
 @Repository
 public interface UserRepository extends BaseRepository<User> {
 
-
 }
