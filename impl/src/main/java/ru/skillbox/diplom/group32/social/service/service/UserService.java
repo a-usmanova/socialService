@@ -2,10 +2,13 @@ package ru.skillbox.diplom.group32.social.service.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import ru.skillbox.diplom.group32.social.service.model.User;
 import ru.skillbox.diplom.group32.social.service.model.UserDto;
 import ru.skillbox.diplom.group32.social.service.repository.UserRepository;
+
+import javax.annotation.Resource;
 
 @Slf4j
 @Service
@@ -24,9 +27,20 @@ public class UserService {
         return userDto;
     }
 
-    public UserDto getUser(Integer id) {
+    public UserDto getUser(Long id) {
         User userFromDB = userRepository.findById(id).get();
         return new UserDto(userFromDB.getId(), userFromDB.getName(), userFromDB.getAge());
     }
+
+//    public Page<UserDto> getAllUser(Sea) {
+//        User userFromDB = userRepository.findById(id).get();
+//        return new UserDto(userFromDB.getId(), userFromDB.getName(), userFromDB.getAge());
+//    }
+
+    public void deleteUserById(Long id) {
+        log.info("User ID to del - " + id);
+        userRepository.deleteById(id);
+    }
+
 
 }
