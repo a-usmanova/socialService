@@ -2,13 +2,12 @@ package ru.skillbox.diplom.group32.social.service.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
+import ru.skillbox.diplom.group32.social.service.mapper.Account;
+import ru.skillbox.diplom.group32.social.service.mapper.AccountMapper;
 import ru.skillbox.diplom.group32.social.service.model.User;
 import ru.skillbox.diplom.group32.social.service.model.UserDto;
 import ru.skillbox.diplom.group32.social.service.repository.UserRepository;
-
-import javax.annotation.Resource;
 
 @Slf4j
 @Service
@@ -16,10 +15,12 @@ import javax.annotation.Resource;
 public class UserService {
 
     final UserRepository userRepository;
+    final AccountMapper accountMapper;
 
 
     public UserDto createUser(UserDto userDto) {
         User userToDB = new User(userDto.getName(), userDto.getAge());
+        accountMapper.AccountToDto(new Account());
         log.info("User to save - " + userToDB);
         userRepository.save(userToDB);
         log.info("User saved to db - " + userToDB);

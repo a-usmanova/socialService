@@ -8,19 +8,19 @@ import ru.skillbox.diplom.group32.social.service.model.base.BaseSearchDto;
 
 public interface BaseController<Dto extends BaseDto, SearchDto extends BaseSearchDto> {
 
-    @PostMapping(value = "/create")
-    ResponseEntity<Dto> create(@RequestBody Dto dto);
-
     @GetMapping(value = "/{id}")
     ResponseEntity<Dto> getById(@PathVariable Long id);
 
     @GetMapping(value = "/")
     ResponseEntity<Page<Dto>> getAll(SearchDto searchDto);
 
-    @PostMapping(value = "/update")
+    @PostMapping(value = "/create")
+    ResponseEntity<Dto> create(@RequestBody Dto dto);
+
+    @PutMapping(value = "/update")
     ResponseEntity<Dto> update(@RequestBody Dto dto);
 
     @DeleteMapping(value = "/{id}")
-    void deleteById(@PathVariable Long id);
+    ResponseEntity deleteById(@PathVariable Long id);
 
 }
