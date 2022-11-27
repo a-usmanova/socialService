@@ -1,9 +1,9 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/smedia
+    url: jdbc:postgresql://localhost:5432/bd
     driverClassName: org.postgresql.Driver
     username: postgres
-    password: postgres
+    password: 123456
 
   liquibase:
     enabled: true

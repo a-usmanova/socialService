@@ -1,6 +1,5 @@
 package ru.skillbox.diplom.group32.social.service.model;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.skillbox.diplom.group32.social.service.model.base.BaseDto;
