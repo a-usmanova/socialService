@@ -21,11 +21,6 @@
     </properties>
 
     <dependencies>
-        <!--	Database	-->
-        <dependency>
-            <groupId>org.postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-        </dependency>
     <!--    Inner modules    -->
         <dependency>
             <groupId>ru.skillbox.diplom.group32</groupId>
