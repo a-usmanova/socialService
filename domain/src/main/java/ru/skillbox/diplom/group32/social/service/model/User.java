@@ -16,18 +16,6 @@ import javax.persistence.*;
 @Table(name = "user", schema = "social_service")
 public class User extends BaseEntity {
 
-    public User(String name, Integer age) {
-        super.setIsDeleted(false);
-        this.name = name;
-        this.age = age;
-    }
-
-    public User(Long id,  String name, Integer age) {
-        super.setId(id);
-        this.name = name;
-        this.age = age;
-    }
-
     @Column(columnDefinition = "VARCHAR(255)", nullable = false)
     private String name;
 
