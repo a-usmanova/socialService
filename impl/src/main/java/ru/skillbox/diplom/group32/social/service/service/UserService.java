@@ -2,12 +2,20 @@ package ru.skillbox.diplom.group32.social.service.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import ru.skillbox.diplom.group32.social.service.mapper.Account;
 import ru.skillbox.diplom.group32.social.service.mapper.AccountMapper;
 import ru.skillbox.diplom.group32.social.service.model.User;
 import ru.skillbox.diplom.group32.social.service.model.UserDto;
 import ru.skillbox.diplom.group32.social.service.repository.UserRepository;
+import ru.skillbox.diplom.group32.social.service.utils.specification.metamodel.User_;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static ru.skillbox.diplom.group32.social.service.utils.specification.SpecificationUtil.equal;
+import static ru.skillbox.diplom.group32.social.service.utils.specification.SpecificationUtil.in;
 
 @Slf4j
 @Service
@@ -43,5 +51,10 @@ public class UserService {
         userRepository.deleteById(id);
     }
 
-
+    public static Specification<User> getSpecification(UserDto userDto) {
+        List<String> nameList = new ArrayList<>();
+        nameList.add(userDto.getName());
+        return in(User_.name, nameList, true)
+                .and(equal(User_.id, userDto.getId(), true));
+    }
 }
