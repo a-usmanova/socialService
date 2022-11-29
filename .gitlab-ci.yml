@@ -1,0 +1,31 @@
+image: maven:3-openjdk-18-slim
+
+build-job:
+  stage: build
+  only:
+    - develop
+  script:
+    - mvn clean package
+    - echo "Building stage"
+  artifacts:
+    paths:
+      - impl/target
+
+deploy-prod:
+  image: docker:19.03.12
+  stage: deploy
+  only:
+    - develop
+  before_script:
+    - docker logout
+    - docker login -u $DOCKER_LOGIN -p $DOCKER_PASSWORD
+  script:
+    - echo "Deploy stage begin"
+    - docker build -f Dockerfile --platform linux/arm64/v8 -t skillboxteam32/social-media .
+    - docker push skillboxteam32/social-media
+    - echo "Deploy stage end"
+  artifacts:
+    paths:
+      - impl/target/social-service-impl-1.0.0-SNAPSHOT-exec.jar
+
+  environment: production

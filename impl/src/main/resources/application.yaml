@@ -16,7 +16,7 @@ spring:
 
   liquibase:
     enabled: true
-    drop-first: false
+    drop-first: ${IS_DROP_FIRST:false}
     default-schema: skillbox
     change-log: classpath:db/changelog/changelog-master.xml
 

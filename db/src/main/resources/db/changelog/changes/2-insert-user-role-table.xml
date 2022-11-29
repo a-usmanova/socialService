@@ -7,7 +7,7 @@
    http://www.liquibase.org/xml/ns/dbchangelog
    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
 
-    <changeSet author="kazakov_i" id="role-table-insert-roles">
+    <changeSet author="kazakov_i" id="role-table-insert">
         <insert tableName="role">
             <column name="name" value="USER"/>
             <column name="is_deleted" value="false"/>
@@ -15,26 +15,6 @@
 
         <insert tableName="role">
             <column name="name" value="ADMIN"/>
-            <column name="is_deleted" value="false"/>
-        </insert>
-    </changeSet>
-
-
-    <changeSet author="kazakov_i" id="user-table-insert-users">
-        <insert tableName="user">
-            <column name="firstname" value="user"/>
-            <column name="lastname" value="user"/>
-            <column name="email" value="user@example.com"/>
-            <!--     userPWD       -->
-            <column name="password" value="$2a$04$qjnOUv5MwGyMkr7oc/UwOuwzJ23OB9EmANVZyUcu.KMyp/3EJTk7S"/>
-            <column name="is_deleted" value="false"/>
-        </insert>
-        <insert tableName="user">
-            <column name="firstname" value="admin"/>
-            <column name="lastname" value="admin"/>
-            <column name="email" value="admin@example.com"/>
-            <!--     adminPWD       -->
-            <column name="password" value="$2a$04$ta8KcXGEY5gsoiVUkRbFLe98bNmaoT9ZzGzEUUDyAAZ4PWt0mKEH2"/>
             <column name="is_deleted" value="false"/>
         </insert>
     </changeSet>
