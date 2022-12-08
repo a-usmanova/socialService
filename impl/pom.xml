@@ -38,7 +38,4 @@
             <version>${revision}${sha1}${changelist}</version>
         </dependency>
     </dependencies>
-
-
-
 </project>

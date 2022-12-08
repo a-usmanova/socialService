@@ -36,6 +36,7 @@
         <lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>
         <mapstruct-processor.version>1.5.3.Final</mapstruct-processor.version>
         <jpamodelgen.versuin>6.1.5.Final</jpamodelgen.versuin>
+        <cloudinary.version>1.33.0</cloudinary.version>
     </properties>
 
     <dependencies>
@@ -75,6 +76,12 @@
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct-processor</artifactId>
             <version>${mapstruct-processor.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.cloudinary</groupId>
+            <artifactId>cloudinary-http42</artifactId>
+            <version>${cloudinary.version}</version>
         </dependency>
 
         <dependency>

@@ -12,14 +12,11 @@ import ru.skillbox.diplom.group32.social.service.model.User;
 import ru.skillbox.diplom.group32.social.service.model.UserDto;
 import ru.skillbox.diplom.group32.social.service.model.UserSearchDto;
 import ru.skillbox.diplom.group32.social.service.model.User_;
-import ru.skillbox.diplom.group32.social.service.model.base.BaseEntity_;
-import ru.skillbox.diplom.group32.social.service.model.base.BaseSearchDto;
 import ru.skillbox.diplom.group32.social.service.repository.UserRepository;
 
 import java.util.List;
 
-import static ru.skillbox.diplom.group32.social.service.utils.specification.SpecificationUtil.equal;
-import static ru.skillbox.diplom.group32.social.service.utils.specification.SpecificationUtil.in;
+import static ru.skillbox.diplom.group32.social.service.utils.specification.SpecificationUtil.*;
 
 @Data
 @Slf4j
@@ -61,10 +58,5 @@ public class UserService {
     public static Specification<User> getSpecification(UserSearchDto searchDto) {
         return getBaseSpecification(searchDto)
                 .and(in(User_.name, searchDto.getNames(), true));
-    }
-
-    private static Specification getBaseSpecification(BaseSearchDto searchDto) {
-        return equal(BaseEntity_.id, searchDto.getId(), true)
-                .and(equal(BaseEntity_.isDeleted, searchDto.getIsDeleted(), true));
     }
 }
