@@ -2,6 +2,6 @@ spring:
   liquibase:
     enabled: true
     drop-first: true
-    default-schema: social_service
+    default-schema: skillbox
     change-log: classpath:db/changelog/changelog-master.xml
 

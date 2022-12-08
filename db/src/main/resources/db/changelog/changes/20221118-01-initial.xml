@@ -1,14 +1,11 @@
 <databaseChangeLog
         xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
-        xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext
-   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd 
-   http://www.liquibase.org/xml/ns/dbchangelog 
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
 
     <changeSet author="kazakov_i" id="20221118-initial-1">
-        <createTable tableName="user" schemaName="social_service">
+        <createTable tableName="user" schemaName="skillbox">
             <column name="id" type="INTEGER" autoIncrement="true">
                 <constraints nullable="false" primaryKey="true" />
             </column>
@@ -25,7 +22,7 @@
     </changeSet>
 
     <changeSet author="kazakov_i" id="20221121-initial-2">
-        <createSequence sequenceName="sequence" schemaName="social_service" cacheSize="100" startValue="1" minValue="1" incrementBy="100"/>
+        <createSequence sequenceName="sequence" schemaName="skillbox" cacheSize="100" startValue="1" minValue="1" incrementBy="100"/>
     </changeSet>
 
 </databaseChangeLog>

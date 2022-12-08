@@ -1,12 +1,9 @@
-server:
-  port: 8086
-
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/smedia
+    url: jdbc:postgresql://${DB_HOST:localhost}:5432/${DB_DATABASE:skillbox}
     driverClassName: org.postgresql.Driver
-    username: postgres
-    password: postgres
+    username: ${DB_USERNAME:skillbox}
+    password: ${DB_PASSWORD:skillbox}
 
   jpa:
     show-sql: true
@@ -15,13 +12,20 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQL10Dialect
+        default_schema: social_service
 
   liquibase:
     enabled: true
     drop-first: false
-    default-schema: social_service
+    default-schema: skillbox
     change-log: classpath:db/changelog/changelog-master.xml
 
   mvc:
     pathmatch:
       matching-strategy: ANT_PATH_MATCHER
+
+cloudinary:
+    development:
+      cloud_name: duvaewonz
+      api_key: '354439898853154'
+      api_secret: N-qIciSHT6v4toj9fvkqArfVzDw

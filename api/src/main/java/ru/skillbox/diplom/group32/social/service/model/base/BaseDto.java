@@ -1,6 +1,5 @@
 package ru.skillbox.diplom.group32.social.service.model.base;
 
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 

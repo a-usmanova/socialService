@@ -6,14 +6,16 @@ import lombok.Setter;
 import lombok.ToString;
 import ru.skillbox.diplom.group32.social.service.model.base.BaseEntity;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
 @ToString
-@Table(name = "user", schema = "social_service")
+@Table(name = "user")
 public class User extends BaseEntity {
 
     @Column(columnDefinition = "VARCHAR(255)", nullable = false)
