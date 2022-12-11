@@ -2,12 +2,12 @@ package ru.skillbox.diplom.group32.social.service.service.post;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import ru.skillbox.diplom.group32.social.service.config.Properties;
 import ru.skillbox.diplom.group32.social.service.exception.ObjectNotFoundException;
 import ru.skillbox.diplom.group32.social.service.mapper.post.PostMapper;
 import ru.skillbox.diplom.group32.social.service.model.post.Post;
@@ -25,25 +25,13 @@ import static ru.skillbox.diplom.group32.social.service.utils.specification.Spec
 
 @Slf4j
 @Service
+@AllArgsConstructor
 public class PostService {
 
     private final PostRepository postRepository;
     private final PostMapper postMapper;
+    private Properties properties;
 
-    @Autowired
-    public PostService(PostRepository postRepository, PostMapper postMapper) {
-        this.postRepository = postRepository;
-        this.postMapper = postMapper;
-    }
-
-    @Value("${cloudinary.development.cloud_name}")
-    private String cloudName;
-
-    @Value("${cloudinary.development.api_key}")
-    private String apiKey;
-
-    @Value("${cloudinary.development.api_secret}")
-    private String apiSecret;
 
     public PostDto getPostById(Long id) {
 
@@ -84,12 +72,13 @@ public class PostService {
     public String savePhoto(MultipartFile request) throws IOException {
 
         Cloudinary cloudinary = new Cloudinary(ObjectUtils.asMap(
-                "cloud_name", cloudName,
-                "api_key", apiKey,
-                "api_secret", apiSecret));
+                "cloud_name", properties.getCloudName(),
+                "api_key", properties.getApiKey(),
+                "api_secret", properties.getApiSecret()));
+
 
         Map uploadResult = cloudinary.uploader().upload(request.getBytes(), ObjectUtils.emptyMap());
-        log.info("successfully uploaded the file" + request.getName());
+        log.info("successfully uploaded the file" + uploadResult.get("name"));
 
         return uploadResult.get("url").toString();
     }
