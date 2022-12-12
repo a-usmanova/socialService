@@ -12,7 +12,7 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQL10Dialect
-        default_schema: social_service
+        default_schema: skillbox
 
   liquibase:
     enabled: true
@@ -23,6 +23,11 @@ spring:
   mvc:
     pathmatch:
       matching-strategy: ANT_PATH_MATCHER
+
+jwt:
+  token:
+    secret: skillboxJWTSecretsecretskillboxJWTSecretsecret
+    expired: 3600000
 
 cloudinary:
     development:

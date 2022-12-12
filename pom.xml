@@ -36,6 +36,11 @@
         <lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>
         <mapstruct-processor.version>1.5.3.Final</mapstruct-processor.version>
         <jpamodelgen.versuin>6.1.5.Final</jpamodelgen.versuin>
+        <jjwt.version>0.9.1</jjwt.version>
+<!--        <spring.security.oauth2.version>2.5.2.RELEASE</spring.security.oauth2.version>
+        <spring.security.jwt.version>1.1.1.RELEASE</spring.security.jwt.version>-->
+        <spring.security.oauth2.resource.server.version>3.0.0</spring.security.oauth2.resource.server.version>
+
         <cloudinary.version>1.33.0</cloudinary.version>
     </properties>
 
@@ -54,7 +59,38 @@
             <artifactId>hibernate-jpamodelgen</artifactId>
             <version>${jpamodelgen.versuin}</version>
         </dependency>
+        <!--    Spring Security   -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt</artifactId>
+            <version>${jjwt.version}</version>
+        </dependency>
 
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jdk8</artifactId>
+        </dependency>
+
+<!--        <dependency>
+            <groupId>org.springframework.security.oauth</groupId>
+            <artifactId>spring-security-oauth2</artifactId>
+            <version>${spring.security.oauth2.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-jwt</artifactId>
+            <version>${spring.security.jwt.version}</version>
+        </dependency>-->
+
+        <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
+        <version>${spring.security.oauth2.resource.server.version}</version>
+    </dependency>
         <!--  Other  -->
         <dependency>
             <groupId>org.projectlombok</groupId>

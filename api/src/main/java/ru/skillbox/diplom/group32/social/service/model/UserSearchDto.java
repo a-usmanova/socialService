@@ -13,6 +13,7 @@ public class UserSearchDto extends BaseSearchDto {
 
     private List<String> names;
     private String name;
+    //This field has deleted in User & userDto
     private Integer age;
 }
 

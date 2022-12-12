@@ -1,0 +1,39 @@
+package ru.skillbox.diplom.group32.social.service.model.auth;
+
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import ru.skillbox.diplom.group32.social.service.model.base.BaseEntity;
+
+import javax.persistence.*;
+import java.util.List;
+
+@Entity
+@Getter
+@Setter
+@NoArgsConstructor
+@ToString
+@Table(name = "user")
+public class User extends BaseEntity {
+
+    @Column(columnDefinition = "VARCHAR(255)", nullable = false)
+    private String firstname;
+
+    @Column(columnDefinition = "VARCHAR(255)", nullable = false)
+    private String lastname;
+
+    @Column(columnDefinition = "VARCHAR(255)", nullable = false)
+    private String email;
+
+    @Column(columnDefinition = "VARCHAR(255)", nullable = false)
+    private String password;
+
+    @ToString.Exclude
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "user_roles",
+            joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},
+            inverseJoinColumns = {@JoinColumn(name = "role_id", referencedColumnName = "id")})
+    private List<Role> roles;
+
+}

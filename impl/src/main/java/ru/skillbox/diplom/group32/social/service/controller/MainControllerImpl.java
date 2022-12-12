@@ -8,9 +8,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import ru.skillbox.diplom.group32.social.service.model.SearchDto;
-import ru.skillbox.diplom.group32.social.service.model.UserDto;
+import ru.skillbox.diplom.group32.social.service.model.security.UserDto;
 import ru.skillbox.diplom.group32.social.service.resource.MainController;
-import ru.skillbox.diplom.group32.social.service.service.UserService;
+import ru.skillbox.diplom.group32.social.service.service.auth.UserService;
 
 @Slf4j
 @RestController
