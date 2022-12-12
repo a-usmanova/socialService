@@ -4,6 +4,8 @@ import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -17,7 +19,7 @@ import ru.skillbox.diplom.group32.social.service.model.post.Post_;
 import ru.skillbox.diplom.group32.social.service.repository.post.PostRepository;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.Arrays;
 import java.util.Map;
 
 import static ru.skillbox.diplom.group32.social.service.utils.specification.SpecificationUtil.*;
@@ -33,17 +35,6 @@ public class PostService {
     private Properties properties;
 
 
-    public PostDto getPostById(Long id) {
-
-        log.info("PostService in getById tried to find post with id: " + id);
-        return postMapper.convertToDto(postRepository.findById(id).orElseThrow(ObjectNotFoundException::new));
-
-    }
-
-    public List<PostDto> getAllPosts(PostSearchDto searchDto) {
-        return postMapper.convertToDtoList(postRepository.findAll(getSpecification(searchDto)));
-    }
-
     //*TODO брать за пример
     public PostDto createPost(PostDto postDto) {
         log.info("Post to save - " + postDto);
@@ -54,6 +45,20 @@ public class PostService {
         return postMapper.convertToDto(post);
     }
 
+    public PostDto getPostById(Long id) {
+
+        log.info("PostService in getById tried to find post with id: " + id);
+        return postMapper.convertToDto(postRepository.findById(id).orElseThrow(ObjectNotFoundException::new));
+
+    }
+
+    public Page<PostDto> getAllPosts(PostSearchDto searchDto, Pageable page) {
+
+        Page<Post> postPage = postRepository.findAll(getSpecification(searchDto), page);
+        return postPage.map(postMapper::convertToDto);
+
+    }
+
     public PostDto updatePost(PostDto postDto) {
 
         Post post = postRepository.save(postMapper.convertToEntity(postDto));
@@ -62,11 +67,22 @@ public class PostService {
         return postMapper.convertToDto(post);
     }
 
-    public static Specification<Post> getSpecification(PostSearchDto searchDto) {
+    public void deletePostById(Long id) {
+        log.info("PostService: Post ID to del - " + id);
+        postRepository.deleteById(id);
+    }
+
+    private Specification<Post> getSpecification(PostSearchDto searchDto) {
         return getBaseSpecification(searchDto)
-                .and(like(Post_.postText, searchDto.getPostText(), true)
-                        .and(like(Post_.title, searchDto.getTitle(), true)
-                                .and(equal(Post_.authorId, searchDto.getAuthorId(), true))));
+                .and(in(Post_.id, Arrays.stream(searchDto.getIds()).toList(), true))
+                .and(in(Post_.authorId, Arrays.stream(searchDto.getAccountIds()).toList(), true))
+                .and(notIn(Post_.authorId, Arrays.stream(searchDto.getBlockedIds()).toList(), true))
+// в Post нет author --- .and(equal(Post_.author, searchDto.getAuthor(), true)
+                .and(equal(Post_.title, searchDto.getTitle(), true)
+                        .and(equal(Post_.postText, searchDto.getPostText(), true)
+// в Post нет withFriends --- .and(equal(Post_.withFriends, searchDto.getWithFriends(), true)
+// в Post нет tags --- .and(in(Post_.tags, Arrays.stream(searchDto.getTags()).toList(), true))
+                                .and(between(Post_.publishDate, searchDto.getDateFrom(), searchDto.getDateTo()))));
     }
 
     public String savePhoto(MultipartFile request) throws IOException {
@@ -81,10 +97,5 @@ public class PostService {
         log.info("successfully uploaded the file" + uploadResult.get("name"));
 
         return uploadResult.get("url").toString();
-    }
-
-    public void deleteUserById(Long id) {
-        log.info("User ID to del - " + id);
-        postRepository.deleteById(id);
     }
 }

@@ -1,4 +1,4 @@
-package ru.skillbox.diplom.group32.social.service.model.post;
+package ru.skillbox.diplom.group32.social.service.model.post.comment;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -16,8 +16,12 @@ import java.time.ZonedDateTime;
 @Setter
 @RequiredArgsConstructor
 @ToString
-@Table(name = "post")
-public class Post extends BaseEntity {
+@Table(name = "comment")
+public class Comment extends BaseEntity {
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "comment_type")
+    private CommentType commentType;
 
     @CreatedDate
     @Column(columnDefinition = "TIMESTAMP WITH TIME ZONE")
@@ -30,14 +34,14 @@ public class Post extends BaseEntity {
     @Column(name = "author_id")
     private Long authorId;
 
-    @Column(name = "title", nullable = false)
-    private String title;
+    @Column(name = "parent_id")
+    private Long parentId;
 
-    @Enumerated(EnumType.STRING)
-    private Type type;
+    @Column(name = "comment_text", nullable = false)
+    private String commentText;
 
-    @Column(name = "post_text", nullable = false)
-    private String postText;
+    @Column(name = "post_id")
+    private Long postId;
 
     @Column(name = "is_blocked")
     private Boolean isBlocked;
@@ -45,21 +49,16 @@ public class Post extends BaseEntity {
     @Column(name = "is_deleted")
     private Boolean isDeleted;
 
-    @Column(name = "comments_count")
-    private Long commentsCount;
-
-//    private List<Tag> tags;
-
     @Column(name = "like_amount")
     private Long likeAmount;
 
     @Column(name = "my_like")
     private Boolean myLike;
 
-    @Column(name = "image_path", nullable = false)
-    private String imagePath;
+    @Column(name = "comments_count")
+    private Long commentsCount;
 
-    @Column(name = "publish_date", columnDefinition = "TIMESTAMP WITH TIME ZONE")
-    private ZonedDateTime publishDate;
+    @Column(name = "image_path")
+    private String imagePath;
 
 }
