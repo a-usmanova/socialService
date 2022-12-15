@@ -9,6 +9,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import ru.skillbox.diplom.group32.social.service.config.security.JwtConfigurer;
 import ru.skillbox.diplom.group32.social.service.config.security.JwtTokenProvider;
@@ -21,7 +22,10 @@ public class SecurityConfig {
     private final JwtTokenProvider jwtTokenProvider;
 
     private static final String LOGIN_ENDPOINT = "/api/v1/auth/login";
+    private static final String REGISTER_ENDPOINT = "/api/v1/auth/register";
+    private static final String CAPTCHA = "/api/v1/auth/captcha";
     private static final String GET_ENDPOINT = "/api/v1/auth/{id}";
+
 
 
     @Bean
@@ -36,7 +40,7 @@ public class SecurityConfig {
                 .and()
                 .csrf().disable()
                 .authorizeRequests()
-                .antMatchers(LOGIN_ENDPOINT).permitAll()
+                .antMatchers(LOGIN_ENDPOINT, REGISTER_ENDPOINT, CAPTCHA).permitAll()
                 .antMatchers(GET_ENDPOINT).hasAuthority("ADMIN")
                 .and()
                 .httpBasic()
@@ -48,4 +52,8 @@ public class SecurityConfig {
         return httpSecurity.build();
     }
 
+    @Bean
+    public BCryptPasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 }

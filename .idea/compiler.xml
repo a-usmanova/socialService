@@ -16,7 +16,7 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <option name="generatedTranslationFilesPath" value="C:\dev\social-service-auth\api/target/generated-translation-files" />
+        <option name="generatedTranslationFilesPath" value="C:\Users\Solibr\YandexDisk\SkillboxProject\social-service\api/target/generated-translation-files" />
         <option name="mapstruct.defaultComponentModel" value="spring" />
         <option name="mapstruct.suppressGeneratorTimestamp" value="true" />
         <processorPath useClasspath="false">
@@ -39,7 +39,7 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <option name="generatedTranslationFilesPath" value="C:\dev\social-service-auth\domain/target/generated-translation-files" />
+        <option name="generatedTranslationFilesPath" value="C:\Users\Solibr\YandexDisk\SkillboxProject\social-service\domain/target/generated-translation-files" />
         <option name="mapstruct.defaultComponentModel" value="spring" />
         <option name="mapstruct.suppressGeneratorTimestamp" value="true" />
         <processorPath useClasspath="false">
@@ -62,7 +62,7 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <option name="generatedTranslationFilesPath" value="C:\dev\social-service-auth\impl/target/generated-translation-files" />
+        <option name="generatedTranslationFilesPath" value="C:\Users\Solibr\YandexDisk\SkillboxProject\social-service\impl/target/generated-translation-files" />
         <option name="mapstruct.defaultComponentModel" value="spring" />
         <option name="mapstruct.suppressGeneratorTimestamp" value="true" />
         <processorPath useClasspath="false">
@@ -85,7 +85,7 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <option name="generatedTranslationFilesPath" value="C:\dev\social-service-auth\db/target/generated-translation-files" />
+        <option name="generatedTranslationFilesPath" value="C:\Users\Solibr\YandexDisk\SkillboxProject\social-service\db/target/generated-translation-files" />
         <option name="mapstruct.defaultComponentModel" value="spring" />
         <option name="mapstruct.suppressGeneratorTimestamp" value="true" />
         <processorPath useClasspath="false">
@@ -112,12 +112,12 @@
       <module name="db" options="-parameters" />
       <module name="domain" options="-parameters" />
       <module name="impl" options="-parameters" />
-      <module name="social-service" options="-parameters -Amapstruct.suppressGeneratorTimestamp=true -Amapstruct.defaultComponentModel=spring -AgeneratedTranslationFilesPath=C:\dev\social-service/target/generated-translation-files" />
-      <module name="social-service-api" options="-parameters -Amapstruct.suppressGeneratorTimestamp=true -Amapstruct.defaultComponentModel=spring -AgeneratedTranslationFilesPath=C:\dev\social-service\api/target/generated-translation-files" />
+      <module name="social-service" options="-parameters -Amapstruct.suppressGeneratorTimestamp=true -Amapstruct.defaultComponentModel=spring -AgeneratedTranslationFilesPath=C:\Users\Solibr\YandexDisk\SkillboxProject\social-service/target/generated-translation-files" />
+      <module name="social-service-api" options="-parameters -Amapstruct.suppressGeneratorTimestamp=true -Amapstruct.defaultComponentModel=spring -AgeneratedTranslationFilesPath=C:\Users\Solibr\YandexDisk\SkillboxProject\social-service\api/target/generated-translation-files" />
       <module name="social-service-auth" options="-parameters -Amapstruct.suppressGeneratorTimestamp=true -Amapstruct.defaultComponentModel=spring -AgeneratedTranslationFilesPath=C:\dev\social-service-auth/target/generated-translation-files" />
-      <module name="social-service-db" options="-parameters -Amapstruct.suppressGeneratorTimestamp=true -Amapstruct.defaultComponentModel=spring -AgeneratedTranslationFilesPath=C:\dev\social-service\db/target/generated-translation-files" />
-      <module name="social-service-domain" options="-parameters -Amapstruct.suppressGeneratorTimestamp=true -Amapstruct.defaultComponentModel=spring -AgeneratedTranslationFilesPath=C:\dev\social-service\domain/target/generated-translation-files" />
-      <module name="social-service-impl" options="-parameters -Amapstruct.suppressGeneratorTimestamp=true -Amapstruct.defaultComponentModel=spring -AgeneratedTranslationFilesPath=C:\dev\social-service\impl/target/generated-translation-files" />
+      <module name="social-service-db" options="-parameters -Amapstruct.suppressGeneratorTimestamp=true -Amapstruct.defaultComponentModel=spring -AgeneratedTranslationFilesPath=C:\Users\Solibr\YandexDisk\SkillboxProject\social-service\db/target/generated-translation-files" />
+      <module name="social-service-domain" options="-parameters -Amapstruct.suppressGeneratorTimestamp=true -Amapstruct.defaultComponentModel=spring -AgeneratedTranslationFilesPath=C:\Users\Solibr\YandexDisk\SkillboxProject\social-service\domain/target/generated-translation-files" />
+      <module name="social-service-impl" options="-parameters -Amapstruct.suppressGeneratorTimestamp=true -Amapstruct.defaultComponentModel=spring -AgeneratedTranslationFilesPath=C:\Users\Solibr\YandexDisk\SkillboxProject\social-service\impl/target/generated-translation-files" />
     </option>
   </component>
 </project>

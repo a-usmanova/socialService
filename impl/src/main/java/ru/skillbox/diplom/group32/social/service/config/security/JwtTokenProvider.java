@@ -34,10 +34,6 @@ public class JwtTokenProvider {
 
     private final JwtUserDetailsService jwtUserDetailsService;
 
-    @Bean
-    public BCryptPasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
 
     @PostConstruct
     protected void init() {

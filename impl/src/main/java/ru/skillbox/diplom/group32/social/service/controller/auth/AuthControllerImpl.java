@@ -26,8 +26,12 @@ public class AuthControllerImpl implements AuthController {
 
     @Override
     @ResponseStatus(HttpStatus.OK)
+    public void logout() {}
+
+    @Override
+    @ResponseStatus(HttpStatus.OK)
     public void register(RegistrationDto registrationDto) {
-//        authService.register(registrationDto);
+        authService.register(registrationDto);
     }
 
     @Override
