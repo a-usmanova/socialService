@@ -7,9 +7,12 @@ import lombok.ToString;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import ru.skillbox.diplom.group32.social.service.model.base.BaseEntity;
+import ru.skillbox.diplom.group32.social.service.model.tag.Tag;
 
 import javax.persistence.*;
 import java.time.ZonedDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -42,13 +45,16 @@ public class Post extends BaseEntity {
     @Column(name = "is_blocked")
     private Boolean isBlocked;
 
-    @Column(name = "is_deleted")
-    private Boolean isDeleted;
-
     @Column(name = "comments_count")
     private Long commentsCount;
 
-//    private List<Tag> tags;
+    @ToString.Exclude
+    @ManyToMany
+    @JoinTable(
+            name = "post_tag",
+            joinColumns = @JoinColumn(name = "post_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "tag_id", referencedColumnName = "id"))
+    private Set<Tag> tags = new HashSet();
 
     @Column(name = "like_amount")
     private Long likeAmount;

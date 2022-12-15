@@ -6,16 +6,14 @@ import ru.skillbox.diplom.group32.social.service.model.base.BaseEntity_;
 import ru.skillbox.diplom.group32.social.service.model.base.BaseSearchDto;
 
 import javax.persistence.metamodel.SingularAttribute;
-import java.time.ZonedDateTime;
 import java.util.Collection;
+import java.time.ZonedDateTime;
 import java.util.function.Supplier;
 
 @Component
 public class SpecificationUtil {
 
-    public static final Specification EMPTY_SPECIFICATION = (root, query, criteriaBuilder) -> {
-        return null;
-    };
+    public static final Specification EMPTY_SPECIFICATION = (root, query, criteriaBuilder) -> {return null;};
 
     public static <T, V> Specification<T> in(SingularAttribute<T, V> field, Collection<V> value, boolean isSkipNullValues) {
         return nullValueCheck(value, isSkipNullValues, () -> {
