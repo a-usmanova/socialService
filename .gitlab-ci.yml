@@ -1,6 +1,13 @@
 image: maven:3-openjdk-18-slim
 
-build-job:
+
+stages:
+  - build
+  - deploy_docker
+  - deploy_k8s
+
+
+build:
   stage: build
   only:
     - develop
@@ -11,9 +18,9 @@ build-job:
     paths:
       - impl/target
 
-deploy-prod:
+deploy_docker:
   image: docker:19.03.12
-  stage: deploy
+  stage: deploy_docker
   only:
     - develop
   before_script:
@@ -29,3 +36,22 @@ deploy-prod:
       - impl/target/social-service-impl-1.0.0-SNAPSHOT-exec.jar
 
   environment: production
+
+deploy_prod:
+  stage: deploy_k8s
+  only:
+    - develop
+  except:
+    - tags
+  before_script:
+    - which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )
+    - eval $(ssh-agent -s)
+    - echo "$SSH_PRIVATE_KEY" | ssh-add -
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - ssh-keyscan $PROD_HOST >> ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
+  script:
+    - ssh $PROD_USER@$PROD_HOST "kubectl rollout restart -n $NAMESPACE deployment $DEPLOYMENT_NAME"
+
+
