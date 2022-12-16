@@ -11,22 +11,7 @@
     <changeSet author="kazakov_i" id="account-table-create">
         <createTable tableName="account">
             <column name="id" type="BIGINT">
-                <constraints nullable="false" primaryKey="true" foreignKeyName="account_user_id_fk" references="user"/>
-            </column>
-            <column name="firstname" type="VARCHAR(255)">
-                <constraints nullable="false" />
-            </column>
-            <column name="lastname" type="VARCHAR(255)">
-                <constraints nullable="false" />
-            </column>
-            <column name="email" type="VARCHAR(255)">
-                <constraints nullable="false" />
-            </column>
-            <column name="is_deleted" type="BOOLEAN">
-                <constraints nullable="false" />
-            </column>
-            <column name="password" type="VARCHAR(255)">
-                <constraints nullable="false" />
+                <constraints nullable="false" primaryKey="true"/>
             </column>
             <column name="phone" type="VARCHAR(255)">
                 <constraints nullable="false" />

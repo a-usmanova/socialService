@@ -27,7 +27,6 @@ spring:
 jwt:
   token:
     secret: skillboxJWTSecretsecretskillboxJWTSecretsecret
-    expired: 3600000
 
 cloudinary:
     development:

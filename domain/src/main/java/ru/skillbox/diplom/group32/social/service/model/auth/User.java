@@ -15,6 +15,7 @@ import java.util.List;
 @NoArgsConstructor
 @ToString
 @Table(name = "user")
+@Inheritance(strategy = InheritanceType.JOINED)
 public class User extends BaseEntity {
 
     @Column(columnDefinition = "VARCHAR(255)", nullable = false)

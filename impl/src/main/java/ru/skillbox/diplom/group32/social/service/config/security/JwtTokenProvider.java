@@ -7,11 +7,9 @@ import com.nimbusds.jose.proc.SecurityContext;
 import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.jose.jws.JwsAlgorithm;
 import org.springframework.security.oauth2.jwt.*;
 import org.springframework.stereotype.Component;
@@ -23,7 +21,9 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.http.HttpServletRequest;
 import java.time.ZonedDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -67,7 +67,7 @@ public class JwtTokenProvider {
 
     }
 
-
+    //TODO new JwtAuthenticationToken() instead of UsernamePasswordAuthenticationToken
     public Authentication getAuthentication(String token) {
 
         UserDetails userDetails = jwtUserDetailsService.loadUserByEmail(getEmail(token));
@@ -80,8 +80,8 @@ public class JwtTokenProvider {
 
     public String resolveToken(HttpServletRequest req) {
         String skillToken = req.getHeader("Authorization");
-        if (skillToken != null && skillToken.startsWith("Skillbox_")) {
-            return skillToken.substring(9, skillToken.length());
+        if (skillToken != null && skillToken.startsWith("Bearer_")) {
+            return skillToken.substring(7, skillToken.length());
         }
         return null;
     }
@@ -91,7 +91,7 @@ public class JwtTokenProvider {
 
             Jwt jwt = jwtDecoder().decode(token);
 
-            if (!jwt.getExpiresAt().isBefore(ZonedDateTime.now().toInstant()) && !jwt.getExpiresAt().isAfter(ZonedDateTime.now().minusHours(1).toInstant()) ) {
+            if (!jwt.getExpiresAt().isBefore(ZonedDateTime.now().toInstant()) && !jwt.getExpiresAt().isAfter(ZonedDateTime.now().minusHours(1).toInstant())) {
                 return false;
             }
 
