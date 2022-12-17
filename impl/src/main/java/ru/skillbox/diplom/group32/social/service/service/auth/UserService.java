@@ -3,7 +3,6 @@ package ru.skillbox.diplom.group32.social.service.service.auth;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.skillbox.diplom.group32.social.service.config.security.exception.UserNotFoundException;
@@ -12,7 +11,7 @@ import ru.skillbox.diplom.group32.social.service.model.auth.User;
 import ru.skillbox.diplom.group32.social.service.model.auth.UserDto;
 import ru.skillbox.diplom.group32.social.service.repository.auth.RoleRepository;
 import ru.skillbox.diplom.group32.social.service.repository.auth.UserRepository;
-import ru.skillbox.diplom.group32.social.service.repository.mapper.UserMapper;
+import ru.skillbox.diplom.group32.social.service.mapper.auth.UserMapper;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -25,8 +25,7 @@ public class SecurityConfig {
     private static final String REGISTER_ENDPOINT = "/api/v1/auth/register";
     private static final String CAPTCHA = "/api/v1/auth/captcha";
     private static final String GET_ENDPOINT = "/api/v1/auth/{id}";
-
-
+    private static final String ACC_ENDPOINT = "/api/v1/account/me";
 
     @Bean
     public AuthenticationManager authenticationManagerBean(AuthenticationConfiguration authenticationConfiguration) throws Exception {
@@ -40,8 +39,8 @@ public class SecurityConfig {
                 .and()
                 .csrf().disable()
                 .authorizeRequests()
-                .antMatchers(LOGIN_ENDPOINT, REGISTER_ENDPOINT, CAPTCHA).permitAll()
-                .antMatchers(GET_ENDPOINT).hasAuthority("ADMIN")
+                .antMatchers(LOGIN_ENDPOINT, REGISTER_ENDPOINT, CAPTCHA, ACC_ENDPOINT).permitAll()
+//                .antMatchers(GET_ENDPOINT).hasAuthority("ADMIN")
                 .and()
                 .httpBasic()
                 .and()

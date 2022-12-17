@@ -1,4 +1,4 @@
-package ru.skillbox.diplom.group32.social.service.repository.mapper;
+package ru.skillbox.diplom.group32.social.service.mapper.auth;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

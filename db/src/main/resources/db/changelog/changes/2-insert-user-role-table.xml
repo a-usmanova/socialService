@@ -19,19 +19,5 @@
         </insert>
     </changeSet>
 
-    <changeSet author="kazakov_i" id="user-roles-table-insert-roles">
-        <insert tableName="user_roles">
-            <column name="user_id" value="1"/>
-            <column name="role_id" value="1"/>
-        </insert>
-        <insert tableName="user_roles">
-            <column name="user_id" value="2"/>
-            <column name="role_id" value="1"/>
-        </insert>
-        <insert tableName="user_roles">
-            <column name="user_id" value="2"/>
-            <column name="role_id" value="2"/>
-        </insert>
-    </changeSet>
 
 </databaseChangeLog>

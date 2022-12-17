@@ -6,7 +6,9 @@ import org.springframework.data.repository.NoRepositoryBean;
 import ru.skillbox.diplom.group32.social.service.model.base.BaseEntity;
 
 import javax.persistence.EntityManager;
+import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
+import java.util.Optional;
 
 @NoRepositoryBean
 public class BaseRepositoryImpl<Entity extends BaseEntity>
@@ -52,6 +54,15 @@ public class BaseRepositoryImpl<Entity extends BaseEntity>
     @Override
     public void hardDelete(Entity entity) {
         super.delete(entity);
+    }
+
+    @Transactional
+    @Override
+    public Optional<Entity> findById(Long id) {
+        if (super.findById(id).isEmpty()){
+            throw new EntityNotFoundException();
+        }
+        return super.findById(id);
     }
 
 }
