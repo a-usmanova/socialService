@@ -11,6 +11,7 @@
     <include file="db/changelog/changes/2-insert-user-role-table.xml"/>
     <include file="db/changelog/changes/3-create-account-table.xml"/>
     <include file="db/changelog/changes/4-create-post-table.xml"/>
+    <include file="db/changelog/changes/5-change-account-table.xml"/>
 
 
 </databaseChangeLog>

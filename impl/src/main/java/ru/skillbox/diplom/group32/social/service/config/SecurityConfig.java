@@ -8,10 +8,12 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import ru.skillbox.diplom.group32.social.service.config.security.JwtConfigurer;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutFilter;
+import ru.skillbox.diplom.group32.social.service.config.security.AuthorizationFilter;
+import ru.skillbox.diplom.group32.social.service.config.security.JwtTokenFilter;
 import ru.skillbox.diplom.group32.social.service.config.security.JwtTokenProvider;
 
 @Configuration
@@ -21,11 +23,12 @@ public class SecurityConfig {
 
     private final JwtTokenProvider jwtTokenProvider;
 
+
     private static final String LOGIN_ENDPOINT = "/api/v1/auth/login";
     private static final String REGISTER_ENDPOINT = "/api/v1/auth/register";
     private static final String CAPTCHA = "/api/v1/auth/captcha";
-    private static final String GET_ENDPOINT = "/api/v1/auth/{id}";
-    private static final String ACC_ENDPOINT = "/api/v1/account/me";
+    private static final String ACC_ME_ENDPOINT = "/api/v1/account/me";
+    private static final String ACC_ENDPOINT = "/api/v1/account";
 
     @Bean
     public AuthenticationManager authenticationManagerBean(AuthenticationConfiguration authenticationConfiguration) throws Exception {
@@ -39,13 +42,13 @@ public class SecurityConfig {
                 .and()
                 .csrf().disable()
                 .authorizeRequests()
-                .antMatchers(LOGIN_ENDPOINT, REGISTER_ENDPOINT, CAPTCHA, ACC_ENDPOINT).permitAll()
+                .antMatchers(LOGIN_ENDPOINT, REGISTER_ENDPOINT, CAPTCHA, ACC_ME_ENDPOINT, ACC_ENDPOINT, REGISTER_ENDPOINT).permitAll()
 //                .antMatchers(GET_ENDPOINT).hasAuthority("ADMIN")
                 .and()
                 .httpBasic()
                 .and()
-                .apply(new JwtConfigurer(jwtTokenProvider))
-                .and()
+                .addFilterBefore(new AuthorizationFilter(), LogoutFilter.class)
+                .addFilterBefore(new JwtTokenFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         return httpSecurity.build();

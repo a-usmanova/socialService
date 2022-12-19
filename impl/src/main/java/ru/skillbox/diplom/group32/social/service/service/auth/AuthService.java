@@ -9,11 +9,14 @@ import ru.skillbox.diplom.group32.social.service.config.security.exception.Passw
 import ru.skillbox.diplom.group32.social.service.config.security.exception.UserAlreadyExistsException;
 import ru.skillbox.diplom.group32.social.service.config.security.exception.UserNotFoundException;
 import ru.skillbox.diplom.group32.social.service.config.security.exception.WrongPasswordException;
+import ru.skillbox.diplom.group32.social.service.mapper.auth.UserMapper;
 import ru.skillbox.diplom.group32.social.service.model.auth.*;
 import ru.skillbox.diplom.group32.social.service.repository.auth.RoleRepository;
 import ru.skillbox.diplom.group32.social.service.repository.auth.UserRepository;
-import ru.skillbox.diplom.group32.social.service.mapper.auth.UserMapper;
+import ru.skillbox.diplom.group32.social.service.service.account.AccountService;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,8 +34,11 @@ public class AuthService {
 
     private final PasswordEncoder passwordEncoder;
 
-    public AuthenticateResponseDto login(AuthenticateDto authenticateDto) {
+    private final HttpServletResponse httpServletResponse;
 
+    private final AccountService accountService;
+
+    public AuthenticateResponseDto login(AuthenticateDto authenticateDto) {
         String email = authenticateDto.getEmail();
         User user = userRepository.findUserByEmail(email).orElseThrow(() -> new UserNotFoundException("User with email: " + email + " not found"));
         log.info("User with email: " + email + " found");
@@ -42,7 +48,16 @@ public class AuthService {
             throw new WrongPasswordException("Wrong password");
         }
         String token = jwtTokenProvider.createToken(user.getId(), email, user.getRoles());
+
+        setCookie(token);
+
         return new AuthenticateResponseDto(token, token);
+    }
+
+    public void setCookie(String token) {
+        Cookie jwtCookie = new Cookie("jwt", token);
+        jwtCookie.setPath("/");
+        httpServletResponse.addCookie(jwtCookie);
     }
 
     public UserDto register(RegistrationDto registrationDto) {
@@ -78,7 +93,7 @@ public class AuthService {
         userToDB.setPassword(passwordEncoder.encode(userDto.getPassword()));
         log.info("Created User to save - " + userToDB);
 
-        userRepository.save(userToDB);
+        accountService.createAccount(userToDB);
         log.info("Created User saved to db - " + userToDB);
 
         UserDto userDtoResult = userMapper.userToDto(userToDB);

@@ -6,8 +6,11 @@ import org.springframework.stereotype.Service;
 import ru.skillbox.diplom.group32.social.service.mapper.account.AccountMapper;
 import ru.skillbox.diplom.group32.social.service.model.account.Account;
 import ru.skillbox.diplom.group32.social.service.model.account.AccountDto;
+import ru.skillbox.diplom.group32.social.service.model.auth.User;
 import ru.skillbox.diplom.group32.social.service.repository.account.AccountRepository;
 import ru.skillbox.diplom.group32.social.service.utils.security.SecurityUtil;
+
+import java.time.ZonedDateTime;
 
 @Slf4j
 @Service
@@ -16,6 +19,17 @@ public class AccountService {
 
     private final AccountRepository accountRepository;
     private final AccountMapper accountMapper;
+
+    public void createAccount(User user) {
+        Account account = accountMapper.userToAccount(user);
+        account.setIsBlocked(false);
+        account.setRegDate(ZonedDateTime.now());
+        account.setCreatedOn(ZonedDateTime.now());
+        account.setUpdatedOn(ZonedDateTime.now());
+
+        accountRepository.save(account);
+        log.info("Account saved - " + account);
+    }
 
     public AccountDto getAccount() {
         Long userId = SecurityUtil.getJwtUserIdFromSecurityContext();
