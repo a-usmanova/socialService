@@ -1,0 +1,39 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext
+   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd
+   http://www.liquibase.org/xml/ns/dbchangelog
+   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+
+    <changeSet author="kazakov_i" id="change-account-table">
+        <dropNotNullConstraint  columnName="phone"
+                                tableName="account"/>
+        <dropNotNullConstraint  columnName="photo"
+                                tableName="account"/>
+        <dropNotNullConstraint  columnName="about"
+                                tableName="account"/>
+        <dropNotNullConstraint  columnName="city"
+                                tableName="account"/>
+        <dropNotNullConstraint  columnName="country"
+                                tableName="account"/>
+        <dropNotNullConstraint  columnName="status_code"
+                                tableName="account"/>
+        <dropNotNullConstraint  columnName="message_permission"
+                                tableName="account"/>
+        <dropNotNullConstraint  columnName="last_online_time"
+                                tableName="account"/>
+        <dropNotNullConstraint  columnName="is_online"
+                                tableName="account"/>
+        <dropNotNullConstraint  columnName="photo_id"
+                                tableName="account"/>
+        <dropNotNullConstraint  columnName="photo_name"
+                                tableName="account"/>
+    </changeSet>
+
+
+
+
+</databaseChangeLog>

@@ -19,7 +19,7 @@ import ru.skillbox.diplom.group32.social.service.model.auth.Role;
 import javax.annotation.PostConstruct;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
-import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Base64;
@@ -57,7 +57,7 @@ public class JwtTokenProvider {
                 .claim("id", userId)
                 .claim("email", email)
                 .claim("roles", getRoleNames(roles))
-                .expiresAt(ZonedDateTime.now().plusMinutes(5).toInstant())
+                .expiresAt(ZonedDateTime.now().plusHours(1).toInstant())
                 .build();
         JwsAlgorithm jwsAlgorithm = () -> JWSAlgorithm.HS256.getName();
 
@@ -78,8 +78,8 @@ public class JwtTokenProvider {
         return jwtDecoder().decode(token).getClaim("email");
     }
 
-    public String resolveToken(HttpServletRequest req) {
-        String skillToken = req.getHeader("Authorization");
+    public String resolveToken(HttpServletResponse response) {
+        String skillToken = response.getHeader("Authorization");
         if (skillToken != null && skillToken.startsWith("Bearer_")) {
             return skillToken.substring(7, skillToken.length());
         }
