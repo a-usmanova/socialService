@@ -38,7 +38,7 @@ public class AuthService {
 
     private final AccountService accountService;
 
-    public AuthenticateResponseDto login(AuthenticateDto authenticateDto) {
+    public AuthenticateResponseDto login(AuthenticateDto authenticateDto, HttpServletResponse response) {
         String email = authenticateDto.getEmail();
         User user = userRepository.findUserByEmail(email).orElseThrow(() -> new UserNotFoundException("User with email: " + email + " not found"));
         log.info("User with email: " + email + " found");
@@ -49,15 +49,14 @@ public class AuthService {
         }
         String token = jwtTokenProvider.createToken(user.getId(), email, user.getRoles());
 
-        setCookie(token);
+        setCookie(response, token);
 
         return new AuthenticateResponseDto(token, token);
     }
 
-    public void setCookie(String token) {
+    public void setCookie(HttpServletResponse response, String token) {
         Cookie jwtCookie = new Cookie("jwt", token);
-        jwtCookie.setPath("/");
-        httpServletResponse.addCookie(jwtCookie);
+        response.addCookie(jwtCookie);
     }
 
     public UserDto register(RegistrationDto registrationDto) {

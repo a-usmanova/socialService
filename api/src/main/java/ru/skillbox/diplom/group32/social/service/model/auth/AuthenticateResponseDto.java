@@ -1,12 +1,13 @@
 package ru.skillbox.diplom.group32.social.service.model.auth;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
 
 @Data
 @AllArgsConstructor
 public class AuthenticateResponseDto {
 
-    private String email;
-    private String token;
+    private String accessToken;
+    private String refreshToken;
 }

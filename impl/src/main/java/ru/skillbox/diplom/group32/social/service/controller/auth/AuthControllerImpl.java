@@ -12,6 +12,8 @@ import ru.skillbox.diplom.group32.social.service.model.auth.RegistrationDto;
 import ru.skillbox.diplom.group32.social.service.resource.auth.AuthController;
 import ru.skillbox.diplom.group32.social.service.service.auth.AuthService;
 
+import javax.servlet.http.HttpServletResponse;
+
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -20,8 +22,8 @@ public class AuthControllerImpl implements AuthController {
     private final AuthService authService;
 
     @Override
-    public ResponseEntity<AuthenticateResponseDto> login(AuthenticateDto authenticateDto) {
-        return ResponseEntity.ok(authService.login(authenticateDto));
+    public ResponseEntity<AuthenticateResponseDto> login(AuthenticateDto authenticateDto, HttpServletResponse response) {
+        return ResponseEntity.ok(authService.login(authenticateDto, response));
     }
 
     @Override

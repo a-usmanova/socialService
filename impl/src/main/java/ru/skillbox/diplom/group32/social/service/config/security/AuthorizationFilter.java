@@ -30,7 +30,7 @@ public class AuthorizationFilter extends GenericFilterBean {
         }
 
         HttpServletResponse resp = (HttpServletResponse) servletResponse;
-        if (cookie != null) {
+        if (cookie != null && !cookie.getValue().equals("")) {
             resp.addHeader("Authorization", "Bearer_" + cookie.getValue());
         }
 

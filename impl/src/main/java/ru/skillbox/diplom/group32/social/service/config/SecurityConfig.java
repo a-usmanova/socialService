@@ -47,7 +47,7 @@ public class SecurityConfig {
                 .and()
                 .httpBasic()
                 .and()
-                .addFilterBefore(new AuthorizationFilter(), LogoutFilter.class)
+                .addFilterAfter(new AuthorizationFilter(), LogoutFilter.class)
                 .addFilterBefore(new JwtTokenFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
