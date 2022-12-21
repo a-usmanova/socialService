@@ -3,15 +3,17 @@ package ru.skillbox.diplom.group32.social.service.controller.account;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RestController;
 import ru.skillbox.diplom.group32.social.service.model.account.AccountDto;
 import ru.skillbox.diplom.group32.social.service.model.account.AccountSearchDto;
 import ru.skillbox.diplom.group32.social.service.resource.account.AccountController;
 import ru.skillbox.diplom.group32.social.service.service.account.AccountService;
-
-import java.util.List;
 
 @Slf4j
 @RestController
@@ -37,7 +39,7 @@ public class AccountControllerImpl implements AccountController {
     }
 
     @Override
-    public ResponseEntity<Page<List<AccountDto>>> getAll(AccountSearchDto searchDto) {
+    public ResponseEntity<Page<AccountDto>> getAll(AccountSearchDto searchDto, Pageable page) {
         return new ResponseEntity<>(HttpStatus.METHOD_NOT_ALLOWED);
     }
 

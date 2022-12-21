@@ -13,19 +13,16 @@ import java.time.ZonedDateTime;
 @AllArgsConstructor
 public class PostSearchDto extends BaseSearchDto {
 
-    private ZonedDateTime time;
-    private ZonedDateTime timeChanged;
-    private Integer authorId;
+    private Long[] ids;
+    private Long[] accountIds;
+    private Long[] blockedIds;
+    private String author;
     private String title;
-    private Type type;
     private String postText;
-    private Boolean isBlocked;
+    private Boolean withFriends;
     private Boolean isDeleted;
-    private Integer commentsCount;
     private String[] tags;
-    private Integer likeAmount;
-    private Boolean myLike;
-    private String imagePath;
-    private ZonedDateTime publishDate;
+    private ZonedDateTime dateFrom;
+    private ZonedDateTime dateTo;
 
 }
