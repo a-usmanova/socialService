@@ -2,8 +2,6 @@ package ru.skillbox.diplom.group32.social.service.resource.base;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.skillbox.diplom.group32.social.service.model.base.BaseDto;
@@ -15,13 +13,12 @@ public interface BaseController<Dto extends BaseDto, SearchDto extends BaseSearc
     ResponseEntity<Dto> getById(@PathVariable Long id);
 
     @GetMapping(value = "/")
-    ResponseEntity<Page<Dto>> getAll(@RequestBody SearchDto searchDto,
-                                           @PageableDefault(sort = {"id"}, direction = Sort.Direction.DESC) Pageable page);
+    ResponseEntity<Page<Dto>> getAll(@RequestBody SearchDto searchDto, Pageable page);
 
-    @PostMapping(value = "/create")
+    @PostMapping(value = "/")
     ResponseEntity<Dto> create(@RequestBody Dto dto);
 
-    @PutMapping(value = "/update")
+    @PutMapping(value = "/")
     ResponseEntity<Dto> update(@RequestBody Dto dto);
 
     @DeleteMapping(value = "/{id}")
