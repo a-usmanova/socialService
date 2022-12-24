@@ -10,15 +10,15 @@ public class PostDto extends BaseDto {
 
     private ZonedDateTime time;
     private ZonedDateTime timeChanged;
-    private Integer authorId;
+    private Long authorId;
     private String title;
     private Type type;
     private String postText;
     private Boolean isBlocked;
     private Boolean isDeleted;
-    private Integer commentsCount;
+    private Long commentsCount;
     private String[] tags;
-    private Integer likeAmount;
+    private Long likeAmount;
     private Boolean myLike;
     private String imagePath;
     private ZonedDateTime publishDate;
