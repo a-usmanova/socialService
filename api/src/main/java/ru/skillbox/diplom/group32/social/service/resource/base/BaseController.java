@@ -12,13 +12,13 @@ public interface BaseController<Dto extends BaseDto, SearchDto extends BaseSearc
     @GetMapping(value = "/{id}")
     ResponseEntity<Dto> getById(@PathVariable Long id);
 
-    @GetMapping(value = "/")
-    ResponseEntity<Page<Dto>> getAll(@RequestBody SearchDto searchDto, Pageable page);
+    @GetMapping
+    ResponseEntity<Page<Dto>> getAll(SearchDto searchDto, Pageable page);
 
-    @PostMapping(value = "/")
+    @PostMapping
     ResponseEntity<Dto> create(@RequestBody Dto dto);
 
-    @PutMapping(value = "/")
+    @PutMapping
     ResponseEntity<Dto> update(@RequestBody Dto dto);
 
     @DeleteMapping(value = "/{id}")

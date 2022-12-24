@@ -19,7 +19,6 @@ import ru.skillbox.diplom.group32.social.service.model.post.Post_;
 import ru.skillbox.diplom.group32.social.service.repository.post.PostRepository;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Map;
 
 import static ru.skillbox.diplom.group32.social.service.utils.specification.SpecificationUtil.*;
@@ -74,9 +73,9 @@ public class PostService {
 
     private Specification<Post> getSpecification(PostSearchDto searchDto) {
         return getBaseSpecification(searchDto)
-                .and(in(Post_.id, Arrays.stream(searchDto.getIds()).toList(), true))
-                .and(in(Post_.authorId, Arrays.stream(searchDto.getAccountIds()).toList(), true))
-                .and(notIn(Post_.authorId, Arrays.stream(searchDto.getBlockedIds()).toList(), true))
+                .and(in(Post_.id, searchDto.getIds(), true))
+                .and(in(Post_.authorId, searchDto.getAccountIds(), true))
+                .and(notIn(Post_.authorId, searchDto.getBlockedIds(), true))
 // в Post нет author --- .and(equal(Post_.author, searchDto.getAuthor(), true)
                 .and(equal(Post_.title, searchDto.getTitle(), true)
                         .and(equal(Post_.postText, searchDto.getPostText(), true)
