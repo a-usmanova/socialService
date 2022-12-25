@@ -12,15 +12,14 @@ import org.springframework.web.multipart.MultipartFile;
 import ru.skillbox.diplom.group32.social.service.config.Properties;
 import ru.skillbox.diplom.group32.social.service.exception.ObjectNotFoundException;
 import ru.skillbox.diplom.group32.social.service.mapper.post.PostMapper;
-import ru.skillbox.diplom.group32.social.service.model.post.Post;
-import ru.skillbox.diplom.group32.social.service.model.post.PostDto;
-import ru.skillbox.diplom.group32.social.service.model.post.PostSearchDto;
-import ru.skillbox.diplom.group32.social.service.model.post.Post_;
+import ru.skillbox.diplom.group32.social.service.model.post.*;
 import ru.skillbox.diplom.group32.social.service.repository.post.PostRepository;
 
 import java.io.IOException;
+import java.time.ZonedDateTime;
 import java.util.Map;
 
+import static ru.skillbox.diplom.group32.social.service.utils.security.SecurityUtil.getJwtUserIdFromSecurityContext;
 import static ru.skillbox.diplom.group32.social.service.utils.specification.SpecificationUtil.*;
 
 
@@ -36,6 +35,16 @@ public class PostService {
 
     //*TODO брать за пример
     public PostDto createPost(PostDto postDto) {
+        postDto.setAuthorId(getJwtUserIdFromSecurityContext());
+        postDto.setIsDeleted(false);
+        postDto.setTime(ZonedDateTime.now());
+        postDto.setPublishDate(ZonedDateTime.now());
+        postDto.setMyLike(false);
+        postDto.setCommentsCount(0L);
+        postDto.setLikeAmount(0L);
+        postDto.setIsBlocked(false);
+        postDto.setType(Type.POSTED);
+        postDto.setTimeChanged(ZonedDateTime.now());
         log.info("Post to save - " + postDto);
 
         Post post = postRepository.save(postMapper.convertToEntity(postDto));
@@ -81,7 +90,7 @@ public class PostService {
                         .and(equal(Post_.postText, searchDto.getPostText(), true)
 // в Post нет withFriends --- .and(equal(Post_.withFriends, searchDto.getWithFriends(), true)
 // в Post нет tags --- .and(in(Post_.tags, Arrays.stream(searchDto.getTags()).toList(), true))
-                                .and(between(Post_.publishDate, searchDto.getDateFrom(), searchDto.getDateTo()))));
+                                .and(between(Post_.publishDate, searchDto.getDateFrom(), searchDto.getDateTo(), true))));
     }
 
     public String savePhoto(MultipartFile request) throws IOException {

@@ -44,15 +44,16 @@ public class SpecificationUtil {
         });
     }
 
-    public static <T> Specification<T> between(SingularAttribute<T, ZonedDateTime> field, ZonedDateTime valueFrom, ZonedDateTime valueTo) {
-
-        ZonedDateTime valueStart = valueFrom == null? ZonedDateTime.parse("1900-01-01T00:00:00.358Z") : valueFrom;
-        ZonedDateTime valueEnd = valueTo == null? ZonedDateTime.parse("2100-01-01T00:00:00.358Z") : valueTo;
+    public static <T> Specification<T> between(SingularAttribute<T, ZonedDateTime> field, ZonedDateTime valueFrom, ZonedDateTime valueTo, boolean isSkipNullValues) {
+        return nullValueCheck(valueFrom, valueTo, isSkipNullValues, () -> {
 
                 return ((root, query, builder) -> {
+                    ZonedDateTime valueStart = valueFrom == null? ZonedDateTime.parse("1900-01-01T00:00:00.358Z") : valueFrom;
+                    ZonedDateTime valueEnd = valueTo == null? ZonedDateTime.parse("2100-01-01T00:00:00.358Z") : valueTo;
                     query.distinct(true);
                     return builder.between(root.get(field), valueStart, valueEnd);
                 });
+        });
     }
 
     public static <T, V> Specification<T> notIn(SingularAttribute<T, V> field, Collection<V> value, boolean isSkipNullValues) {
@@ -71,4 +72,9 @@ public class SpecificationUtil {
     private static <T, V> Specification<T> nullValueCheck(V value, boolean isSkipNullValues, Supplier<Specification<T>> specificationSupplier) {
         return value == null && isSkipNullValues ? EMPTY_SPECIFICATION : (Specification) specificationSupplier.get();
     }
+
+    private static <T, V> Specification<T> nullValueCheck(V value, V value2, boolean isSkipNullValues, Supplier<Specification<T>> specificationSupplier) {
+        return value == null && value2 == null && isSkipNullValues ? EMPTY_SPECIFICATION : (Specification) specificationSupplier.get();
+    }
+
 }
