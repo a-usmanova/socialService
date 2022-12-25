@@ -6,8 +6,8 @@ import ru.skillbox.diplom.group32.social.service.model.base.BaseEntity_;
 import ru.skillbox.diplom.group32.social.service.model.base.BaseSearchDto;
 
 import javax.persistence.metamodel.SingularAttribute;
-import java.util.Collection;
 import java.time.ZonedDateTime;
+import java.util.Collection;
 import java.util.function.Supplier;
 
 @Component
@@ -46,10 +46,13 @@ public class SpecificationUtil {
         return nullValueCheck(valueFrom, valueTo, isSkipNullValues, () -> {
 
                 return ((root, query, builder) -> {
-                    ZonedDateTime valueStart = valueFrom == null? ZonedDateTime.parse("1900-01-01T00:00:00.358Z") : valueFrom;
-                    ZonedDateTime valueEnd = valueTo == null? ZonedDateTime.parse("2100-01-01T00:00:00.358Z") : valueTo;
-                    query.distinct(true);
-                    return builder.between(root.get(field), valueStart, valueEnd);
+                    if (valueFrom == null) {
+                        return builder.lessThanOrEqualTo(root.get(field), valueTo);
+                    } else if (valueTo == null) {
+                        return builder.greaterThanOrEqualTo(root.get(field), valueFrom);
+                    } else {
+                        return builder.between(root.get(field), valueFrom, valueTo);
+                    }
                 });
         });
     }

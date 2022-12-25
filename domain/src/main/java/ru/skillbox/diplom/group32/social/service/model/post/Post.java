@@ -49,7 +49,7 @@ public class Post extends BaseEntity {
     private Long commentsCount;
 
     @ToString.Exclude
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(
             name = "post_tag",
             joinColumns = @JoinColumn(name = "post_id", referencedColumnName = "id"),

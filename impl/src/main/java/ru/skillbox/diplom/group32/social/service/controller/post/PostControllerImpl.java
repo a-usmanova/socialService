@@ -1,5 +1,6 @@
 package ru.skillbox.diplom.group32.social.service.controller.post;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -38,23 +39,27 @@ public class PostControllerImpl implements PostController {
     }
 
     @Override
+    @Hidden
+    public ResponseEntity<PostDto> update(PostDto dto) {
+        return ResponseEntity.ok(null);
+    }
+
+    @Override
     public ResponseEntity<PostDto> getById(Long id) {
-        return ResponseEntity.ok(postService.getPostById(id));
+        return ResponseEntity.ok(postService.getById(id));
     }
 
     @Override
     public ResponseEntity<Page<PostDto>> getAll(PostSearchDto searchDto, Pageable page) {
-        return new ResponseEntity(postService.getAll(searchDto, page), HttpStatus.OK);
+        return ResponseEntity.ok(postService.getAll(searchDto, page));
     }
 
-    @Override
     @ResponseStatus(code = HttpStatus.CREATED)
-    public ResponseEntity<PostDto> update(PostDto dto) {
-        return ResponseEntity.ok(postService.update(dto));
+    public ResponseEntity<PostDto> updatePost(Long id, PostDto dto) {
+        return ResponseEntity.ok(postService.update(dto, id));
     }
 
     @Override
-    @ResponseStatus(code = HttpStatus.OK)
     public ResponseEntity deleteById(Long id) {
         postService.deleteById(id);
         return ResponseEntity.ok().body("POST DELETED");
@@ -68,22 +73,24 @@ public class PostControllerImpl implements PostController {
     }
 
     @Override
-    public ResponseEntity createComment(Long id, CommentDto commentDto) {
+    @ResponseStatus(code = HttpStatus.CREATED)
+    public ResponseEntity<CommentDto> createComment(Long id, CommentDto commentDto) {
         return ResponseEntity.ok(commentService.createComment(commentDto, id));
     }
 
     @Override
-    public ResponseEntity getComment(Long id, Pageable page) {
+    public ResponseEntity<Page<CommentDto>> getComment(Long id, Pageable page) {
         return ResponseEntity.ok(commentService.getAllComments(id, page));
     }
 
     @Override
-    public ResponseEntity getSubcomment(Long id, Long commentId, Pageable page) {
+    public ResponseEntity<Page<CommentDto>> getSubcomment(Long id, Long commentId, Pageable page) {
         return ResponseEntity.ok(commentService.getSubcomments(id, commentId, page));
     }
 
+
     @Override
-    public ResponseEntity updateComment(Long id, CommentDto commentDto, Long commentId) {
+    public ResponseEntity<CommentDto> updateComment(Long id, CommentDto commentDto, Long commentId) {
         return ResponseEntity.ok(commentService.updateComment(commentDto, id, commentId));
     }
 

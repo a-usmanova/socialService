@@ -13,7 +13,10 @@ import ru.skillbox.diplom.group32.social.service.config.Properties;
 import ru.skillbox.diplom.group32.social.service.exception.ObjectNotFoundException;
 import ru.skillbox.diplom.group32.social.service.mapper.post.PostMapper;
 import ru.skillbox.diplom.group32.social.service.mapper.tag.TagMapper;
-import ru.skillbox.diplom.group32.social.service.model.post.*;
+import ru.skillbox.diplom.group32.social.service.model.post.Post;
+import ru.skillbox.diplom.group32.social.service.model.post.PostDto;
+import ru.skillbox.diplom.group32.social.service.model.post.PostSearchDto;
+import ru.skillbox.diplom.group32.social.service.model.post.Post_;
 import ru.skillbox.diplom.group32.social.service.model.tag.Tag;
 import ru.skillbox.diplom.group32.social.service.model.tag.Tag_;
 import ru.skillbox.diplom.group32.social.service.repository.post.PostRepository;
@@ -25,7 +28,6 @@ import java.time.ZonedDateTime;
 import java.util.Map;
 import java.util.Set;
 
-import static ru.skillbox.diplom.group32.social.service.utils.security.SecurityUtil.getJwtUserIdFromSecurityContext;
 import static ru.skillbox.diplom.group32.social.service.utils.specification.SpecificationUtil.*;
 
 
@@ -39,7 +41,7 @@ public class PostService {
     private final TagMapper tagMapper;
     private Properties properties;
 
-    public PostDto getPostById(Long id) {
+    public PostDto getById(Long id) {
 
         log.info("PostService in getById tried to find post with id: " + id);
         return postMapper.convertToDto(postRepository.findById(id).orElseThrow(ObjectNotFoundException::new));
@@ -48,6 +50,7 @@ public class PostService {
 
     public Page<PostDto> getAll(PostSearchDto searchDto, Pageable page) {
 
+        log.info("PostService in getAll tried to find posts with postSearchDto: {} and pageable: {}", searchDto, page);
         Page<Post> postPage = postRepository.findAll(getSpecification(searchDto), page);
         return postPage.map(e->{
             PostDto postDto = postMapper.convertToDto(e);
@@ -59,39 +62,33 @@ public class PostService {
 
     //*TODO брать за пример
     public PostDto create(PostDto postDto) {
-        postDto.setAuthorId(getJwtUserIdFromSecurityContext());
-        postDto.setIsDeleted(false);
-        postDto.setTime(ZonedDateTime.now());
-        postDto.setPublishDate(ZonedDateTime.now());
-        postDto.setMyLike(false);
-        postDto.setCommentsCount(0L);
-        postDto.setLikeAmount(0L);
-        postDto.setIsBlocked(false);
-        postDto.setType(Type.POSTED);
-        postDto.setTimeChanged(ZonedDateTime.now());
-        log.info("Post to save - " + postDto);
 
-        Post postEntity = postMapper.convertToEntity(postDto);
+        log.info("PostService in create has post to save: " + postDto);
+
+        Post postEntity = postMapper.convertToEntityCreated(postDto);
         postEntity.setTags(tagService.createNonExistent(postDto.getTags()));
         Post post = postRepository.save(postEntity);
-        log.info("Post saved to db - " + postDto);
+        log.info("PostService in create: Post saved to db: " + postDto);
 
         return postMapper.convertToDto(post);
     }
 
-    public PostDto update(PostDto postDto) {
+    public PostDto update(PostDto postDto, Long id) {
 
-        Post post = postRepository.save(postMapper.convertToEntity(postDto));
-        log.info("PostService in updatePost: Post updated. New Post: " + postDto);
+        log.info("PostService in update has post with id: {} to update: {} ", id, postDto);
+        Post post = updatePost(postDto, id);
+        log.info("PostService in updatePost: Post updated. New Post: " + post);
 
-        return postMapper.convertToDto(post);
+        return postMapper.convertToDto(postRepository.save(post));
     }
 
     public void deleteById(Long id) {
-        log.info("User ID to del - " + id);
+
+        log.info("PostService in deleteById: trying to del post with id: " + id);
         postRepository.deleteById(id);
-        Post post = postRepository.findById(id).get();
+        Post post = postRepository.findById(id).orElseThrow(ObjectNotFoundException::new);
         tagService.deleteAll(post.getTags());
+
     }
 
     private Specification<Post> getSpecification(PostSearchDto searchDto) {
@@ -109,15 +106,31 @@ public class PostService {
     }
 
     public String savePhoto(MultipartFile request) throws IOException {
+
         Cloudinary cloudinary = new Cloudinary(ObjectUtils.asMap(
                 "cloud_name", properties.getCloudName(),
                 "api_key", properties.getApiKey(),
                 "api_secret", properties.getApiSecret()));
 
+
         Map uploadResult = cloudinary.uploader().upload(request.getBytes(), ObjectUtils.emptyMap());
-        log.info("successfully uploaded the file" + uploadResult.get("name"));
+        log.info("PostService in savePhoto: successfully uploaded the file: " + uploadResult.get("original_filename"));
 
         return uploadResult.get("url").toString();
+    }
+
+    private Post updatePost (PostDto postDto, Long id) {
+
+        Post post = postRepository.findById(id).orElseThrow(ObjectNotFoundException::new);
+
+        post.setTags(tagService.createNonExistent(postDto.getTags()));
+        post.setTitle(postDto.getTitle());
+        post.setPostText(postDto.getPostText());
+        post.setImagePath(postDto.getImagePath());
+        post.setTimeChanged(ZonedDateTime.now());
+
+        return post;
+
     }
 
     private static Specification<Post> containsTag(Set<String> tags) {
