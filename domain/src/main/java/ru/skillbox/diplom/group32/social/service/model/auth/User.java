@@ -18,11 +18,11 @@ import java.util.List;
 @Inheritance(strategy = InheritanceType.JOINED)
 public class User extends BaseEntity {
 
-    @Column(columnDefinition = "VARCHAR(255)", nullable = false)
-    private String firstname;
+    @Column(name = "first_name", columnDefinition = "VARCHAR(255)", nullable = false)
+    private String firstName;
 
-    @Column(columnDefinition = "VARCHAR(255)", nullable = false)
-    private String lastname;
+    @Column(name = "last_name", columnDefinition = "VARCHAR(255)", nullable = false)
+    private String lastName;
 
     @Column(columnDefinition = "VARCHAR(255)", nullable = false)
     private String email;

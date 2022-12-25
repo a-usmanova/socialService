@@ -10,8 +10,6 @@ import ru.skillbox.diplom.group32.social.service.model.auth.User;
 import ru.skillbox.diplom.group32.social.service.repository.account.AccountRepository;
 import ru.skillbox.diplom.group32.social.service.utils.security.SecurityUtil;
 
-import java.time.ZonedDateTime;
-
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -22,10 +20,6 @@ public class AccountService {
 
     public void createAccount(User user) {
         Account account = accountMapper.userToAccount(user);
-        account.setIsBlocked(false);
-        account.setRegDate(ZonedDateTime.now());
-        account.setCreatedOn(ZonedDateTime.now());
-        account.setUpdatedOn(ZonedDateTime.now());
 
         accountRepository.save(account);
         log.info("Account saved - " + account);

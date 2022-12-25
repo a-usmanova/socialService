@@ -12,8 +12,8 @@ import ru.skillbox.diplom.group32.social.service.model.base.BaseDto;
 @AllArgsConstructor
 public class UserDto extends BaseDto { //TODO Можно в принципе сделать RegistrationDto и не привязыватьс к userDto и как в свагере ее сделать
 
-    private String firstname;
-    private String lastname;
+    private String firstName;
+    private String lastName;
     private String email;
     private String password;
 }

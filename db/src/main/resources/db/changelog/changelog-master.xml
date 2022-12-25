@@ -10,6 +10,7 @@
     <include file="db/changelog/changes/4-create-post-table.xml"/>
     <include file="db/changelog/changes/4-comment-initial.xml"/>
     <include file="db/changelog/changes/5-change-account-table.xml"/>
+    <include file="db/changelog/changes/change-user-table.xml"/>
 
 
 </databaseChangeLog>

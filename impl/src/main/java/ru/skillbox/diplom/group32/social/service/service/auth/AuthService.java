@@ -56,6 +56,7 @@ public class AuthService {
 
     public void setCookie(HttpServletResponse response, String token) {
         Cookie jwtCookie = new Cookie("jwt", token);
+        jwtCookie.setPath("/");
         response.addCookie(jwtCookie);
     }
 
@@ -71,15 +72,7 @@ public class AuthService {
         }
 
 
-        // TODO - mapper
-        UserDto userDto = new UserDto();
-        userDto.setEmail(registrationDto.getEmail());
-        userDto.setFirstname(registrationDto.getFirstName());
-        userDto.setLastname(registrationDto.getLastName());
-        userDto.setPassword(registrationDto.getPassword1());
-        userDto.setIsDeleted(false);
-
-        return createUser(userDto);
+        return createUser(userMapper.registrationDtoToUserDto(registrationDto));
     }
 
     public UserDto createUser(UserDto userDto) {
