@@ -37,11 +37,12 @@
         <mapstruct-processor.version>1.5.3.Final</mapstruct-processor.version>
         <jpamodelgen.versuin>6.1.5.Final</jpamodelgen.versuin>
         <jjwt.version>0.9.1</jjwt.version>
-<!--        <spring.security.oauth2.version>2.5.2.RELEASE</spring.security.oauth2.version>
-        <spring.security.jwt.version>1.1.1.RELEASE</spring.security.jwt.version>-->
         <spring.security.oauth2.resource.server.version>3.0.0</spring.security.oauth2.resource.server.version>
-
+        <swagger.version>2.2.6</swagger.version>
+        <springdoc.version>1.6.14</springdoc.version>
         <cloudinary.version>1.33.0</cloudinary.version>
+        <spring-boot-maven-plugin.version>3.0.0</spring-boot-maven-plugin.version>
+        <maven-compiler-plugin.version>3.10.1</maven-compiler-plugin.version>
     </properties>
 
     <dependencies>
@@ -74,17 +75,6 @@
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-jdk8</artifactId>
         </dependency>
-
-<!--        <dependency>
-            <groupId>org.springframework.security.oauth</groupId>
-            <artifactId>spring-security-oauth2</artifactId>
-            <version>${spring.security.oauth2.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-jwt</artifactId>
-            <version>${spring.security.jwt.version}</version>
-        </dependency>-->
 
         <dependency>
         <groupId>org.springframework.boot</groupId>
@@ -121,6 +111,18 @@
         </dependency>
 
         <dependency>
+            <groupId>io.swagger.core.v3</groupId>
+            <artifactId>swagger-annotations</artifactId>
+            <version>${swagger.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-ui</artifactId>
+            <version>${springdoc.version}</version>
+        </dependency>
+
+        <!--  Database  -->
+        <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <version>${postgresql.version}</version>
@@ -137,6 +139,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven-compiler-plugin.version}</version>
                 <configuration>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
@@ -167,6 +170,7 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${spring-boot-maven-plugin.version}</version>
                 <configuration>
                     <mainClass>
                         ru.skillbox.diplom.group32.social.service.Application
@@ -180,6 +184,24 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+<!--     Swagger       -->
+            <plugin>
+                <groupId>org.springdoc</groupId>
+                <artifactId>springdoc-openapi-maven-plugin</artifactId>
+                <version>1.4</version>
+                <executions>
+                    <execution>
+                        <phase>integration-test</phase>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <apiDocsUrl>http://localhost:8080/v3/api-docs</apiDocsUrl>
+                    <outputFileName>social-net-api.yml</outputFileName>
+                </configuration>
             </plugin>
         </plugins>
     </build>
