@@ -11,12 +11,13 @@ import ru.skillbox.diplom.group32.social.service.model.post.PostDto;
 import ru.skillbox.diplom.group32.social.service.model.post.PostSearchDto;
 import ru.skillbox.diplom.group32.social.service.model.post.comment.CommentDto;
 import ru.skillbox.diplom.group32.social.service.resource.base.BaseController;
+import ru.skillbox.diplom.group32.social.service.resource.utils.web.WebConstant;
 
 import java.io.IOException;
 
 import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 
-@RequestMapping("api/v1/post")
+@RequestMapping(value = WebConstant.VERSION_URL  + "/post")
 public interface PostController extends BaseController<PostDto, PostSearchDto> {
 
 

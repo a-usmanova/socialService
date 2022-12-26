@@ -1,4 +1,4 @@
-package ru.skillbox.diplom.group32.social.service.config;
+package ru.skillbox.diplom.group32.social.service.config.security;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -12,9 +12,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
-import ru.skillbox.diplom.group32.social.service.config.security.AuthorizationFilter;
-import ru.skillbox.diplom.group32.social.service.config.security.JwtTokenFilter;
-import ru.skillbox.diplom.group32.social.service.config.security.JwtTokenProvider;
 
 @Configuration
 @EnableWebSecurity
@@ -29,6 +26,7 @@ public class SecurityConfig {
     private static final String CAPTCHA = "/api/v1/auth/captcha";
     private static final String ACC_ME_ENDPOINT = "/api/v1/account/me";
     private static final String ACC_ENDPOINT = "/api/v1/account";
+
 
     @Bean
     public AuthenticationManager authenticationManagerBean(AuthenticationConfiguration authenticationConfiguration) throws Exception {

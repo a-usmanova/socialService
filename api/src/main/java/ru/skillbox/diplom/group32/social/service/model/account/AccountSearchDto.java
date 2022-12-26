@@ -8,6 +8,7 @@ import java.time.ZonedDateTime;
 @Data
 public class AccountSearchDto extends BaseSearchDto {
 
+    private String author;
     private String phone;
     private String photo;
     private String about;
