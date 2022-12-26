@@ -1,6 +1,6 @@
 package ru.skillbox.diplom.group32.social.service.controller.post;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,7 +24,7 @@ import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 
 @Slf4j
 @RestController
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class PostControllerImpl implements PostController {
 
     final PostService postService;
@@ -34,7 +34,7 @@ public class PostControllerImpl implements PostController {
     @Override
     @ResponseStatus(code = HttpStatus.CREATED)
     public ResponseEntity<PostDto> create(PostDto dto) {
-        return ResponseEntity.ok(postService.createPost(dto));
+        return ResponseEntity.ok(postService.create(dto));
     }
 
     @Override
@@ -44,23 +44,24 @@ public class PostControllerImpl implements PostController {
 
     @Override
     public ResponseEntity<Page<PostDto>> getAll(PostSearchDto searchDto, Pageable page) {
-        return ResponseEntity.ok(postService.getAllPosts(searchDto, page));
+        return new ResponseEntity(postService.getAll(searchDto, page), HttpStatus.OK);
     }
 
     @Override
     @ResponseStatus(code = HttpStatus.CREATED)
     public ResponseEntity<PostDto> update(PostDto dto) {
-        return ResponseEntity.ok(postService.updatePost(dto));
+        return ResponseEntity.ok(postService.update(dto));
     }
 
     @Override
+    @ResponseStatus(code = HttpStatus.OK)
     public ResponseEntity deleteById(Long id) {
-        postService.deletePostById(id);
+        postService.deleteById(id);
         return ResponseEntity.ok().body("POST DELETED");
     }
 
     @PostMapping(value = "/storagePostPhoto", consumes = {MULTIPART_FORM_DATA_VALUE})
-    public String storagePostPhoto(@RequestParam(value = "request", required = false) MultipartFile request) throws IOException {
+    public String storagePostPhoto (@RequestParam(value = "request", required = false) MultipartFile request) throws IOException {
 
         return postService.savePhoto(request);
 
@@ -80,7 +81,6 @@ public class PostControllerImpl implements PostController {
     public ResponseEntity getSubcomment(Long id, Long commentId, Pageable page) {
         return ResponseEntity.ok(commentService.getSubcomments(id, commentId, page));
     }
-
 
     @Override
     public ResponseEntity updateComment(Long id, CommentDto commentDto, Long commentId) {

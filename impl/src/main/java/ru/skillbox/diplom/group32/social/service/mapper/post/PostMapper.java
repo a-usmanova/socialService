@@ -13,10 +13,13 @@ public interface PostMapper {
 
 
     @Mapping(target = "id", source = "id")
+    @Mapping(target = "tags", ignore = true)
     PostDto  convertToDto(Post post);
 
     @InheritInverseConfiguration
+    @Mapping(target = "tags", ignore = true)
     Post convertToEntity(PostDto postDto);
 
+    @Mapping(target = "tags", ignore = true)
     List<PostDto> convertToDtoList(List<Post> postList);
 }

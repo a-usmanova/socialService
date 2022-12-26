@@ -1,0 +1,28 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+    <changeSet author="a.usmanova" id="4-tag-initial">
+        <preConditions onFail="MARK_RAN" onError="CONTINUE">
+            <not>
+                <tableExists tableName="tag"/>
+            </not>
+        </preConditions>
+        <createTable tableName="tag" schemaName="skillbox">
+            <column name="id" type="INTEGER" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="is_deleted" type="BOOLEAN">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+    </changeSet>
+
+
+
+</databaseChangeLog>
