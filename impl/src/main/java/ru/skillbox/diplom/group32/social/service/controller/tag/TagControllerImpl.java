@@ -12,8 +12,6 @@ import ru.skillbox.diplom.group32.social.service.model.tag.TagSearchDto;
 import ru.skillbox.diplom.group32.social.service.resource.tag.TagController;
 import ru.skillbox.diplom.group32.social.service.service.tag.TagService;
 
-import java.util.List;
-
 @Slf4j
 @RestController
 public class TagControllerImpl implements TagController {
