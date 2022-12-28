@@ -1,17 +1,11 @@
 package ru.skillbox.diplom.group32.social.service.model.post.comment;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.Data;
 import ru.skillbox.diplom.group32.social.service.model.base.BaseSearchDto;
 
 import java.time.ZonedDateTime;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
+@Data
 public class CommentSearchDto extends BaseSearchDto {
 
     private CommentType commentType;

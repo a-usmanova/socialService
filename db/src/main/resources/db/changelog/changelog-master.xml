@@ -9,9 +9,12 @@
     <include file="db/changelog/changes/3-create-account-table.xml"/>
     <include file="db/changelog/changes/4-create-post-table.xml"/>
     <include file="db/changelog/changes/5-change-account-table.xml"/>
+
+
     <include file="db/changelog/changes/5-create-post-tag-table.xml"/>
     <include file="db/changelog/changes/6-create-tag-table.xml"/>
     <include file="db/changelog/changes/4-comment-initial.xml"/>
+    <include file="db/changelog/changes/5-change-account-table.xml"/>
     <include file="db/changelog/changes/change-user-table.xml"/>
     <include file="db/changelog/changes/create-captcha-table.xml"/>
     <include file="db/changelog/changes/create-city-table.xml"/>
@@ -20,5 +23,7 @@
     <include file="db/changelog/changes/change-account-table-v2.xml"/>
     <include file="db/changelog/changes/insert-country-table.xml"/>
     <include file="db/changelog/changes/insert-city-table.xml"/>
+    <include file="db/changelog/changes/create-friend-table.xml"/>
+
 
 </databaseChangeLog>
