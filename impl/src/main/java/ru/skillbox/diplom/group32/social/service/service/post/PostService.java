@@ -12,7 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 import ru.skillbox.diplom.group32.social.service.config.Properties;
 import ru.skillbox.diplom.group32.social.service.exception.ObjectNotFoundException;
 import ru.skillbox.diplom.group32.social.service.mapper.post.PostMapper;
-import ru.skillbox.diplom.group32.social.service.mapper.tag.TagMapper;
+import ru.skillbox.diplom.group32.social.service.model.like.LikeType;
 import ru.skillbox.diplom.group32.social.service.model.post.Post;
 import ru.skillbox.diplom.group32.social.service.model.post.PostDto;
 import ru.skillbox.diplom.group32.social.service.model.post.PostSearchDto;
@@ -20,6 +20,7 @@ import ru.skillbox.diplom.group32.social.service.model.post.Post_;
 import ru.skillbox.diplom.group32.social.service.model.tag.Tag;
 import ru.skillbox.diplom.group32.social.service.model.tag.Tag_;
 import ru.skillbox.diplom.group32.social.service.repository.post.PostRepository;
+import ru.skillbox.diplom.group32.social.service.service.like.LikeService;
 import ru.skillbox.diplom.group32.social.service.service.tag.TagService;
 
 import javax.persistence.criteria.Join;
@@ -38,7 +39,8 @@ public class PostService {
     private final PostRepository postRepository;
     private final TagService tagService;
     private final PostMapper postMapper;
-    private final TagMapper tagMapper;
+
+    final LikeService likeService;
     private Properties properties;
 
     public PostDto getById(Long id) {
@@ -49,12 +51,12 @@ public class PostService {
     }
 
     public Page<PostDto> getAll(PostSearchDto searchDto, Pageable page) {
-
         log.info("PostService in getAll tried to find posts with postSearchDto: {} and pageable: {}", searchDto, page);
         Page<Post> postPage = postRepository.findAll(getSpecification(searchDto), page);
         return postPage.map(e->{
             PostDto postDto = postMapper.convertToDto(e);
             postDto.setTags(tagService.getNames(e.getTags()));
+            postDto.setMyLike(likeService.getMyLike(postDto.getId(), LikeType.POST));
             return postDto;
         });
 
@@ -100,7 +102,6 @@ public class PostService {
                 .and(equal(Post_.title, searchDto.getTitle(), true)
                         .and(equal(Post_.postText, searchDto.getPostText(), true)
 // в Post нет withFriends --- .and(equal(Post_.withFriends, searchDto.getWithFriends(), true)
-// в Post нет tags --- .and(in(Post_.tags, Arrays.stream(searchDto.getTags()).toList(), true))
                                 .and(between(Post_.publishDate, searchDto.getDateFrom(), searchDto.getDateTo(), true))
                                 .and(containsTag(searchDto.getTags()))));
     }

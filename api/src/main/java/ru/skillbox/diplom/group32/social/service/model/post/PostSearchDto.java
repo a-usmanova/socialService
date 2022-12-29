@@ -1,7 +1,7 @@
 package ru.skillbox.diplom.group32.social.service.model.post;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import ru.skillbox.diplom.group32.social.service.model.base.BaseSearchDto;
 
 import java.time.ZonedDateTime;
@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Set;
 
 @Data
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class PostSearchDto extends BaseSearchDto {
 
     private List<Long> ids;

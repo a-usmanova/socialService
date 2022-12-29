@@ -16,6 +16,5 @@
     <include file="db/changelog/changes/create-captcha-table.xml"/>
     <include file="db/changelog/changes/create-city-table.xml"/>
     <include file="db/changelog/changes/create-country-table.xml"/>
-
-
+    <include file="db/changelog/changes/7-create-like-table.xml"/>
 </databaseChangeLog>

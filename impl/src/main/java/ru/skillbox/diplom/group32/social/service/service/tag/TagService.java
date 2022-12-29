@@ -97,7 +97,6 @@ public class TagService {
     }
     private static Specification<Tag> getSpecification(TagSearchDto searchDto) {
         return getBaseSpecification(searchDto)
-                .and(equal(Tag_.id, searchDto.getId(), true))
                 .and(like(Tag_.name, searchDto.getName(), true));
     }
 }

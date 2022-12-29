@@ -8,8 +8,10 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import ru.skillbox.diplom.group32.social.service.exception.ObjectNotFoundException;
 import ru.skillbox.diplom.group32.social.service.mapper.comment.CommentMapper;
+import ru.skillbox.diplom.group32.social.service.model.like.LikeType;
 import ru.skillbox.diplom.group32.social.service.model.post.comment.*;
 import ru.skillbox.diplom.group32.social.service.repository.post.comment.CommentRepository;
+import ru.skillbox.diplom.group32.social.service.service.like.LikeService;
 
 import java.time.ZonedDateTime;
 
@@ -23,6 +25,7 @@ public class CommentService {
 
     private final CommentRepository commentRepository;
     private final CommentMapper commentMapper;
+    private final LikeService likeService;
 
 
     public CommentDto createComment(CommentDto commentDto, Long id) {
@@ -54,8 +57,11 @@ public class CommentService {
         commentSearchDto.setIsDeleted(false);
         Page<Comment> commentPage = commentRepository.findAll(getSpecification(commentSearchDto), page);
         log.info("CommentService in getAllComments: find comments: " + commentPage);
-        return commentPage.map(commentMapper::convertToDto);
-
+        return commentPage.map(e->{
+            CommentDto commentDto = commentMapper.convertToDto(e);
+            commentDto.setMyLike(likeService.getMyLike(commentDto.getId(), LikeType.COMMENT));
+            return commentDto;
+        });
     }
 
     public CommentDto updateComment(CommentDto commentDto, Long id, Long commentId) {
