@@ -8,9 +8,11 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import ru.skillbox.diplom.group32.social.service.model.auth.AuthenticateDto;
 import ru.skillbox.diplom.group32.social.service.model.auth.AuthenticateResponseDto;
+import ru.skillbox.diplom.group32.social.service.model.auth.CaptchaDto;
 import ru.skillbox.diplom.group32.social.service.model.auth.RegistrationDto;
 import ru.skillbox.diplom.group32.social.service.resource.auth.AuthController;
 import ru.skillbox.diplom.group32.social.service.service.auth.AuthService;
+import ru.skillbox.diplom.group32.social.service.service.captcha.CaptchaService;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -20,6 +22,8 @@ import javax.servlet.http.HttpServletResponse;
 public class AuthControllerImpl implements AuthController {
 
     private final AuthService authService;
+    private final CaptchaService captchaService;
+
 
     @Override
     public ResponseEntity<AuthenticateResponseDto> login(AuthenticateDto authenticateDto, HttpServletResponse response) {
@@ -37,8 +41,9 @@ public class AuthControllerImpl implements AuthController {
     }
 
     @Override
-    @ResponseStatus(HttpStatus.OK)
-    public void captcha() {}
+    public ResponseEntity<CaptchaDto> captcha() {
+        return ResponseEntity.ok(captchaService.getCaptcha());
+    }
 
     /* Можно добавить данное искючение и спринг сам преобразует все как надо
     * @ResponseStatus(code = HttpStatus.NOT_FOUND, reason = UserNotFoundException.REASON_RU)
