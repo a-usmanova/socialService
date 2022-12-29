@@ -14,6 +14,7 @@ import ru.skillbox.diplom.group32.social.service.model.auth.*;
 import ru.skillbox.diplom.group32.social.service.repository.auth.RoleRepository;
 import ru.skillbox.diplom.group32.social.service.repository.auth.UserRepository;
 import ru.skillbox.diplom.group32.social.service.service.account.AccountService;
+import ru.skillbox.diplom.group32.social.service.service.captcha.CaptchaService;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
@@ -27,16 +28,15 @@ public class AuthService {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
-
     private final UserMapper userMapper;
 
     private final JwtTokenProvider jwtTokenProvider;
 
     private final PasswordEncoder passwordEncoder;
 
-    private final HttpServletResponse httpServletResponse;
-
     private final AccountService accountService;
+
+    private final CaptchaService captchaService;
 
     public AuthenticateResponseDto login(AuthenticateDto authenticateDto, HttpServletResponse response) {
         String email = authenticateDto.getEmail();
@@ -61,16 +61,17 @@ public class AuthService {
     }
 
     public UserDto register(RegistrationDto registrationDto) {
+
+        if (!captchaService.passCaptcha(registrationDto)) {
+            throw new WrongPasswordException("Captcha code isn't right");
+        }
+
         String email = registrationDto.getEmail();
-
-        // TODO - заменить метод на exists()
         userRepository.findUserByEmail(email).ifPresent(x -> { throw new UserAlreadyExistsException("This email already taken");});
-
 
         if (!registrationDto.getPassword1().equals(registrationDto.getPassword2())) {
             throw new PasswordsAreNotMatchingException("Passwords should be equal");
         }
-
 
         return createUser(userMapper.registrationDtoToUserDto(registrationDto));
     }
