@@ -11,10 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import ru.skillbox.diplom.group32.social.service.model.account.AccountDto;
 import ru.skillbox.diplom.group32.social.service.model.account.AccountSearchDto;
 import ru.skillbox.diplom.group32.social.service.model.auth.UserDto;
@@ -56,7 +53,7 @@ public interface AccountController extends BaseController<AccountDto, AccountSea
                             schema = @Schema(allOf = {AccountDto.class, UserDto.class}))),
             @ApiResponse(responseCode = "400", content = @Content(mediaType = "")),
             @ApiResponse(responseCode = "401", content = @Content(mediaType = ""))})
-    ResponseEntity<AccountDto> update(AccountDto dto);
+    ResponseEntity<AccountDto> update(@RequestBody AccountDto dto);
 
 
     @GetMapping("/search")
