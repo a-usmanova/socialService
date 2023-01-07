@@ -114,4 +114,10 @@ public class JwtTokenProvider {
         return result;
     }
 
+    public Long getCurrentUserIdFromJwt(String token){
+        Jwt jwt = jwtDecoder().decode(token);
+        Long id = jwt.getClaim("id");
+        log.info("Current User from JWT in WebSocketSession: {}",  id);
+        return id;
+    }
 }
