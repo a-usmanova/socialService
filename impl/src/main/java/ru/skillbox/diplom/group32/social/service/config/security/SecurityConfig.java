@@ -11,21 +11,18 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.authentication.logout.LogoutFilter;
+import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
+import org.springframework.security.web.csrf.CsrfFilter;
+
+import javax.servlet.http.HttpServletResponse;
 
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
-
+    private final WhiteList whiteList;
     private final JwtTokenProvider jwtTokenProvider;
-
-
-    private static final String LOGIN_ENDPOINT = "/api/v1/auth/login";
-    private static final String REGISTER_ENDPOINT = "/api/v1/auth/register";
-    private static final String CAPTCHA = "/api/v1/auth/captcha";
-    private static final String ACC_ME_ENDPOINT = "/api/v1/account/me";
-    private static final String ACC_ENDPOINT = "/api/v1/account";
+    private static final String LOGOUT_ENDPOINT = "/**/logout";
 
 
     @Bean
@@ -35,17 +32,29 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
+
         httpSecurity
                 .cors()
                 .and()
                 .csrf().disable()
+                .addFilterBefore(new AuthorizationFilter(), CsrfFilter.class)
+                .antMatcher("/**/swagger-ui/*").anonymous()
+                .and()
                 .authorizeRequests()
-                .antMatchers(LOGIN_ENDPOINT, REGISTER_ENDPOINT, CAPTCHA, ACC_ME_ENDPOINT, ACC_ENDPOINT, REGISTER_ENDPOINT).permitAll()
-//                .antMatchers(GET_ENDPOINT).hasAuthority("ADMIN")
+                .antMatchers(whiteList.getLinks()).permitAll()
                 .and()
-                .httpBasic()
+                .authorizeRequests()
+                .anyRequest().authenticated()
                 .and()
-                .addFilterAfter(new AuthorizationFilter(), LogoutFilter.class)
+                .logout(
+                        logout -> {
+                            logout
+                                    .logoutUrl(LOGOUT_ENDPOINT)
+                                    .logoutSuccessUrl("/")
+                                    .deleteCookies("jwt")
+                                    .logoutSuccessHandler(getLogoutSuccess());
+                        }
+                )
                 .addFilterBefore(new JwtTokenFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
@@ -55,5 +64,10 @@ public class SecurityConfig {
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    protected LogoutSuccessHandler getLogoutSuccess() {
+        return (httpServletRequest, httpServletResponse, auth) -> httpServletResponse.setStatus(HttpServletResponse.SC_OK);
     }
 }
