@@ -28,7 +28,7 @@ deploy_docker:
     - docker login -u $DOCKER_LOGIN -p $DOCKER_PASSWORD
   script:
     - echo "Deploy stage begin"
-    - docker build -f Dockerfile --platform linux/arm64/v8 -t skillboxteam32/social-media .
+    - docker build -f Dockerfile -t skillboxteam32/social-media .
     - docker push skillboxteam32/social-media
     - echo "Deploy stage end"
   artifacts:
@@ -53,5 +53,3 @@ deploy_prod:
     - chmod 644 ~/.ssh/known_hosts
   script:
     - ssh $PROD_USER@$PROD_HOST "kubectl rollout restart -n $NAMESPACE deployment $DEPLOYMENT_NAME"
-
-
