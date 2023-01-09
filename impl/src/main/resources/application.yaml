@@ -36,3 +36,18 @@ cloudinary:
       cloud_name: duvaewonz
       api_key: '354439898853154'
       api_secret: N-qIciSHT6v4toj9fvkqArfVzDw
+
+white-list:
+  links:
+    - /**/login
+    - /**/captcha
+    - /**/register
+    - /**/registration
+    - /**/swagger-ui/*
+#    - /api/v1/profile
+#    - /api/v1/friends
+#    - /api/v1/dialogs
+#    - /api/v1/auth
+#    - /api/v1/auth/captcha
+#    - /api/v1/account
+#    - /api/v1/post

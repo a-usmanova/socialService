@@ -27,7 +27,7 @@ public interface AuthController {
                             schema = @Schema(implementation = AuthenticateResponseDto.class))),
             @ApiResponse(responseCode = "400", content = @Content(mediaType = "")),
             @ApiResponse(responseCode = "401", content = @Content(mediaType = ""))})
-    ResponseEntity<AuthenticateResponseDto> login(@RequestBody AuthenticateDto authenticateDto, HttpServletResponse response);
+    ResponseEntity<AuthenticateResponseDto> login(@RequestBody AuthenticateDto authenticateDto);
 
     @PostMapping("logout")
     @Operation(summary = "Логаут")

@@ -4,7 +4,6 @@ import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
-import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -13,7 +12,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.jose.jws.JwsAlgorithm;
 import org.springframework.security.oauth2.jwt.*;
 import org.springframework.stereotype.Component;
-import ru.skillbox.diplom.group32.social.service.config.security.exception.JwtAuthenticationException;
 import ru.skillbox.diplom.group32.social.service.model.auth.Role;
 
 import javax.annotation.PostConstruct;
@@ -91,14 +89,14 @@ public class JwtTokenProvider {
 
             Jwt jwt = jwtDecoder().decode(token);
 
-            if (!jwt.getExpiresAt().isBefore(ZonedDateTime.now().toInstant()) && !jwt.getExpiresAt().isAfter(ZonedDateTime.now().minusHours(1).toInstant())) {
-                return false;
+            if (jwt.getExpiresAt().isAfter(ZonedDateTime.now().toInstant())) {
+                return true;
             }
 
-            return true;
         } catch (JwtException | IllegalArgumentException e) {
-            throw new JwtAuthenticationException("JWT token is expired or invalid");
+            e.printStackTrace();
         }
+        return false;
     }
 
     private List<String> getRoleNames(List<Role> userRoles) {
