@@ -26,6 +26,8 @@ public class AccountDto extends UserDto {
     private StatusCode statusCode;
     @Schema(description = "Дата регистрации")
     private ZonedDateTime regDate;
+    @Schema(description = "Дата рождения")
+    private ZonedDateTime birthDate;
     @Schema(description = "Разрешения сообщения")
     private String messagePermission;
     @Schema(description = "Время последнего появления онлайн")

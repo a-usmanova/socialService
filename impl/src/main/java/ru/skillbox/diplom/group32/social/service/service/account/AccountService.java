@@ -42,9 +42,12 @@ public class AccountService {
     }
 
     public AccountDto updateAccount(AccountDto accountDto) {
-        Account accountFromDB = accountRepository.save(accountMapper.convertToAccount(accountDto));
-        log.info("Updated Account is - " + accountFromDB);
-        return accountMapper.convertToDto(accountFromDB);
+        Long userId = SecurityUtil.getJwtUserIdFromSecurityContext();
+
+        Account accountToSave = accountMapper.convertToAccount(accountDto, accountRepository.findById(userId).orElse(new Account()));
+        accountRepository.save(accountToSave);
+        log.info("Updated Account is - " + accountToSave);
+        return accountMapper.convertToDto(accountToSave);
     }
 
     public String softDeleteAccount() {
