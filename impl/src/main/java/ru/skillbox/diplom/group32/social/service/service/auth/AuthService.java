@@ -14,7 +14,7 @@ import ru.skillbox.diplom.group32.social.service.model.auth.*;
 import ru.skillbox.diplom.group32.social.service.repository.auth.RoleRepository;
 import ru.skillbox.diplom.group32.social.service.repository.auth.UserRepository;
 import ru.skillbox.diplom.group32.social.service.service.account.AccountService;
-import ru.skillbox.diplom.group32.social.service.service.captcha.CaptchaService;
+import ru.skillbox.diplom.group32.social.service.service.auth.captcha.CaptchaService;
 
 import java.util.ArrayList;
 import java.util.List;

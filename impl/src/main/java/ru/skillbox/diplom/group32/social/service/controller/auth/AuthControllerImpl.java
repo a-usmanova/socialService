@@ -6,13 +6,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import ru.skillbox.diplom.group32.social.service.model.auth.AuthenticateDto;
-import ru.skillbox.diplom.group32.social.service.model.auth.AuthenticateResponseDto;
-import ru.skillbox.diplom.group32.social.service.model.auth.CaptchaDto;
-import ru.skillbox.diplom.group32.social.service.model.auth.RegistrationDto;
+import ru.skillbox.diplom.group32.social.service.model.auth.*;
+import ru.skillbox.diplom.group32.social.service.model.auth.passwordRecovery.NewPasswordDto;
+import ru.skillbox.diplom.group32.social.service.model.auth.passwordRecovery.PasswordRecoveryDto;
 import ru.skillbox.diplom.group32.social.service.resource.auth.AuthController;
 import ru.skillbox.diplom.group32.social.service.service.auth.AuthService;
-import ru.skillbox.diplom.group32.social.service.service.captcha.CaptchaService;
+import ru.skillbox.diplom.group32.social.service.service.auth.passwordRecovery.PasswordRecoveryService;
+import ru.skillbox.diplom.group32.social.service.service.auth.captcha.CaptchaService;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -23,6 +23,8 @@ public class AuthControllerImpl implements AuthController {
 
     private final AuthService authService;
     private final CaptchaService captchaService;
+
+    private final PasswordRecoveryService passwordRecoveryService;
 
 
     @Override
@@ -54,5 +56,14 @@ public class UserNotFoundException extends RuntimeException {
 
 }*/
 
+    @Override
+    public void getPasswordRecoveryMail(PasswordRecoveryDto passwordRecoveryDto) {
+        passwordRecoveryService.sendEmail(passwordRecoveryDto);
+    }
+
+    @Override
+    public void setPassword(String linkId, NewPasswordDto newPasswordDto) {
+        passwordRecoveryService.setPassword(linkId, newPasswordDto);
+    }
 
 }
