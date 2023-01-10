@@ -25,6 +25,8 @@ public class Account extends User {
     private StatusCode statusCode;
     @Column(name = "reg_date", columnDefinition = "TIMESTAMP WITH TIME ZONE")
     private ZonedDateTime regDate;
+    @Column(name = "birth_date", columnDefinition = "TIMESTAMP WITH TIME ZONE")
+    private ZonedDateTime birthDate;
     @Column(name = "message_permission")
     private String messagePermission;
     @Column(name = "last_online_time", columnDefinition = "TIMESTAMP WITH TIME ZONE")

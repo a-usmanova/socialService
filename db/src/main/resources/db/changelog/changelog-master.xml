@@ -17,4 +17,7 @@
     <include file="db/changelog/changes/create-city-table.xml"/>
     <include file="db/changelog/changes/create-country-table.xml"/>
     <include file="db/changelog/changes/7-create-like-table.xml"/>
+    <include file="db/changelog/changes/change-account-table-v2.xml"/>
+
+
 </databaseChangeLog>
