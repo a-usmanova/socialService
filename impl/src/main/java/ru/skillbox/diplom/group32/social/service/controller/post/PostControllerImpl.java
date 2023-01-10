@@ -12,11 +12,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import ru.skillbox.diplom.group32.social.service.model.like.LikeDto;
+import ru.skillbox.diplom.group32.social.service.model.like.LikeType;
 import ru.skillbox.diplom.group32.social.service.model.post.PostDto;
 import ru.skillbox.diplom.group32.social.service.model.post.PostSearchDto;
 import ru.skillbox.diplom.group32.social.service.model.post.comment.CommentDto;
 import ru.skillbox.diplom.group32.social.service.resource.post.PostController;
 import ru.skillbox.diplom.group32.social.service.service.comment.CommentService;
+import ru.skillbox.diplom.group32.social.service.service.like.LikeService;
 import ru.skillbox.diplom.group32.social.service.service.post.PostService;
 
 import java.io.IOException;
@@ -29,8 +32,8 @@ import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 public class PostControllerImpl implements PostController {
 
     final PostService postService;
-
     final CommentService commentService;
+    final LikeService likeService;
 
     @Override
     @ResponseStatus(code = HttpStatus.CREATED)
@@ -98,6 +101,28 @@ public class PostControllerImpl implements PostController {
     public ResponseEntity deleteComment(Long id, Long commentId) {
 
         commentService.deleteComment(id, commentId);
+        return ResponseEntity.ok().build();
+    }
+
+    @Override
+    public ResponseEntity<LikeDto> createPostLike(Long id) {
+        return ResponseEntity.ok(likeService.createLike(id, LikeType.POST));
+    }
+
+    @Override
+    public ResponseEntity deletePostLike(Long id) {
+        likeService.deleteLike(id, LikeType.POST);
+        return ResponseEntity.ok().build();
+    }
+
+    @Override
+    public ResponseEntity<LikeDto> createCommentLike(Long id, Long commentId) {
+        return ResponseEntity.ok(likeService.createLike(commentId, LikeType.COMMENT));
+    }
+
+    @Override
+    public ResponseEntity deleteCommentLike(Long id, Long commentId) {
+        likeService.deleteLike(commentId, LikeType.COMMENT);
         return ResponseEntity.ok().build();
     }
 }

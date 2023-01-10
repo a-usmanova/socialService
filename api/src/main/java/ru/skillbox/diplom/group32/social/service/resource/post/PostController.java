@@ -15,6 +15,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import ru.skillbox.diplom.group32.social.service.model.like.LikeDto;
 import ru.skillbox.diplom.group32.social.service.model.post.PostDto;
 import ru.skillbox.diplom.group32.social.service.model.post.PostSearchDto;
 import ru.skillbox.diplom.group32.social.service.model.post.comment.CommentDto;
@@ -158,5 +159,15 @@ public interface PostController extends BaseController<PostDto, PostSearchDto> {
     @Operation(summary = "Создание фото к посту")
     String storagePostPhoto(@Schema(description = "Файл фото") @RequestParam(value = "request", required = false) MultipartFile request) throws IOException;
 
-
+//
+//    -----------***LIKES***-----------
+//
+  @PostMapping(value = "{id}/like")
+  ResponseEntity<LikeDto> createPostLike(@PathVariable Long id);
+  @DeleteMapping(value = "{id}/like")
+  ResponseEntity deletePostLike(@PathVariable Long id);
+  @PostMapping(value = "{id}/comment/{commentId}/like")
+  ResponseEntity<LikeDto> createCommentLike(@PathVariable Long id, @PathVariable Long commentId);
+  @DeleteMapping(value = "{id}/comment/{commentId}/like")
+   ResponseEntity deleteCommentLike(@PathVariable Long id, @PathVariable Long commentId);
 }
