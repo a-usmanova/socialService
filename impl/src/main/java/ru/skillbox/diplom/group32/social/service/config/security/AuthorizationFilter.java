@@ -21,10 +21,10 @@ public class AuthorizationFilter extends GenericFilterBean {
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
-        log.info("Start auth filter");
+        log.info("Start auth AuthorizationFilter");
         HttpServletRequest req = (HttpServletRequest) servletRequest;
         Cookie[] cookies = req.getCookies();
-        Cookie cookie = null;
+        Cookie cookie;
 
         if (cookies == null) {
             filterChain.doFilter(servletRequest, servletResponse);
@@ -34,7 +34,7 @@ public class AuthorizationFilter extends GenericFilterBean {
 
             HttpServletResponse resp = (HttpServletResponse) servletResponse;
             if (cookie != null && !cookie.getValue().equals("")) {
-                log.info("Cookie val - {}" + cookie.getValue());
+                log.info("AuthorizationFilter: Cookie value " + cookie.getValue());
                 resp.addHeader("Authorization", "Bearer_" + cookie.getValue());
             }
 

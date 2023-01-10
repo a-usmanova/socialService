@@ -78,7 +78,7 @@ public class JwtTokenProvider {
 
     public String resolveToken(HttpServletResponse response) {
         String skillToken = response.getHeader("Authorization");
-        if (skillToken != null && skillToken.startsWith("Bearer_")) {
+        if (skillToken != null && skillToken.startsWith("Bearer")) {
             return skillToken.substring(7, skillToken.length());
         }
         return null;
