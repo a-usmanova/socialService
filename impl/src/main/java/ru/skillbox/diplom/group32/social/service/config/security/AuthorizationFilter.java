@@ -26,19 +26,24 @@ public class AuthorizationFilter extends GenericFilterBean {
         Cookie[] cookies = req.getCookies();
         Cookie cookie;
 
-        if (cookies == null) {
+        if(req.getHeader("Authorization") != null ) {
+            log.info("Authorization header exist, skip filter");
+            filterChain.doFilter(servletRequest, servletResponse);
+        } else if (cookies == null) {
+            log.info("Cookies not exist, skip filter");
             filterChain.doFilter(servletRequest, servletResponse);
         } else {
             cookie = Arrays.stream(req.getCookies()).
                     filter(x -> x.getName().equals("jwt")).findFirst().orElse(null);
 
-            HttpServletResponse resp = (HttpServletResponse) servletResponse;
+            MutableHttpServletRequest mutableReq = new MutableHttpServletRequest(req);
+
             if (cookie != null && !cookie.getValue().equals("")) {
                 log.info("AuthorizationFilter: Cookie value " + cookie.getValue());
-                resp.addHeader("Authorization", "Bearer_" + cookie.getValue());
+                mutableReq.putHeader("Authorization", "Bearer " + cookie.getValue());
             }
 
-            filterChain.doFilter(req, resp);
+            filterChain.doFilter(mutableReq, servletResponse);
         }
     }
 }
