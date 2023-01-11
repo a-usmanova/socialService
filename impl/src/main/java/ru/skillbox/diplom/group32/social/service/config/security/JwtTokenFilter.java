@@ -11,6 +11,7 @@ import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
@@ -24,7 +25,7 @@ public class JwtTokenFilter extends GenericFilterBean {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain filterChain) throws IOException, ServletException {
         log.info("Start jwt JwtTokenFilter");
-        String token = jwtTokenProvider.resolveToken((HttpServletResponse) response);
+        String token = jwtTokenProvider.resolveToken((HttpServletRequest) request);
         log.info("Token = " + token);
 
 

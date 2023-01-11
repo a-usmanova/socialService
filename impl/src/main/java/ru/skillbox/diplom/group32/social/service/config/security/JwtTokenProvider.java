@@ -5,6 +5,7 @@ import com.nimbusds.jose.jwk.source.ImmutableSecret;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -17,6 +18,7 @@ import ru.skillbox.diplom.group32.social.service.model.auth.Role;
 import javax.annotation.PostConstruct;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -25,6 +27,7 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class JwtTokenProvider {
 
     @Value("${jwt.token.secret}")
@@ -76,9 +79,11 @@ public class JwtTokenProvider {
         return jwtDecoder().decode(token).getClaim("email");
     }
 
-    public String resolveToken(HttpServletResponse response) {
-        String skillToken = response.getHeader("Authorization");
-        if (skillToken != null && skillToken.startsWith("Bearer")) {
+    public String resolveToken(HttpServletRequest request) {
+        String skillToken = request.getHeader("Authorization");
+        log.info("Before check ResolvedToken with Bearer - " + skillToken);
+        if (skillToken != null && skillToken.startsWith("Bearer ")) {
+            log.info("ResolvedToken - " + skillToken.substring(7, skillToken.length()));
             return skillToken.substring(7, skillToken.length());
         }
         return null;
