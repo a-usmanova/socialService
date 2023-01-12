@@ -42,6 +42,15 @@ public class SpecificationUtil {
         });
     }
 
+    public static <T> Specification<T> likeLowerCase(SingularAttribute<T, String> field, String value, boolean isSkipNullValues) {
+        return nullValueCheck(value, isSkipNullValues, () -> {
+            return ((root, query, builder) -> {
+                query.distinct(true);
+                return builder.like(
+                        builder.lower(root.get(field)), "%" + value.toLowerCase() + "%");
+            });
+        });
+    }
     public static <T> Specification<T> between(SingularAttribute<T, ZonedDateTime> field, ZonedDateTime valueFrom, ZonedDateTime valueTo, boolean isSkipNullValues) {
         return nullValueCheck(valueFrom, valueTo, isSkipNullValues, () -> {
 

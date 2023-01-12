@@ -1,7 +1,6 @@
 package ru.skillbox.diplom.group32.social.service.resource.account;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -62,8 +61,20 @@ public interface AccountController extends BaseController<AccountDto, AccountSea
             @ApiResponse(responseCode = "200",
                     description = "Аккаунт найден",
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            schema = @Schema(allOf = {Pageable.class ,AccountDto.class, UserDto.class}))),
+                            schema = @Schema(allOf = {Pageable.class, AccountDto.class, UserDto.class}))),
             @ApiResponse(responseCode = "400", content = @Content(mediaType = "")),
             @ApiResponse(responseCode = "401", content = @Content(mediaType = ""))})
     ResponseEntity<Page<AccountDto>> search(AccountSearchDto accountSearchDto, Pageable page);
+
+    @GetMapping(value = "/{id}")
+    @Operation(summary = "Получение аккаунта по id")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",
+                    description = "Аккаунт получен",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(allOf = {AccountDto.class, UserDto.class}))),
+            @ApiResponse(responseCode = "400", content = @Content(mediaType = "")),
+            @ApiResponse(responseCode = "401", content = @Content(mediaType = "")),
+            @ApiResponse(responseCode = "404", description = "Аккаунт не найден", content = @Content(mediaType = ""))})
+    ResponseEntity<AccountDto> getById(@Schema(description = "id Аккаунта") @PathVariable Long id);
 }
