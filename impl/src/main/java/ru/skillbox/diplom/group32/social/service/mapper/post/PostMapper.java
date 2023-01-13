@@ -26,7 +26,7 @@ public interface PostMapper {
     @Mapping(target = "authorId", expression = "java(ru.skillbox.diplom.group32.social.service.utils.security.SecurityUtil.getJwtUserIdFromSecurityContext())")
     @Mapping(target = "isDeleted", constant = "false")
     @Mapping(target = "time", expression = "java(postDto.getPublishDate())")
-    @Mapping(target = "publishDate", expression = "java(postDto.getPublishDate().equals(null) ? ZonedDateTime.now() : postDto.getPublishDate())")
+    @Mapping(target = "publishDate", expression = "java((postDto.getPublishDate()==null) ? ZonedDateTime.now() : postDto.getPublishDate())")
     @Mapping(target = "myLike", constant = "false")
     @Mapping(target = "commentsCount", constant = "0L")
     @Mapping(target = "likeAmount", constant = "0L")
