@@ -40,6 +40,6 @@ public class PostDto extends BaseDto {
     @Schema(description = "Путь к фото")
     private String imagePath;
     @Schema(description = "Время публикации поста")
-    private ZonedDateTime publishDate;
+    private String publishDate;
 
 }
