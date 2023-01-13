@@ -8,7 +8,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -69,9 +68,10 @@ public class PostControllerImpl implements PostController {
     }
 
     @PostMapping(value = "/storagePostPhoto", consumes = {MULTIPART_FORM_DATA_VALUE})
-    public String storagePostPhoto (@RequestParam(value = "request", required = false) MultipartFile request) throws IOException {
+    @ResponseStatus(code = HttpStatus.CREATED)
+    public ResponseEntity<PostDto> storagePostPhoto (MultipartFile request) throws IOException {
 
-        return postService.savePhoto(request);
+        return ResponseEntity.ok(postService.savePhoto(request));
 
     }
 

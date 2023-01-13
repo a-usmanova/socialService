@@ -157,7 +157,7 @@ public interface PostController extends BaseController<PostDto, PostSearchDto> {
 
     @PostMapping(value = "/storagePostPhoto", consumes = {MULTIPART_FORM_DATA_VALUE})
     @Operation(summary = "Создание фото к посту")
-    String storagePostPhoto(@Schema(description = "Файл фото") @RequestParam(value = "request", required = false) MultipartFile request) throws IOException;
+    ResponseEntity<PostDto> storagePostPhoto(@Schema(description = "Файл фото") @RequestParam(value = "file", required = false) MultipartFile request) throws IOException;
 
 //
 //    -----------***LIKES***-----------

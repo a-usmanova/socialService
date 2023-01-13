@@ -1,6 +1,7 @@
 package ru.skillbox.diplom.group32.social.service.service.post;
 
 import com.cloudinary.Cloudinary;
+import com.cloudinary.Transformation;
 import com.cloudinary.utils.ObjectUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -41,7 +42,7 @@ public class PostService {
     private final PostMapper postMapper;
 
     final LikeService likeService;
-    private Properties properties;
+    private final Properties properties;
 
     public PostDto getById(Long id) {
 
@@ -51,6 +52,8 @@ public class PostService {
     }
 
     public Page<PostDto> getAll(PostSearchDto searchDto, Pageable page) {
+
+        searchDto.setDateTo(ZonedDateTime.now());
         log.info("PostService in getAll tried to find posts with postSearchDto: {} and pageable: {}", searchDto, page);
         Page<Post> postPage = postRepository.findAll(getSpecification(searchDto), page);
         return postPage.map(e->{
@@ -67,6 +70,8 @@ public class PostService {
 
         log.info("PostService in create has post to save: " + postDto);
 
+//        ZonedDateTimeConverter zonedDateTimeConverter = new ZonedDateTimeConverter(ZoneId.systemDefault());
+//        postDto.setPublishDate(String.valueOf(postDto.getPublishDate().equals("false") ? ZonedDateTime.now() : zonedDateTimeConverter.convert(postDto.getPublishDate())));
         Post postEntity = postMapper.convertToEntityCreated(postDto);
         postEntity.setTags(tagService.createNonExistent(postDto.getTags()));
         Post post = postRepository.save(postEntity);
@@ -106,7 +111,8 @@ public class PostService {
                                 .and(containsTag(searchDto.getTags()))));
     }
 
-    public String savePhoto(MultipartFile request) throws IOException {
+
+    public PostDto savePhoto(MultipartFile file) throws IOException {
 
         Cloudinary cloudinary = new Cloudinary(ObjectUtils.asMap(
                 "cloud_name", properties.getCloudName(),
@@ -114,11 +120,17 @@ public class PostService {
                 "api_secret", properties.getApiSecret()));
 
 
-        Map uploadResult = cloudinary.uploader().upload(request.getBytes(), ObjectUtils.emptyMap());
+        Map uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.asMap("transformation",
+                new Transformation()
+                        .height(400).width(400).crop("pad")));
         log.info("PostService in savePhoto: successfully uploaded the file: " + uploadResult.get("original_filename"));
 
-        return uploadResult.get("url").toString();
+        Post post = new Post();
+        post.setImagePath(uploadResult.get("url").toString());
+
+        return postMapper.convertToDto(post);
     }
+
 
     private Post updatePost (PostDto postDto, Long id) {
 
