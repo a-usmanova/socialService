@@ -23,9 +23,11 @@ import ru.skillbox.diplom.group32.social.service.model.tag.Tag_;
 import ru.skillbox.diplom.group32.social.service.repository.post.PostRepository;
 import ru.skillbox.diplom.group32.social.service.service.like.LikeService;
 import ru.skillbox.diplom.group32.social.service.service.tag.TagService;
+import ru.skillbox.diplom.group32.social.service.utils.zonedDateTime.ZonedDateTimeConverter;
 
 import javax.persistence.criteria.Join;
 import java.io.IOException;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Map;
 import java.util.Set;
@@ -70,8 +72,8 @@ public class PostService {
 
         log.info("PostService in create has post to save: " + postDto);
 
-//        ZonedDateTimeConverter zonedDateTimeConverter = new ZonedDateTimeConverter(ZoneId.systemDefault());
-//        postDto.setPublishDate(String.valueOf(postDto.getPublishDate().equals("false") ? ZonedDateTime.now() : zonedDateTimeConverter.convert(postDto.getPublishDate())));
+        ZonedDateTimeConverter zonedDateTimeConverter = new ZonedDateTimeConverter(ZoneId.systemDefault());
+        postDto.setPublishDate(String.valueOf(postDto.getPublishDate().equals("false") ? ZonedDateTime.now() : zonedDateTimeConverter.convert(postDto.getPublishDate())));
         Post postEntity = postMapper.convertToEntityCreated(postDto);
         postEntity.setTags(tagService.createNonExistent(postDto.getTags()));
         Post post = postRepository.save(postEntity);
