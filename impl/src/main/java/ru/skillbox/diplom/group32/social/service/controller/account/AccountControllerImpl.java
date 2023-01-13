@@ -23,7 +23,7 @@ public class AccountControllerImpl implements AccountController {
     @Override
     @Hidden
     public ResponseEntity<AccountDto> getById(Long id) {
-        return new ResponseEntity<>(HttpStatus.METHOD_NOT_ALLOWED);
+        return new ResponseEntity<>(accountService.getAccountById(id), HttpStatus.OK);
     }
 
     @Override
@@ -61,6 +61,6 @@ public class AccountControllerImpl implements AccountController {
 
     @Override
     public ResponseEntity<Page<AccountDto>> search(AccountSearchDto accountSearchDto, Pageable page) {
-        return new ResponseEntity<>(accountService.searchAccountByFirstAndLastName(accountSearchDto, page), HttpStatus.OK);
+        return new ResponseEntity<>(accountService.searchAccount(accountSearchDto, page), HttpStatus.OK);
     }
 }

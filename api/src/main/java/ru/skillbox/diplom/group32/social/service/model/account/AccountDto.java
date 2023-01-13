@@ -1,6 +1,5 @@
 package ru.skillbox.diplom.group32.social.service.model.account;
 
-import io.swagger.v3.oas.annotations.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;

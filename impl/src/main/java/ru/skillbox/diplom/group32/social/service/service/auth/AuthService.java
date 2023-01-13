@@ -16,8 +16,6 @@ import ru.skillbox.diplom.group32.social.service.repository.auth.UserRepository;
 import ru.skillbox.diplom.group32.social.service.service.account.AccountService;
 import ru.skillbox.diplom.group32.social.service.service.captcha.CaptchaService;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.List;
 
