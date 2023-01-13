@@ -1,0 +1,30 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+    <changeSet author="up156" id="create-friend-table">
+        <preConditions onFail="MARK_RAN" onError="CONTINUE">
+            <not>
+                <tableExists tableName="friend"/>
+            </not>
+        </preConditions>
+        <createTable tableName="friend">
+            <column name="id" type="INTEGER" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="is_deleted" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="from_account_id" type="BIGINT">
+            </column>
+            <column name="status_code" type="VARCHAR(255)">
+            </column>
+            <column name="to_account_id" type="BIGINT">
+            </column>
+
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>

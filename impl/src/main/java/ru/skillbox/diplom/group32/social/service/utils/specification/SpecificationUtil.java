@@ -33,6 +33,15 @@ public class SpecificationUtil {
         });
     }
 
+    public static <T, V> Specification<T> notEqual(SingularAttribute<T, V> field, V value, boolean isSkipNullValues) {
+        return nullValueCheck(value, isSkipNullValues, () -> {
+            return ((root, query, builder) -> {
+                query.distinct(true);
+                return builder.equal(root.get(field), value).not();
+            });
+        });
+    }
+
     public static <T> Specification<T> like(SingularAttribute<T, String> field, String value, boolean isSkipNullValues) {
         return nullValueCheck(value, isSkipNullValues, () -> {
             return ((root, query, builder) -> {

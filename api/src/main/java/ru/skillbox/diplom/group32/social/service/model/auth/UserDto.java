@@ -6,6 +6,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import ru.skillbox.diplom.group32.social.service.model.base.BaseDto;
+import ru.skillbox.diplom.group32.social.service.model.friend.FriendDto;
+
+import java.util.List;
 
 @Getter
 @Setter
@@ -22,4 +25,6 @@ public class UserDto extends BaseDto { //TODO Можно в принципе с�
     private String email;
     @Schema(description = "Пароль пользователя")
     private String password;
+
+    private List<FriendDto> friends;
 }
