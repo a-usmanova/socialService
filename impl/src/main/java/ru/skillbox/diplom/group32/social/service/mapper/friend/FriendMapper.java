@@ -16,11 +16,13 @@ public interface FriendMapper {
     FriendDto convertToDto(Friend friend);
 
     @Mapping(target = "fromAccountId", source = "id")
+    @Mapping(target = "isBlocked", expression = "java(false)")
     @Mapping(target = "statusCode", expression = "java(StatusCode.REQUEST_TO)")
     @Mapping(target = "toAccountId", expression = "java(ru.skillbox.diplom.group32.social.service.utils.security.SecurityUtil.getJwtUserIdFromSecurityContext())")
     Friend userDtoToFriend(UserDto userDto);
 
     @Mapping(target = "toAccountId", source = "id")
+    @Mapping(target = "isBlocked", expression = "java(false)")
     @Mapping(target = "statusCode", expression = "java(StatusCode.REQUEST_FROM)")
     @Mapping(target = "fromAccountId", expression = "java(ru.skillbox.diplom.group32.social.service.utils.security.SecurityUtil.getJwtUserIdFromSecurityContext())")
     Friend userDtoToFriendFrom(UserDto userDto);
@@ -28,6 +30,7 @@ public interface FriendMapper {
     @InheritInverseConfiguration
     Friend convertToEntity(FriendDto friendDto);
 
-    List<FriendDto> convertToDtoList(List<Friend> FriendList);
+    List<FriendDto> convertToDtoList(List<Friend> friendList);
+    List<Friend> convertToEntityList(List<FriendDto> friendDtoList);
 
 }

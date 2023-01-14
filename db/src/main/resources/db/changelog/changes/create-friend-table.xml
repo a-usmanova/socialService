@@ -23,6 +23,8 @@
             </column>
             <column name="to_account_id" type="BIGINT">
             </column>
+            <column name="is_blocked" type="BOOLEAN">
+            </column>
 
         </createTable>
     </changeSet>

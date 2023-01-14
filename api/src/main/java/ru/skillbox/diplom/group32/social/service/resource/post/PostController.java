@@ -72,8 +72,7 @@ public interface PostController extends BaseController<PostDto, PostSearchDto> {
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
                             schema = @Schema(allOf = {PostDto.class}))),
             @ApiResponse(responseCode = "400", content = @Content(mediaType = ""))})
-    ResponseEntity updatePost(@Schema(description = "id Поста для обновления")
-                              @PathVariable Long id, @RequestBody PostDto postDto);
+    ResponseEntity updatePost(@Schema(description = "id Поста для обновления") @RequestBody PostDto postDto);
 
     @Override
     @DeleteMapping(value = "/{id}")

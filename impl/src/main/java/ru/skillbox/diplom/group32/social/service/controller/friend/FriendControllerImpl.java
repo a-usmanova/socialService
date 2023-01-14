@@ -62,13 +62,15 @@ public class FriendControllerImpl implements FriendController {
     }
 
     @Override
-    public ResponseEntity approveFriend(Long id) {
-        return null;
+    public ResponseEntity approveFriend(Long id)  {
+        friendService.approveFriend(id);
+        return ResponseEntity.ok().body("ok");
     }
 
     @Override
     public ResponseEntity blockFriend(Long id) {
-        return null;
+        friendService.blockFriend(id);
+        return ResponseEntity.ok().body("ok");
     }
 
     @Override
