@@ -70,8 +70,7 @@ public class AccountService {
     public Page<AccountDto> searchAccount(AccountSearchDto accountSearchDto, Pageable page) {
         Page<Account> accountSearchPages;
 
-        if (accountSearchDto.getFirstName() == null && accountSearchDto.getLastName() == null && accountSearchDto.getAgeFrom() == null
-                && accountSearchDto.getAgeTo() == null && accountSearchDto.getCountry() == null && accountSearchDto.getCity() == null) {
+        if (accountSearchDto.getAuthor() != null) {
             accountSearchPages = accountRepository.findAll(getSpecificationByAuthor(accountSearchDto), page);
         } else {
             accountSearchPages = accountRepository.findAll(getSpecificationByOtherFields(accountSearchDto), page);

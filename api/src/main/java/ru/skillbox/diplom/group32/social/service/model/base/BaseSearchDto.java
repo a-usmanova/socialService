@@ -12,6 +12,6 @@ public abstract class BaseSearchDto implements Serializable {
 
     private Long id;
 
-    private Boolean isDeleted;
+    private Boolean isDeleted = false;
 
 }
