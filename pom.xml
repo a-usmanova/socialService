@@ -93,10 +93,10 @@
         </dependency>
 
         <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
-        <version>${spring.security.oauth2.resource.server.version}</version>
-    </dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
+            <version>${spring.security.oauth2.resource.server.version}</version>
+        </dependency>
         <!--  Other  -->
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -200,7 +200,7 @@
                     </execution>
                 </executions>
             </plugin>
-<!--     Swagger       -->
+            <!--     Swagger       -->
             <plugin>
                 <groupId>org.springdoc</groupId>
                 <artifactId>springdoc-openapi-maven-plugin</artifactId>

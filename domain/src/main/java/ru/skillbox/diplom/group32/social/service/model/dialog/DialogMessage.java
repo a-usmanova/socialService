@@ -7,10 +7,10 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class DialogMessage {
+public class DialogMessage <T>{
 
     private String type;
     private Long accountId;
-    private DialogMessageDto data;
+    private T data;
 
 }

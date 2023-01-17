@@ -13,6 +13,7 @@ spring:
     driverClassName: org.postgresql.Driver
     username: ${DB_USERNAME:skillbox}
     password: ${DB_PASSWORD:skillbox}
+
   mail:
     protocol: smtps
     username: skillbox.team32.service@yandex.ru

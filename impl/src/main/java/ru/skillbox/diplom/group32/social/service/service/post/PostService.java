@@ -44,7 +44,7 @@ public class PostService {
     private final TagService tagService;
     private final PostMapper postMapper;
 
-    final LikeService likeService;
+    private final LikeService likeService;
     private final Properties properties;
 
     public PostDto getById(Long id) {
