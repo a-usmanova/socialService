@@ -7,21 +7,20 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import ru.skillbox.diplom.group32.social.service.exception.ObjectNotFoundException;
-import ru.skillbox.diplom.group32.social.service.mapper.account.AccountMapper;
-import ru.skillbox.diplom.group32.social.service.mapper.auth.UserMapper;
 import ru.skillbox.diplom.group32.social.service.mapper.friend.FriendMapper;
 import ru.skillbox.diplom.group32.social.service.model.account.StatusCode;
+import ru.skillbox.diplom.group32.social.service.model.base.BaseEntity;
 import ru.skillbox.diplom.group32.social.service.model.friend.Friend;
 import ru.skillbox.diplom.group32.social.service.model.friend.FriendDto;
 import ru.skillbox.diplom.group32.social.service.model.friend.FriendSearchDto;
 import ru.skillbox.diplom.group32.social.service.model.friend.Friend_;
-import ru.skillbox.diplom.group32.social.service.repository.account.AccountRepository;
 import ru.skillbox.diplom.group32.social.service.repository.friend.FriendRepository;
 import ru.skillbox.diplom.group32.social.service.service.account.AccountService;
 import ru.skillbox.diplom.group32.social.service.service.auth.UserService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static ru.skillbox.diplom.group32.social.service.utils.security.SecurityUtil.getJwtUserIdFromSecurityContext;
 import static ru.skillbox.diplom.group32.social.service.utils.specification.SpecificationUtil.*;
@@ -32,11 +31,8 @@ import static ru.skillbox.diplom.group32.social.service.utils.specification.Spec
 public class FriendService {
 
     private final FriendRepository friendRepository;
-    private final AccountRepository accountRepository;
     private final AccountService accountService;
     private final FriendMapper friendMapper;
-    private final AccountMapper accountMapper;
-    private final UserMapper userMapper;
 
     private final UserService userService;
 
@@ -51,7 +47,6 @@ public class FriendService {
 
         log.info("FriendService in getAll tried to find friends with FriendSearchDto: {} and pageable: {}", searchDto, page);
 
-        searchDto.setIsDeleted(false);
         if (searchDto.getStatusCode() == null) {
             searchDto.setStatusCode(StatusCode.NONE);
         } else {
@@ -61,16 +56,9 @@ public class FriendService {
         Page<Friend> friendPage = friendRepository.findAll(getSpecification(searchDto), page);
         Page<FriendDto> friendDtos = friendPage.map(friendMapper::convertToDto);
         friendDtos.map(e -> {
-            if (e.getStatusCode().equals(StatusCode.REQUEST_TO)) {
-                e.setFirstName(accountService.getAccountById(e.getFromAccountId()).getFirstName());
-                e.setLastName(accountService.getAccountById(e.getFromAccountId()).getLastName());
-            }
-            else  {
-                e.setFirstName(accountService.getAccountById(e.getFromAccountId()).getFirstName());
-                e.setLastName(accountService.getAccountById(e.getFromAccountId()).getLastName());
-            }
+            e.setFirstName(accountService.getAccountById(e.getFromAccountId()).getFirstName());
+            e.setLastName(accountService.getAccountById(e.getFromAccountId()).getLastName());
             return e;
-
         });
 
         return friendDtos;
@@ -96,7 +84,8 @@ public class FriendService {
                 .and(in(Friend_.id, searchDto.getIds(), true))
                 .and(equal(Friend_.statusCode, searchDto.getStatusCode(), true)
                 .and(equal(Friend_.fromAccountId, searchDto.getId_from(), true))
-                .and(equal(Friend_.toAccountId, searchDto.getId_to(), true)));
+                .and(equal(Friend_.toAccountId, searchDto.getId_to(), true))
+                .and(equal(Friend_.isBlocked, searchDto.getIsBlocked(), true)));
 //                .and(like(Friend_.firstName, searchDto.getFirstName(), true))
 //                .and(between(Friend_.birthDate, searchDto.getBirthDateFrom(), searchDto.getBirthDateFrom(), true))
 //                .and(like(Friend_.city, searchDto.getCity(), true))
@@ -105,22 +94,28 @@ public class FriendService {
 
     public List<Long> getFriendsIds() {
 
-        return null;
+        FriendSearchDto friendSearchDto = new FriendSearchDto();
+        friendSearchDto.setStatusCode(StatusCode.FRIEND);
+        friendSearchDto.setId_to(getJwtUserIdFromSecurityContext());
+        friendSearchDto.setIsBlocked(false);
+        return friendRepository.findAll(getSpecification(friendSearchDto)).stream().map(BaseEntity::getId).collect(Collectors.toList());
 
     }
 
     public Integer getCount() {
 
-        final Integer count = 0;
+        FriendSearchDto friendSearchDto = new FriendSearchDto();
+        friendSearchDto.setStatusCode(StatusCode.REQUEST_FROM);
+        friendSearchDto.setId_to(getJwtUserIdFromSecurityContext());
+        friendSearchDto.setIsBlocked(false);
 
-        return null;
+        return friendRepository.findAll(getSpecification(friendSearchDto)).size();
 
 
     }
 
     public List<FriendDto> addFriend(Long id) {
 
-// *TODO на каждую дружбу две записи
 
         log.info("FriendService in addFriend has new friend - user with id {} to save: ", id);
         List<Friend> friendList = new ArrayList<>();
@@ -167,7 +162,11 @@ public class FriendService {
         searchDto.setIsDeleted(false);
         searchDto.setId_from(getJwtUserIdFromSecurityContext());
         searchDto.setId_to(id);
-        return friendRepository.findAll(getSpecification(searchDto));
+        List<Friend> list = friendRepository.findAll(getSpecification(searchDto));
+        searchDto.setId_to(getJwtUserIdFromSecurityContext());
+        searchDto.setId_from(id);
+        list.addAll(friendRepository.findAll(getSpecification(searchDto)));
+        return list;
 
     }
 
@@ -189,4 +188,15 @@ public class FriendService {
         friendRepository.saveAll(initialList);
 
     }
+
+    public List<Long> getBlockedFriendsIds() {
+        FriendSearchDto friendSearchDto = new FriendSearchDto();
+        friendSearchDto.setIsBlocked(true);
+        return (friendRepository.findAll(getSpecification(friendSearchDto))).stream().map(BaseEntity::getId).collect(Collectors.toList());
+    }
+
+    public void sendNotice() {
+        // ??
+    }
+
 }

@@ -48,7 +48,7 @@ public class FriendControllerImpl implements FriendController {
 
     @Override
     public ResponseEntity<List<Long>> getBlockedFriendsIds() {
-        return null;
+        return ResponseEntity.ok(friendService.getBlockedFriendsIds());
     }
 
     @Override
