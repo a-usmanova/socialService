@@ -20,6 +20,7 @@ import ru.skillbox.diplom.group32.social.service.repository.friend.FriendReposit
 import ru.skillbox.diplom.group32.social.service.service.account.AccountService;
 import ru.skillbox.diplom.group32.social.service.service.auth.UserService;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static ru.skillbox.diplom.group32.social.service.utils.security.SecurityUtil.getJwtUserIdFromSecurityContext;
@@ -53,20 +54,18 @@ public class FriendService {
         searchDto.setIsDeleted(false);
         if (searchDto.getStatusCode() == null) {
             searchDto.setStatusCode(StatusCode.NONE);
-        }
-        else if (searchDto.getStatusCode().equals(StatusCode.REQUEST_FROM)) {
-            searchDto.setId_to(getJwtUserIdFromSecurityContext());
-        } else if (searchDto.getStatusCode().equals(StatusCode.REQUEST_TO)) {
+        } else {
             searchDto.setId_to(getJwtUserIdFromSecurityContext());
         }
 
         Page<Friend> friendPage = friendRepository.findAll(getSpecification(searchDto), page);
         Page<FriendDto> friendDtos = friendPage.map(friendMapper::convertToDto);
         friendDtos.map(e -> {
-            if (e.getStatusCode().equals(StatusCode.REQUEST_FROM)) {
+            if (e.getStatusCode().equals(StatusCode.REQUEST_TO)) {
                 e.setFirstName(accountService.getAccountById(e.getFromAccountId()).getFirstName());
                 e.setLastName(accountService.getAccountById(e.getFromAccountId()).getLastName());
-            }if (e.getStatusCode().equals(StatusCode.REQUEST_TO)) {
+            }
+            else  {
                 e.setFirstName(accountService.getAccountById(e.getFromAccountId()).getFirstName());
                 e.setLastName(accountService.getAccountById(e.getFromAccountId()).getLastName());
             }
@@ -119,21 +118,75 @@ public class FriendService {
 
     }
 
-    public FriendDto addFriend(Long id) {
+    public List<FriendDto> addFriend(Long id) {
 
 // *TODO на каждую дружбу две записи
 
-        log.info("FriendService in addFriend has new friend - user with {} to save: ", id);
-        Friend friendTo = friendMapper.userDtoToFriend(userService.getUser(id));
-        Friend friendFrom = friendMapper.userDtoToFriendFrom(userService.getUser(id));
+        log.info("FriendService in addFriend has new friend - user with id {} to save: ", id);
+        List<Friend> friendList = new ArrayList<>();
+        friendList.add(friendMapper.userDtoToFriend(userService.getUser(id)));
+        friendList.add(friendMapper.userDtoToFriendFrom(userService.getUser(id)));
+        if (getCurrentFriendsByAccountId(id).isEmpty()) {
+            return friendMapper.convertToDtoList(friendRepository.saveAll(friendList));
+        } else return friendMapper.convertToDtoList(friendList);
+
+    }
+
+    public void approveFriend(Long id) {
+
+        List<Friend> friendList = getCurrentFriendsByFriendId(id);
+        if (!friendList.isEmpty()) {
+
+            friendList.forEach(e -> e.setStatusCode(StatusCode.FRIEND));
+            friendRepository.saveAll(friendList);
+        }
+    }
+
+    private List<Friend> getCurrentFriendsByFriendId(Long id) {
+
+        Friend initialFriend = friendRepository.findById(id).orElseThrow(ObjectNotFoundException::new);
         FriendSearchDto friendSearchDto = new FriendSearchDto();
-        friendSearchDto.setId_from(friendFrom.getFromAccountId());
+        friendSearchDto.setId_to(initialFriend.getFromAccountId());
+        friendSearchDto.setId_from(initialFriend.getToAccountId());
         friendSearchDto.setIsDeleted(false);
-        friendSearchDto.setId_to(id);
-        List<Friend> friendSearch = friendRepository.findAll(getSpecification(friendSearchDto));
-        if (friendSearch.isEmpty()) {
-            friendRepository.save(friendFrom);
-            return friendMapper.convertToDto(friendRepository.save(friendTo));
-        } else return friendMapper.convertToDto(friendSearch.stream().findFirst().orElseThrow(ObjectNotFoundException::new));
+        List<Friend> list = friendRepository.findAll(getSpecification(friendSearchDto));
+        friendSearchDto.setId_to(initialFriend.getToAccountId());
+        friendSearchDto.setId_from(initialFriend.getFromAccountId());
+        friendSearchDto.setIsDeleted(false);
+        list.addAll(friendRepository.findAll(getSpecification(friendSearchDto)));
+
+        return list;
+
+    }
+
+    //** TODO сделать поиск по постаам
+
+    private List<Friend> getCurrentFriendsByAccountId(Long id) {
+
+        FriendSearchDto searchDto = new FriendSearchDto();
+        searchDto.setIsDeleted(false);
+        searchDto.setId_from(getJwtUserIdFromSecurityContext());
+        searchDto.setId_to(id);
+        return friendRepository.findAll(getSpecification(searchDto));
+
+    }
+
+    public void blockFriend(Long id) {
+
+        List<Friend> initialList = getCurrentFriendsByAccountId(id);
+
+        if (initialList.isEmpty()) {
+            initialList.addAll(friendMapper.convertToEntityList(addFriend(id)));
+            initialList.forEach(f -> f.setStatusCode(StatusCode.NONE));
+        }
+        initialList.forEach(f -> {
+                    if (f.getIsBlocked()) {
+                        f.setIsBlocked(false);
+                    } else f.setIsBlocked(true);
+                }
+        );
+
+        friendRepository.saveAll(initialList);
+
     }
 }

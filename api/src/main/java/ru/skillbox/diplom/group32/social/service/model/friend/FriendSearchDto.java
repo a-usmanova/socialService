@@ -24,6 +24,7 @@ public class FriendSearchDto extends BaseSearchDto {
     private String country;
     private Long ageFrom;
     private Long ageTo;
+    private Boolean isBlocked;
 
 
 }

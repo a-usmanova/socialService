@@ -77,10 +77,11 @@ public class PostService {
         return postMapper.convertToDto(post);
     }
 
-    public PostDto update(PostDto postDto, Long id) {
+    public PostDto update(PostDto postDto) {
 
-        log.info("PostService in update has post with id: {} to update: {} ", id, postDto);
-        Post post = updatePost(postDto, id);
+        log.info("PostService in update has post with id: {} to update: {} ", postDto.getId(), postDto);
+        Post post = updatePost(postDto);
+//        Post post = updatePost(postDto, id);
         log.info("PostService in updatePost: Post updated. New Post: " + post);
 
         return postMapper.convertToDto(postRepository.save(post));
@@ -128,10 +129,11 @@ public class PostService {
         return postMapper.convertToDto(post);
     }
 
+    private Post updatePost (PostDto postDto) {
+//    private Post updatePost (PostDto postDto, Long id) {
 
-    private Post updatePost (PostDto postDto, Long id) {
-
-        Post post = postRepository.findById(id).orElseThrow(ObjectNotFoundException::new);
+//        Post post = postRepository.findById(id).orElseThrow(ObjectNotFoundException::new);
+        Post post = postRepository.findById(postDto.getId()).orElseThrow(ObjectNotFoundException::new);
 
         post.setTags(tagService.createNonExistent(postDto.getTags()));
         post.setTitle(postDto.getTitle());

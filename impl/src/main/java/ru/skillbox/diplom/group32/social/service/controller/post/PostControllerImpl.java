@@ -57,8 +57,8 @@ public class PostControllerImpl implements PostController {
     }
 
     @ResponseStatus(code = HttpStatus.CREATED)
-    public ResponseEntity<PostDto> updatePost(Long id, PostDto dto) {
-        return ResponseEntity.ok(postService.update(dto, id));
+    public ResponseEntity<PostDto> updatePost(PostDto dto) {
+        return ResponseEntity.ok(postService.update(dto));
     }
 
     @Override
