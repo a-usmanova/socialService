@@ -1,6 +1,5 @@
 package ru.skillbox.diplom.group32.social.service.controller.post;
 
-import io.swagger.v3.oas.annotations.Hidden;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -41,9 +40,8 @@ public class PostControllerImpl implements PostController {
     }
 
     @Override
-    @Hidden
     public ResponseEntity<PostDto> update(PostDto dto) {
-        return ResponseEntity.ok(null);
+        return ResponseEntity.ok(postService.update(dto));
     }
 
     @Override

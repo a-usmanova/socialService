@@ -21,6 +21,7 @@ import ru.skillbox.diplom.group32.social.service.model.post.Post_;
 import ru.skillbox.diplom.group32.social.service.model.tag.Tag;
 import ru.skillbox.diplom.group32.social.service.model.tag.Tag_;
 import ru.skillbox.diplom.group32.social.service.repository.post.PostRepository;
+import ru.skillbox.diplom.group32.social.service.service.friend.FriendService;
 import ru.skillbox.diplom.group32.social.service.service.like.LikeService;
 import ru.skillbox.diplom.group32.social.service.service.tag.TagService;
 
@@ -38,6 +39,8 @@ import static ru.skillbox.diplom.group32.social.service.utils.specification.Spec
 @RequiredArgsConstructor
 public class PostService {
     private final PostRepository postRepository;
+
+    private final FriendService friendService;
     private final TagService tagService;
     private final PostMapper postMapper;
 
@@ -52,6 +55,10 @@ public class PostService {
     }
 
     public Page<PostDto> getAll(PostSearchDto searchDto, Pageable page) {
+
+        if (searchDto.getWithFriends() != null) {
+            searchDto.setIds(friendService.getFriendsIds());
+        }
 
         searchDto.setDateTo(ZonedDateTime.now());
         log.info("PostService in getAll tried to find posts with postSearchDto: {} and pageable: {}", searchDto, page);
