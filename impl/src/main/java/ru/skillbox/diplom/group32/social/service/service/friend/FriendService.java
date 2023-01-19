@@ -50,14 +50,15 @@ public class FriendService {
         if (searchDto.getStatusCode() == null) {
             searchDto.setStatusCode(StatusCode.NONE);
         } else {
-            searchDto.setId_to(getJwtUserIdFromSecurityContext());
+            searchDto.setId_from(getJwtUserIdFromSecurityContext());
         }
 
         Page<Friend> friendPage = friendRepository.findAll(getSpecification(searchDto), page);
         Page<FriendDto> friendDtos = friendPage.map(friendMapper::convertToDto);
         friendDtos.map(e -> {
-            e.setFirstName(accountService.getAccountById(e.getFromAccountId()).getFirstName());
-            e.setLastName(accountService.getAccountById(e.getFromAccountId()).getLastName());
+            e.setFirstName(accountService.getAccountById(e.getToAccountId()).getFirstName());
+            e.setLastName(accountService.getAccountById(e.getToAccountId()).getLastName());
+            e.setIsBlocked(friendRepository.findById(e.getId()).get().getIsBlocked());
             return e;
         });
 
@@ -69,13 +70,7 @@ public class FriendService {
 
         log.info("FriendService in deleteById tried to delete friend with id: " + id);
 
-        Friend friend = friendRepository.findById(id).orElseThrow(ObjectNotFoundException::new);
-        FriendSearchDto searchDto = new FriendSearchDto();
-        searchDto.setId_from(friend.getToAccountId());
-        searchDto.setId_to(friend.getFromAccountId());
-        Page<Friend> friendPage = friendRepository.findAll(getSpecification(searchDto), Pageable.unpaged());
-        friendRepository.deleteAll(friendPage);
-        friendRepository.deleteById(id);
+        friendRepository.deleteAll(getCurrentFriendsByAccountId(id));
 
     }
 
@@ -106,7 +101,7 @@ public class FriendService {
 
         FriendSearchDto friendSearchDto = new FriendSearchDto();
         friendSearchDto.setStatusCode(StatusCode.REQUEST_FROM);
-        friendSearchDto.setId_to(getJwtUserIdFromSecurityContext());
+        friendSearchDto.setId_from(getJwtUserIdFromSecurityContext());
         friendSearchDto.setIsBlocked(false);
 
         return friendRepository.findAll(getSpecification(friendSearchDto)).size();
@@ -172,25 +167,30 @@ public class FriendService {
 
     public void blockFriend(Long id) {
 
-        List<Friend> initialList = getCurrentFriendsByAccountId(id);
+        FriendSearchDto friendSearchDto = new FriendSearchDto();
+        friendSearchDto.setId_from(getJwtUserIdFromSecurityContext());
+        friendSearchDto.setId_to(id);
 
-        if (initialList.isEmpty()) {
-            initialList.addAll(friendMapper.convertToEntityList(addFriend(id)));
-            initialList.forEach(f -> f.setStatusCode(StatusCode.NONE));
+        List<Friend> friendList = friendRepository.findAll(getSpecification(friendSearchDto));
+
+        if (friendList.isEmpty()) {
+            friendList.addAll(friendMapper.convertToEntityList(addFriend(id)));
+            friendList.forEach(f -> f.setStatusCode(StatusCode.NONE));
         }
-        initialList.forEach(f -> {
+        friendList.forEach(f -> {
                     if (f.getIsBlocked()) {
                         f.setIsBlocked(false);
                     } else f.setIsBlocked(true);
                 }
         );
 
-        friendRepository.saveAll(initialList);
+        friendRepository.saveAll(friendList);
 
     }
 
     public List<Long> getBlockedFriendsIds() {
         FriendSearchDto friendSearchDto = new FriendSearchDto();
+        friendSearchDto.setId_from(getJwtUserIdFromSecurityContext());
         friendSearchDto.setIsBlocked(true);
         return (friendRepository.findAll(getSpecification(friendSearchDto))).stream().map(BaseEntity::getId).collect(Collectors.toList());
     }
