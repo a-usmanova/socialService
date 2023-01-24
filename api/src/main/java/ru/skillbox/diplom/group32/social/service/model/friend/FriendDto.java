@@ -42,7 +42,7 @@ public class FriendDto extends BaseDto {
     @Schema(name = "Аккаунт, к которому идет запрос")
     private Long toAccountId;
 
-    @Schema(name = "Блокирован?")
-    private Boolean isBlocked;
+    @Schema(name = "Предыдущий статус")
+    private StatusCode previousStatusCode;
 
 }

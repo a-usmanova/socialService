@@ -92,6 +92,7 @@ public class AccountService {
         ArrayList<String> notInList = new ArrayList<>();
         notInList.add(SecurityUtil.getJwtUserFromSecurityContext().getEmail());
         return getBaseSpecification(accountSearchDto)
+                .and(in(Account_.id, accountSearchDto.getIds(), true))
                 .and(likeLowerCase(Account_.firstName, accountSearchDto.getFirstName(), true)
                         .and(likeLowerCase(Account_.lastName, accountSearchDto.getLastName(), true)
                                 .and(notIn(User_.email, notInList, true))))
