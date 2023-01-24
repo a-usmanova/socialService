@@ -1,12 +1,30 @@
 swagger-api:
   version: "1.0"
 
+host: "212.22.94.79"
+
+server:
+  error:
+    include-message: always
+
 spring:
   datasource:
     url: jdbc:postgresql://${DB_HOST:localhost}:5432/${DB_DATABASE:skillbox}
     driverClassName: org.postgresql.Driver
     username: ${DB_USERNAME:skillbox}
     password: ${DB_PASSWORD:skillbox}
+  mail:
+    protocol: smtps
+    username: skillbox.team32.service@yandex.ru
+    password: zukiufnasemqhtbr
+    host: smtp.yandex.ru
+    port: 465
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
 
   jpa:
     show-sql: true

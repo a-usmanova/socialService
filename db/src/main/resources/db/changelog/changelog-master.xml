@@ -25,5 +25,7 @@
     <include file="db/changelog/changes/insert-city-table.xml"/>
     <include file="db/changelog/changes/create-friend-table.xml"/>
     <include file="db/changelog/changes/change-friend--table.xml"/>
+    <include file="db/changelog/changes/create-password-recovery-table.xml"/>
+
 
 </databaseChangeLog>

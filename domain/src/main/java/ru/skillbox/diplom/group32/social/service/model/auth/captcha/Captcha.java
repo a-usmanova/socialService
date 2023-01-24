@@ -1,4 +1,4 @@
-package ru.skillbox.diplom.group32.social.service.model.captcha;
+package ru.skillbox.diplom.group32.social.service.model.auth.captcha;
 
 import lombok.Getter;
 import lombok.Setter;

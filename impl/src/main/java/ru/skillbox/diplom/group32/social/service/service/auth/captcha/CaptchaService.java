@@ -1,4 +1,4 @@
-package ru.skillbox.diplom.group32.social.service.service.captcha;
+package ru.skillbox.diplom.group32.social.service.service.auth.captcha;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -6,8 +6,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import ru.skillbox.diplom.group32.social.service.model.auth.CaptchaDto;
 import ru.skillbox.diplom.group32.social.service.model.auth.RegistrationDto;
-import ru.skillbox.diplom.group32.social.service.model.captcha.Captcha;
-import ru.skillbox.diplom.group32.social.service.repository.captcha.CaptchaRepository;
+import ru.skillbox.diplom.group32.social.service.model.auth.captcha.Captcha;
+import ru.skillbox.diplom.group32.social.service.repository.auth.captcha.CaptchaRepository;
 
 import javax.imageio.ImageIO;
 import java.io.ByteArrayOutputStream;
