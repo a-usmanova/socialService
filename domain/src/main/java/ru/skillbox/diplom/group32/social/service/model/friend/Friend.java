@@ -37,10 +37,11 @@ public class Friend extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private StatusCode statusCode;
 
+    @Column(name = "previous_status_code")
+    @Enumerated(EnumType.STRING)
+    private StatusCode previousStatusCode;
+
     @Column(name = "to_account_id")
     private Long toAccountId;
-
-    @Column(name = "is_blocked")
-    private Boolean isBlocked;
 
 }

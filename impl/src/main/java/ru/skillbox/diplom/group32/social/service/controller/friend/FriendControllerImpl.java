@@ -32,8 +32,8 @@ public class FriendControllerImpl implements FriendController {
     }
 
     @Override
-    public ResponseEntity<Page<RecommendationDto>> getRecommendation(FriendSearchDto searchDto) {
-        return null;
+    public ResponseEntity<List<RecommendationDto>> getRecommendation(FriendSearchDto searchDto) {
+        return ResponseEntity.ok(friendService.getRecommendation());
     }
 
     @Override

@@ -16,13 +16,11 @@ public interface FriendMapper {
     FriendDto convertToDto(Friend friend);
 
     @Mapping(target = "toAccountId", source = "id")
-    @Mapping(target = "isBlocked", expression = "java(false)")
     @Mapping(target = "statusCode", expression = "java(StatusCode.REQUEST_TO)")
     @Mapping(target = "fromAccountId", expression = "java(ru.skillbox.diplom.group32.social.service.utils.security.SecurityUtil.getJwtUserIdFromSecurityContext())")
     Friend userDtoToFriend(UserDto userDto);
 
     @Mapping(target = "fromAccountId", source = "id")
-    @Mapping(target = "isBlocked", expression = "java(false)")
     @Mapping(target = "statusCode", expression = "java(StatusCode.REQUEST_FROM)")
     @Mapping(target = "toAccountId", expression = "java(ru.skillbox.diplom.group32.social.service.utils.security.SecurityUtil.getJwtUserIdFromSecurityContext())")
     Friend userDtoToFriendFrom(UserDto userDto);

@@ -24,7 +24,7 @@ public interface FriendController extends BaseController<FriendDto, FriendSearch
     ResponseEntity<Page<FriendDto>> getAll(FriendSearchDto searchDto, Pageable page);
 
     @GetMapping(value = "/recommendations")
-    ResponseEntity<Page<RecommendationDto>> getRecommendation(FriendSearchDto searchDto);
+    ResponseEntity<List<RecommendationDto>> getRecommendation(FriendSearchDto searchDto);
 
     @GetMapping(value = "/friendId")
     ResponseEntity<List<Long>> getFriendId();
