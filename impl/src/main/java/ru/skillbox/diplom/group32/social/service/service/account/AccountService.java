@@ -18,7 +18,9 @@ import ru.skillbox.diplom.group32.social.service.utils.security.SecurityUtil;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static ru.skillbox.diplom.group32.social.service.utils.specification.SpecificationUtil.*;
 
@@ -67,6 +69,11 @@ public class AccountService {
         return "Account with id - " + userId + " deleted.";
     }
 
+    public List<AccountDto> searchByIds(AccountSearchDto accountSearchDto){
+         List<Account> resultAccount = accountRepository.findAll(getSpecificationByAccountIds(accountSearchDto));
+         return resultAccount.stream().map(accountMapper::convertToDto).collect(Collectors.toList());
+    }
+
     public Page<AccountDto> searchAccount(AccountSearchDto accountSearchDto, Pageable page) {
         Page<Account> accountSearchPages;
 
@@ -76,6 +83,14 @@ public class AccountService {
             accountSearchPages = accountRepository.findAll(getSpecificationByOtherFields(accountSearchDto), page);
         }
         return accountSearchPages.map(accountMapper::convertToDto);
+    }
+
+    private static Specification<Account> getSpecificationByAccountIds(AccountSearchDto accountSearchDto) {
+        ArrayList<String> notInList = new ArrayList<>();
+        notInList.add(SecurityUtil.getJwtUserFromSecurityContext().getEmail());
+        return getBaseSpecification(accountSearchDto)
+                .and(notIn(User_.email, notInList, true))
+                .and(in(Account_.id, accountSearchDto.getIds(), true));
     }
 
     private static Specification<Account> getSpecificationByAuthor(AccountSearchDto accountSearchDto) {
