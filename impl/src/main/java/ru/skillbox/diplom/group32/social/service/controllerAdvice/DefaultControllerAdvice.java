@@ -7,9 +7,13 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.server.ResponseStatusException;
+import ru.skillbox.diplom.group32.social.service.config.security.exception.WrongPasswordException;
 
 
 import javax.persistence.EntityNotFoundException;
+import java.io.OutputStream;
+import java.io.PrintStream;
 
 @Slf4j
 @ControllerAdvice
@@ -17,20 +21,21 @@ public class DefaultControllerAdvice {
 
     @ResponseBody
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(EntityNotFoundException.class)
-    public Object entityNotFound(EntityNotFoundException e) {
-        log.error("PasswordRecoveryExceptionHandler.entityNotFound: Запрос на изменение пароля с невалидным идентификатором, {}", e.getMessage());
-        return new Object() {
-            public String message = "Невалидный идентификатор";
-        };
-    }
-
-    @ResponseBody
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(RuntimeException.class)
     public Object defaultExceptionHandler(RuntimeException e) {
+
         return new Object() {
             public String message = "Ошибка запроса";
         };
+    }
+
+    @ExceptionHandler(ResponseStatusException.class)
+    public Object responseStatusExceptionHandler(ResponseStatusException e) {
+        throw e;
+    }
+
+    @ExceptionHandler(WrongPasswordException.class)
+    public Object wrongPasswordExceptionHandler(WrongPasswordException e) {
+        throw e;
     }
 }
