@@ -9,7 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import ru.skillbox.diplom.group32.social.service.model.friend.FriendDto;
 import ru.skillbox.diplom.group32.social.service.model.friend.FriendSearchDto;
-import ru.skillbox.diplom.group32.social.service.model.friend.RecommendationDto;
 import ru.skillbox.diplom.group32.social.service.resource.friend.FriendController;
 import ru.skillbox.diplom.group32.social.service.service.friend.FriendService;
 
@@ -32,7 +31,7 @@ public class FriendControllerImpl implements FriendController {
     }
 
     @Override
-    public ResponseEntity<List<RecommendationDto>> getRecommendation(FriendSearchDto searchDto) {
+    public ResponseEntity<List<FriendDto>> getRecommendation(FriendSearchDto searchDto) {
         return ResponseEntity.ok(friendService.getRecommendation());
     }
 

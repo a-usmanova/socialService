@@ -44,4 +44,7 @@ public class Friend extends BaseEntity {
     @Column(name = "to_account_id")
     private Long toAccountId;
 
+    @Column(name = "rating")
+    private Long rating;
+
 }
