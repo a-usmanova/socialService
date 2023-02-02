@@ -41,6 +41,7 @@
         <swagger.version>2.2.6</swagger.version>
         <springdoc.version>1.6.14</springdoc.version>
         <cloudinary.version>1.33.0</cloudinary.version>
+        <websoket.version>3.0.1</websoket.version>
         <spring-boot-maven-plugin.version>3.0.0</spring-boot-maven-plugin.version>
         <maven-compiler-plugin.version>3.10.1</maven-compiler-plugin.version>
     </properties>
@@ -59,6 +60,17 @@
             <groupId>org.hibernate.orm</groupId>
             <artifactId>hibernate-jpamodelgen</artifactId>
             <version>${jpamodelgen.versuin}</version>
+        </dependency>
+        <!--Spring Kafka & Websocket-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-websocket</artifactId>
+            <version>${websoket.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.kafka</groupId>
+            <artifactId>spring-kafka</artifactId>
+            <version>2.9.0</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -124,7 +136,6 @@
             <artifactId>springdoc-openapi-ui</artifactId>
             <version>${springdoc.version}</version>
         </dependency>
-
         <!--  Database  -->
         <dependency>
             <groupId>org.postgresql</groupId>
