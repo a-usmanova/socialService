@@ -25,6 +25,9 @@ public interface FriendMapper {
     @Mapping(target = "toAccountId", expression = "java(ru.skillbox.diplom.group32.social.service.utils.security.SecurityUtil.getJwtUserIdFromSecurityContext())")
     Friend userDtoToFriendFrom(UserDto userDto);
 
+    @Mapping(target = "fromAccountId", source = "id")
+    FriendDto userDtoToFriendDto(UserDto userDto);
+
     @InheritInverseConfiguration
     Friend convertToEntity(FriendDto friendDto);
 

@@ -7,6 +7,8 @@ import ru.skillbox.diplom.group32.social.service.model.account.StatusCode;
 import ru.skillbox.diplom.group32.social.service.model.base.BaseDto;
 
 import java.time.ZonedDateTime;
+import java.util.Objects;
+
 @Data
 @AllArgsConstructor
 @Schema(description = "Дто для друзей")
@@ -45,4 +47,19 @@ public class FriendDto extends BaseDto {
     @Schema(name = "Предыдущий статус")
     private StatusCode previousStatusCode;
 
+    @Schema(name = "Рейтинг")
+    private Long rating;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        FriendDto friendDto = (FriendDto) o;
+        return Objects.equals(rating, friendDto.rating);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(rating);
+    }
 }

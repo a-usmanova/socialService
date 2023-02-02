@@ -7,7 +7,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.skillbox.diplom.group32.social.service.model.friend.FriendDto;
 import ru.skillbox.diplom.group32.social.service.model.friend.FriendSearchDto;
-import ru.skillbox.diplom.group32.social.service.model.friend.RecommendationDto;
 import ru.skillbox.diplom.group32.social.service.resource.base.BaseController;
 import ru.skillbox.diplom.group32.social.service.resource.utils.web.WebConstant;
 
@@ -24,7 +23,7 @@ public interface FriendController extends BaseController<FriendDto, FriendSearch
     ResponseEntity<Page<FriendDto>> getAll(FriendSearchDto searchDto, Pageable page);
 
     @GetMapping(value = "/recommendations")
-    ResponseEntity<List<RecommendationDto>> getRecommendation(FriendSearchDto searchDto);
+    ResponseEntity<List<FriendDto>> getRecommendation(FriendSearchDto searchDto);
 
     @GetMapping(value = "/friendId")
     ResponseEntity<List<Long>> getFriendId();
