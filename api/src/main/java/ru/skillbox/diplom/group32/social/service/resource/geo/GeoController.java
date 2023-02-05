@@ -19,7 +19,7 @@ import java.util.List;
 @Tag(name = "Geo service", description = "Работа со странами и городами")
 @RequestMapping(WebConstant.VERSION_URL + "/geo")
 public interface GeoController {
-    @GetMapping("/countries")
+    @GetMapping("/country")
     @Operation(summary = "Получение всех стран")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200",
@@ -30,7 +30,7 @@ public interface GeoController {
             @ApiResponse(responseCode = "401", content = @Content(mediaType = ""))})
     ResponseEntity<List<CountryDto>> getAll();
 
-    @GetMapping("/cities/{countryId}")
+    @GetMapping("/country/{countryId}/city")
     @Operation(summary = "Получение списка городов по id страны")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200",
