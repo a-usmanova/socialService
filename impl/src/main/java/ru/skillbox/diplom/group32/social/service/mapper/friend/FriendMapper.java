@@ -3,9 +3,12 @@ package ru.skillbox.diplom.group32.social.service.mapper.friend;
 import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import ru.skillbox.diplom.group32.social.service.model.account.AccountDto;
+import ru.skillbox.diplom.group32.social.service.model.account.AccountSearchDto;
 import ru.skillbox.diplom.group32.social.service.model.auth.UserDto;
 import ru.skillbox.diplom.group32.social.service.model.friend.Friend;
 import ru.skillbox.diplom.group32.social.service.model.friend.FriendDto;
+import ru.skillbox.diplom.group32.social.service.model.friend.FriendSearchDto;
 
 import java.util.List;
 
@@ -33,5 +36,10 @@ public interface FriendMapper {
 
     List<FriendDto> convertToDtoList(List<Friend> friendList);
     List<Friend> convertToEntityList(List<FriendDto> friendDtoList);
+
+    AccountSearchDto friendSearchDtoToAccountSearchDto(FriendSearchDto searchDto);
+    FriendSearchDto accountSearchDtoToFriendSearchDto(AccountSearchDto searchDto);
+
+    FriendDto accountDtoToFriendDto(AccountDto accountDto);
 
 }

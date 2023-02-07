@@ -1,7 +1,8 @@
 package ru.skillbox.diplom.group32.social.service.service.friend;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -26,15 +27,21 @@ import static ru.skillbox.diplom.group32.social.service.utils.specification.Spec
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
-public class FriendService {
+public
+class FriendService {
 
-    private final FriendRepository friendRepository;
-    private final AccountService accountService;
-    private final FriendMapper friendMapper;
+    private FriendRepository friendRepository;
+    private AccountService accountService;
+    private FriendMapper friendMapper;
+    private UserService userService;
 
-    private final UserService userService;
-
+    @Autowired
+    public FriendService(FriendRepository friendRepository, @Lazy AccountService accountService, FriendMapper friendMapper, UserService userService) {
+        this.friendRepository = friendRepository;
+        this.accountService = accountService;
+        this.friendMapper = friendMapper;
+        this.userService = userService;
+    }
 
     public FriendDto getById(Long id) {
 
@@ -45,6 +52,12 @@ public class FriendService {
 //**TODO добавление самого себя, блокировка самого себя, удаление самого себя
 
     public Page<FriendDto> getAll(FriendSearchDto searchDto, Pageable page) {
+
+        if (searchDto.getFirstName() != null || searchDto.getAgeFrom() != null ||
+                searchDto.getAgeTo() != null || searchDto.getCity() != null || searchDto.getCountry() != null) {
+            return accountService.searchAccount(friendMapper.friendSearchDtoToAccountSearchDto(searchDto), page)
+                    .map(friendMapper::accountDtoToFriendDto);
+        }
 
         log.info("FriendService in getAll tried to find friends with FriendSearchDto: {} and pageable: {}", searchDto, page);
 
@@ -97,7 +110,7 @@ public class FriendService {
                 .and(equal(Friend_.statusCode, searchDto.getStatusCode(), true)
                         .and(equal(Friend_.fromAccountId, searchDto.getId_from(), true))
                         .and(equal(Friend_.toAccountId, searchDto.getId_to(), true)));
-//                .and(like(Friend_.firstName, searchDto.getFirstName(), true))
+//                        .and(like(Friend_.firstName, searchDto.getFirstName(), true)));
 //                .and(between(Friend_.birthDate, searchDto.getBirthDateFrom(), searchDto.getBirthDateFrom(), true))
 //                .and(like(Friend_.city, searchDto.getCity(), true))
 //                .and(like(Friend_.country, searchDto.getCountry(), true));
@@ -209,7 +222,8 @@ public class FriendService {
         if (forwardFriend.isEmpty()) {
             if (checkImBlocked(id)) {
                 blockIfBlocked(id);
-            };
+            }
+            ;
         }
         forwardFriend.forEach(f -> {
 
@@ -265,6 +279,14 @@ public class FriendService {
         searchDto.setId_to(id);
         return friendRepository.findAll(getSpecification(searchDto));
 
+    }
+
+    public StatusCode getStatus(Long id) {
+        List<Friend> friend = getForwardFriend(id);
+        if (friend.isEmpty()) {
+            return StatusCode.NONE;
+        }
+        return friend.get(0).getStatusCode();
     }
 
     private List<Friend> getBackwardFriend(Long id) {

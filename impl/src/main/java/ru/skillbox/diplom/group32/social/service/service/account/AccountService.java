@@ -1,7 +1,8 @@
 package ru.skillbox.diplom.group32.social.service.service.account;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -14,6 +15,7 @@ import ru.skillbox.diplom.group32.social.service.model.account.Account_;
 import ru.skillbox.diplom.group32.social.service.model.auth.User;
 import ru.skillbox.diplom.group32.social.service.model.auth.User_;
 import ru.skillbox.diplom.group32.social.service.repository.account.AccountRepository;
+import ru.skillbox.diplom.group32.social.service.service.friend.FriendService;
 import ru.skillbox.diplom.group32.social.service.utils.security.SecurityUtil;
 
 import java.time.ZonedDateTime;
@@ -26,11 +28,19 @@ import static ru.skillbox.diplom.group32.social.service.utils.specification.Spec
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
+//@RequiredArgsConstructor
 public class AccountService {
 
-    private final AccountRepository accountRepository;
-    private final AccountMapper accountMapper;
+    private AccountRepository accountRepository;
+    private AccountMapper accountMapper;
+    private FriendService friendService;
+
+    @Autowired
+    public AccountService(AccountRepository accountRepository, AccountMapper accountMapper, @Lazy FriendService friendService) {
+        this.accountRepository = accountRepository;
+        this.accountMapper = accountMapper;
+        this.friendService = friendService;
+    }
 
     public void createAccount(User user) {
         Account account = accountMapper.userToAccount(user);
@@ -69,19 +79,27 @@ public class AccountService {
         return "Account with id - " + userId + " deleted.";
     }
 
-    public List<AccountDto> searchByIds(AccountSearchDto accountSearchDto){
-         List<Account> resultAccount = accountRepository.findAll(getSpecificationByAccountIds(accountSearchDto));
-         return resultAccount.stream().map(accountMapper::convertToDto).collect(Collectors.toList());
+    public List<AccountDto> searchByIds(AccountSearchDto accountSearchDto) {
+        List<Account> resultAccount = accountRepository.findAll(getSpecificationByAccountIds(accountSearchDto));
+        return resultAccount.stream().map(accountMapper::convertToDto).collect(Collectors.toList());
     }
 
     public Page<AccountDto> searchAccount(AccountSearchDto accountSearchDto, Pageable page) {
-        Page<Account> accountSearchPages;
+        Long currentUser = SecurityUtil.getJwtUserIdFromSecurityContext();
+        List<Long> blockedByIds = friendService.getBlockedFriendsIds(currentUser);
+        if (blockedByIds.size() != 0) {
+            accountSearchDto.setBlockedByIds(blockedByIds);
+        }
 
+        Page<Account> accountSearchPages;
         if (accountSearchDto.getAuthor() != null) {
             accountSearchPages = accountRepository.findAll(getSpecificationByAuthor(accountSearchDto), page);
         } else {
             accountSearchPages = accountRepository.findAll(getSpecificationByOtherFields(accountSearchDto), page);
         }
+
+        accountSearchPages.forEach(acc -> acc.setStatusCode(friendService.getStatus(acc.getId())));
+
         return accountSearchPages.map(accountMapper::convertToDto);
     }
 
@@ -97,6 +115,7 @@ public class AccountService {
         ArrayList<String> notInList = new ArrayList<>();
         notInList.add(SecurityUtil.getJwtUserFromSecurityContext().getEmail());
         return getBaseSpecification(accountSearchDto)
+                .and(notIn(Account_.id, accountSearchDto.getBlockedByIds(), true))
                 .and(likeLowerCase(Account_.firstName, accountSearchDto.getAuthor(), true)
                         .and(notIn(User_.email, notInList, true))
                         .or(likeLowerCase(Account_.lastName, accountSearchDto.getAuthor(), true)
@@ -107,6 +126,7 @@ public class AccountService {
         ArrayList<String> notInList = new ArrayList<>();
         notInList.add(SecurityUtil.getJwtUserFromSecurityContext().getEmail());
         return getBaseSpecification(accountSearchDto)
+                .and(notIn(Account_.id, accountSearchDto.getBlockedByIds(), true))
                 .and(in(Account_.id, accountSearchDto.getIds(), true))
                 .and(likeLowerCase(Account_.firstName, accountSearchDto.getFirstName(), true)
                         .and(likeLowerCase(Account_.lastName, accountSearchDto.getLastName(), true)
