@@ -88,7 +88,7 @@ public class SpecificationUtil {
         return equal(BaseEntity_.id, searchDto.getId(), true)
                 .and(equal(BaseEntity_.isDeleted, searchDto.getIsDeleted(), true));
     }
-    private static <T, V> Specification<T> nullValueCheck(V value, boolean isSkipNullValues, Supplier<Specification<T>> specificationSupplier) {
+    public static <T, V> Specification<T> nullValueCheck(V value, boolean isSkipNullValues, Supplier<Specification<T>> specificationSupplier) {
         return value == null && isSkipNullValues ? EMPTY_SPECIFICATION : (Specification) specificationSupplier.get();
     }
 
