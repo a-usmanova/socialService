@@ -57,7 +57,7 @@ public class PostService {
     public Page<PostDto> getAll(PostSearchDto searchDto, Pageable page) {
 
         if (searchDto.getWithFriends() != null) {
-            searchDto.setIds(friendService.getFriendsIds());
+            searchDto.setAccountIds(friendService.getFriendsIds());
         }
 
         searchDto.setDateTo(ZonedDateTime.now());

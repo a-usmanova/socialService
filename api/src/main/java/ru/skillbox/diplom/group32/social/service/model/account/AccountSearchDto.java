@@ -9,6 +9,7 @@ import java.util.List;
 public class AccountSearchDto extends BaseSearchDto {
 
     private List<Long> ids;
+    private List<Long> blockedByIds;
     private String author;
     private String firstName;
     private String lastName;
