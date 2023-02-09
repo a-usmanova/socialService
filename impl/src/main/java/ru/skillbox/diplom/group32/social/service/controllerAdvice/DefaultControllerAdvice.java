@@ -32,10 +32,6 @@ public class DefaultControllerAdvice {
     public Object responseStatusExceptionHandler(ResponseStatusException e) {
         throw e;
     }
-    @ExceptionHandler(NullPointerException.class)
-    public Object nullPointerExceptionHandler(NullPointerException e) {
-        throw e;
-    }
 
     @ExceptionHandler(WrongPasswordException.class)
     public Object wrongPasswordExceptionHandler(WrongPasswordException e) {

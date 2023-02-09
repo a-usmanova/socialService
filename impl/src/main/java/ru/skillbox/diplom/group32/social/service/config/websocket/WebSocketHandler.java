@@ -16,10 +16,12 @@ import ru.skillbox.diplom.group32.social.service.config.security.JwtTokenProvide
 import ru.skillbox.diplom.group32.social.service.mapper.dialog.streaming.StreamingMapper;
 import ru.skillbox.diplom.group32.social.service.model.account.AccountOnlineDto;
 import ru.skillbox.diplom.group32.social.service.model.dialog.message.MessageDto;
+import ru.skillbox.diplom.group32.social.service.model.notification.NotificationDto;
 import ru.skillbox.diplom.group32.social.service.model.streaming.StreamingDataDto;
 import ru.skillbox.diplom.group32.social.service.model.streaming.StreamingMessageDto;
 import ru.skillbox.diplom.group32.social.service.service.account.AccountService;
 import ru.skillbox.diplom.group32.social.service.service.dialog.DialogService;
+import ru.skillbox.diplom.group32.social.service.service.notification.NotificationService;
 import ru.skillbox.diplom.group32.social.service.utils.websocket.WebsocketContextUtil;
 
 import java.io.IOException;
@@ -48,17 +50,26 @@ public class WebSocketHandler extends TextWebSocketHandler {
                     .sendMessage(new TextMessage(objectMapper.writeValueAsString(streamingMessageDto)));
             log.info("To user with id: {}, send message to webSocket: {}", streamingMessageDto.getAccountId(), streamingMessageDto);
         }
-
     }
 
     @KafkaListener(topics = "sender-account-online", containerFactory = "accountOnlineListener")
-    public void sendToSocketNotification(AccountOnlineDto accountOnlineDto) {
+    public void sendToSocketAccountOnline(AccountOnlineDto accountOnlineDto) {
 
         log.info("Received account online notification - {}", accountOnlineDto);
         if (accountOnlineDto != null) {
             accountService.updateAccountOnline(accountOnlineDto);
         }
 
+    }
+
+    @KafkaListener(topics = "send-notification", containerFactory = "sendNotificationListener")
+    public void sendToSocketNotification(StreamingMessageDto<NotificationDto> streamingMessageDto) throws IOException {
+        Long receiverId = streamingMessageDto.getAccountId();
+        log.info("WebSocketHandler.sendToSocketNotification: Notification for user with id {} has been received by WebSocketHandler", receiverId);
+        if (WebsocketContextUtil.contextContains(receiverId)) {
+            WebsocketContextUtil.getSessionFromContext(receiverId).sendMessage(new TextMessage(objectMapper.writeValueAsString(streamingMessageDto)));
+            log.info("WebSocketHandler.sendToSocketNotification: Notification for user with id {} has been sent", receiverId);
+        }
     }
 
     public void receiveMessage(StreamingMessageDto streamingMessageDto) {

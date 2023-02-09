@@ -30,5 +30,7 @@
     <include file="db/changelog/changes/change-friend--table.xml"/>
     <include file="db/changelog/changes/create-password-recovery-table.xml"/>
     <include file="db/changelog/changes/change-friend--table2.xml"/>
+    <include file="db/changelog/changes/create-notification-table.xml"/>
+    <include file="db/changelog/changes/create-notification-settings-table.xml"/>
 
 </databaseChangeLog>

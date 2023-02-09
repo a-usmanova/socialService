@@ -13,6 +13,7 @@ import ru.skillbox.diplom.group32.social.service.model.auth.User;
 import ru.skillbox.diplom.group32.social.service.model.auth.User_;
 import ru.skillbox.diplom.group32.social.service.repository.account.AccountRepository;
 import ru.skillbox.diplom.group32.social.service.service.friend.FriendService;
+import ru.skillbox.diplom.group32.social.service.service.notification.NotificationService;
 import ru.skillbox.diplom.group32.social.service.utils.security.SecurityUtil;
 
 import java.time.ZonedDateTime;
@@ -31,18 +32,25 @@ public class AccountService {
     private AccountRepository accountRepository;
     private AccountMapper accountMapper;
     private FriendService friendService;
+    private NotificationService notificationService;
 
     @Autowired
-    public AccountService(AccountRepository accountRepository, AccountMapper accountMapper, @Lazy FriendService friendService) {
+    public AccountService(AccountRepository accountRepository,
+                          AccountMapper accountMapper,
+                          @Lazy FriendService friendService,
+                          NotificationService notificationService) {
         this.accountRepository = accountRepository;
         this.accountMapper = accountMapper;
         this.friendService = friendService;
+        this.notificationService = notificationService;
     }
 
     public void createAccount(User user) {
         Account account = accountMapper.userToAccount(user);
 
         accountRepository.save(account);
+        notificationService.createSettings(account);
+
         log.info("Account saved - " + account);
     }
 
