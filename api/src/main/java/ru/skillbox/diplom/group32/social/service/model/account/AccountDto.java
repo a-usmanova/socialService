@@ -3,11 +3,13 @@ package ru.skillbox.diplom.group32.social.service.model.account;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import ru.skillbox.diplom.group32.social.service.model.auth.UserDto;
 
 import java.time.ZonedDateTime;
 
 @Data
+@NoArgsConstructor
 @AllArgsConstructor
 @Schema(description = "Дто для аккаунта")
 public class AccountDto extends UserDto {

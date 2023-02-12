@@ -15,7 +15,7 @@ import org.springframework.kafka.core.*;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 import ru.skillbox.diplom.group32.social.service.model.account.AccountOnlineDto;
-import ru.skillbox.diplom.group32.social.service.model.dialog.DialogMessage;
+import ru.skillbox.diplom.group32.social.service.model.streaming.StreamingMessageDto;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -49,7 +49,7 @@ public class KafkaConfig {
     }
 
     @Bean
-    public ConsumerFactory<String, DialogMessage> consumerDialogFactory() {
+    public ConsumerFactory<String, StreamingMessageDto> consumerDialogFactory() {
         Map<String, Object> config = new HashMap<>();
 
         config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,
@@ -66,7 +66,7 @@ public class KafkaConfig {
         );
 
         return new DefaultKafkaConsumerFactory<>(config, new StringDeserializer(),
-                new JsonDeserializer<>(DialogMessage.class));
+                new JsonDeserializer<>(StreamingMessageDto.class));
     }
 
     @Bean
@@ -91,8 +91,8 @@ public class KafkaConfig {
     }
 
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, DialogMessage> dialogListener() {
-        ConcurrentKafkaListenerContainerFactory<String, DialogMessage> factory = new ConcurrentKafkaListenerContainerFactory<>();
+    public ConcurrentKafkaListenerContainerFactory<String, StreamingMessageDto> dialogListener() {
+        ConcurrentKafkaListenerContainerFactory<String, StreamingMessageDto> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerDialogFactory());
 
         return factory;
@@ -108,7 +108,7 @@ public class KafkaConfig {
 
 
     @Bean
-    public ProducerFactory<String, DialogMessage> producerDialogFactory() {
+    public ProducerFactory<String, StreamingMessageDto> producerDialogFactory() {
         Map<String, Object> config = new HashMap<>();
 
         config.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG,
@@ -146,8 +146,8 @@ public class KafkaConfig {
     }
 
     @Bean
-    public KafkaTemplate<String, DialogMessage> kafkaDialogTemplate() {
-        KafkaTemplate<String, DialogMessage> kafkaTemplate = new KafkaTemplate<>(producerDialogFactory());
+    public KafkaTemplate<String, StreamingMessageDto> kafkaDialogTemplate() {
+        KafkaTemplate<String, StreamingMessageDto> kafkaTemplate = new KafkaTemplate<>(producerDialogFactory());
         kafkaTemplate.setConsumerFactory(consumerDialogFactory());
         return kafkaTemplate;
     }
