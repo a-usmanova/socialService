@@ -42,7 +42,7 @@ public class KafkaConfig {
     @Bean
     NewTopic notificationTopic() {
         return TopicBuilder
-                .name("sender-notification")
+                .name("sender-account-online")
                 .partitions(1)
                 .replicas(1)
                 .build();
@@ -70,7 +70,7 @@ public class KafkaConfig {
     }
 
     @Bean
-    public ConsumerFactory<String, AccountOnlineDto> consumerNotificationFactory() {
+    public ConsumerFactory<String, AccountOnlineDto> consumerAccountOnlineFactory() {
         Map<String, Object> config = new HashMap<>();
 
         config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,
@@ -99,9 +99,9 @@ public class KafkaConfig {
     }
 
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, AccountOnlineDto> notificationListener() {
+    public ConcurrentKafkaListenerContainerFactory<String, AccountOnlineDto> accountOnlineListener() {
         ConcurrentKafkaListenerContainerFactory<String, AccountOnlineDto> factory = new ConcurrentKafkaListenerContainerFactory<>();
-        factory.setConsumerFactory(consumerNotificationFactory());
+        factory.setConsumerFactory(consumerAccountOnlineFactory());
 
         return factory;
     }
@@ -127,7 +127,7 @@ public class KafkaConfig {
     }
 
     @Bean
-    public ProducerFactory<String, AccountOnlineDto> producerNotificationFactory() {
+    public ProducerFactory<String, AccountOnlineDto> producerAccountOnlineFactory() {
         Map<String, Object> config = new HashMap<>();
 
         config.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG,
@@ -153,9 +153,9 @@ public class KafkaConfig {
     }
 
     @Bean
-    public KafkaTemplate<String, AccountOnlineDto> kafkaNotificationTemplate() {
-        KafkaTemplate<String, AccountOnlineDto> kafkaTemplate = new KafkaTemplate<>(producerNotificationFactory());
-        kafkaTemplate.setConsumerFactory(consumerNotificationFactory());
+    public KafkaTemplate<String, AccountOnlineDto> kafkaAccountOnlineTemplate() {
+        KafkaTemplate<String, AccountOnlineDto> kafkaTemplate = new KafkaTemplate<>(producerAccountOnlineFactory());
+        kafkaTemplate.setConsumerFactory(consumerAccountOnlineFactory());
         return kafkaTemplate;
     }
 
