@@ -18,7 +18,6 @@ import ru.skillbox.diplom.group32.social.service.utils.security.SecurityUtil;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import static ru.skillbox.diplom.group32.social.service.utils.specification.SpecificationUtil.*;
@@ -142,12 +141,5 @@ public class AccountService {
                         accountSearchDto.getAgeFrom() == null ? null : ZonedDateTime.now().minusYears(accountSearchDto.getAgeFrom()), true));
     }
 
-    public AccountDto updateAccountPhoto(Map uploadResult) {
-        AccountDto resultAccountDto = getAccount();
-        resultAccountDto.setPhoto(uploadResult.get("url").toString());
-        resultAccountDto.setPhotoName(uploadResult.get("original_filename").toString());
-        updateAccount(resultAccountDto);
-        return resultAccountDto;
-    }
 
 }

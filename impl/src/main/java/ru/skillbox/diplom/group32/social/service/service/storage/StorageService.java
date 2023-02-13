@@ -8,8 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import ru.skillbox.diplom.group32.social.service.config.Properties;
-import ru.skillbox.diplom.group32.social.service.model.account.AccountDto;
-import ru.skillbox.diplom.group32.social.service.service.account.AccountService;
+import ru.skillbox.diplom.group32.social.service.model.storage.StorageDto;
 
 import java.io.IOException;
 import java.util.Map;
@@ -22,7 +21,7 @@ public class StorageService {
     private final Properties properties;
 
 
-    public Map store(MultipartFile image) throws IOException {
+    public StorageDto store(MultipartFile image) throws IOException {
 
         Cloudinary cloudinary = new Cloudinary(ObjectUtils.asMap(
                 "cloud_name", properties.getCloudName(),
@@ -37,7 +36,11 @@ public class StorageService {
         Map uploadResult = cloudinary.uploader().upload(image.getBytes(), params);
         log.info("StorageService storePhoto: successfully uploaded the file: " + uploadResult.get("original_filename"));
 
-        return uploadResult;
+        StorageDto storeResult = new StorageDto();
+        storeResult.setPhotoPath(uploadResult.get("url").toString());
+        storeResult.setPhotoName(uploadResult.get("original_filename").toString());
+
+        return storeResult;
     }
 
 
