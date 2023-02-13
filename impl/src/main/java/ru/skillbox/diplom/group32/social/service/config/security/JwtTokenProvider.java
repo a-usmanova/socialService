@@ -58,7 +58,7 @@ public class JwtTokenProvider {
                 .claim("id", userId)
                 .claim("email", email)
                 .claim("roles", getRoleNames(roles))
-                .expiresAt(ZonedDateTime.now().plusHours(1).toInstant())
+                .expiresAt(ZonedDateTime.now().plusHours(3).toInstant())
                 .build();
         JwsAlgorithm jwsAlgorithm = () -> JWSAlgorithm.HS256.getName();
 

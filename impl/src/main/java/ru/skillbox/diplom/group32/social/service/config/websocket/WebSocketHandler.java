@@ -51,7 +51,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
 
     }
 
-    @KafkaListener(topics = "sender-notification", containerFactory = "notificationListener")
+    @KafkaListener(topics = "sender-account-online", containerFactory = "accountOnlineListener")
     public void sendToSocketNotification(AccountOnlineDto accountOnlineDto) {
 
         log.info("Received account online notification - {}", accountOnlineDto);
@@ -69,7 +69,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
 
     public void changeAccountOnline(AccountOnlineDto accountOnlineDto) {
 
-        kafkaNotificationTemplate.send("sender-notification", accountOnlineDto);
+        kafkaNotificationTemplate.send("sender-account-online", accountOnlineDto);
 
     }
 
