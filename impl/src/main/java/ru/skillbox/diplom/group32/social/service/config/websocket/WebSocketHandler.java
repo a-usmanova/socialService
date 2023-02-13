@@ -13,9 +13,12 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 import ru.skillbox.diplom.group32.social.service.config.security.JwtTokenProvider;
+import ru.skillbox.diplom.group32.social.service.mapper.dialog.streaming.StreamingMapper;
 import ru.skillbox.diplom.group32.social.service.model.account.AccountOnlineDto;
-import ru.skillbox.diplom.group32.social.service.model.dialog.DialogMessage;
 import ru.skillbox.diplom.group32.social.service.model.dialog.message.MessageDto;
+import ru.skillbox.diplom.group32.social.service.model.streaming.StreamingDataDto;
+import ru.skillbox.diplom.group32.social.service.model.streaming.StreamingMessageDto;
+import ru.skillbox.diplom.group32.social.service.service.account.AccountService;
 import ru.skillbox.diplom.group32.social.service.service.dialog.DialogService;
 import ru.skillbox.diplom.group32.social.service.utils.websocket.WebsocketContextUtil;
 
@@ -30,44 +33,43 @@ public class WebSocketHandler extends TextWebSocketHandler {
 
     private final JwtTokenProvider jwtTokenProvider;
     private final ObjectMapper objectMapper;
-    private final KafkaTemplate<String, DialogMessage> kafkaDialogTemplate;
+    private final KafkaTemplate<String, StreamingMessageDto> kafkaDialogTemplate;
     private final KafkaTemplate<String, AccountOnlineDto> kafkaNotificationTemplate;
-
     private final DialogService dialogService;
+    private final StreamingMapper streamingMapper;
+    private final AccountService accountService;
 
     @KafkaListener(topics = "sender-message", containerFactory = "dialogListener")
-    public void sendToSocketMessage(DialogMessage dialogMessage) throws IOException {
+    public void sendToSocketMessage(StreamingMessageDto streamingMessageDto) throws IOException {
 
-        log.info("Received message - {}", dialogMessage);
-        if (dialogMessage != null) {
-            WebsocketContextUtil.getSessionFromContext(dialogMessage.getAccountId())
-                    .sendMessage(new TextMessage(objectMapper.writeValueAsString(dialogMessage)));
-            log.info("To user with id: {}, send message to webSocket: {}", dialogMessage.getAccountId(), dialogMessage);
+        log.info("Received message - {}", streamingMessageDto);
+        if (streamingMessageDto != null && WebsocketContextUtil.contextContains(streamingMessageDto.getAccountId())) {
+            WebsocketContextUtil.getSessionFromContext(streamingMessageDto.getAccountId())
+                    .sendMessage(new TextMessage(objectMapper.writeValueAsString(streamingMessageDto)));
+            log.info("To user with id: {}, send message to webSocket: {}", streamingMessageDto.getAccountId(), streamingMessageDto);
         }
 
     }
 
     @KafkaListener(topics = "sender-notification", containerFactory = "notificationListener")
-    public void sendToSocketNotification(AccountOnlineDto accountOnlineDto) throws IOException {
+    public void sendToSocketNotification(AccountOnlineDto accountOnlineDto) {
 
         log.info("Received account online notification - {}", accountOnlineDto);
         if (accountOnlineDto != null) {
-            WebsocketContextUtil.getSessionFromContext(accountOnlineDto.getId())
-                    .sendMessage(new TextMessage(objectMapper.writeValueAsString(accountOnlineDto)));
-            log.info("To user with id: {}, send notification about online to webSocket: {}", accountOnlineDto.getId(), accountOnlineDto);
+            accountService.updateAccountOnline(accountOnlineDto);
         }
 
     }
 
-    public void receiveMessage(DialogMessage dialogMessage) {
+    public void receiveMessage(StreamingMessageDto streamingMessageDto) {
 
-        kafkaDialogTemplate.send("sender-message", dialogMessage);
+        kafkaDialogTemplate.send("sender-message", streamingMessageDto);
 
     }
 
     public void changeAccountOnline(AccountOnlineDto accountOnlineDto) {
 
-        kafkaNotificationTemplate.send("receive-notification", accountOnlineDto);
+        kafkaNotificationTemplate.send("sender-notification", accountOnlineDto);
 
     }
 
@@ -110,10 +112,13 @@ public class WebSocketHandler extends TextWebSocketHandler {
         JsonNode jsonNode = objectMapper.readTree(payload);
         if (jsonNode.get("type").textValue().equals("MESSAGE")) {
 
-            DialogMessage dialogMessage = objectMapper.readValue(payload, DialogMessage.class);
-            MessageDto messageDto = dialogService.createMessage(objectMapper.convertValue(dialogMessage.getData(), MessageDto.class));
-            dialogMessage.setData(objectMapper.convertValue(messageDto, HashMap.class));
-            receiveMessage(dialogMessage);
+            StreamingMessageDto streamingMessageDto = objectMapper.readValue(payload, StreamingMessageDto.class);
+
+            MessageDto messageDtoFromData = streamingMapper.convertToMessageDto((objectMapper.readValue(jsonNode.get("data").toString(), StreamingDataDto.class)));
+
+            MessageDto messageDto = dialogService.createMessage(messageDtoFromData);
+            streamingMessageDto.setData(objectMapper.convertValue(messageDto, HashMap.class));
+            receiveMessage(streamingMessageDto);
 
         }
 

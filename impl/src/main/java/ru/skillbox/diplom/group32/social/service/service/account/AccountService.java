@@ -8,10 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import ru.skillbox.diplom.group32.social.service.mapper.account.AccountMapper;
-import ru.skillbox.diplom.group32.social.service.model.account.Account;
-import ru.skillbox.diplom.group32.social.service.model.account.AccountDto;
-import ru.skillbox.diplom.group32.social.service.model.account.AccountSearchDto;
-import ru.skillbox.diplom.group32.social.service.model.account.Account_;
+import ru.skillbox.diplom.group32.social.service.model.account.*;
 import ru.skillbox.diplom.group32.social.service.model.auth.User;
 import ru.skillbox.diplom.group32.social.service.model.auth.User_;
 import ru.skillbox.diplom.group32.social.service.repository.account.AccountRepository;
@@ -70,6 +67,13 @@ public class AccountService {
         accountRepository.save(accountToSave);
         log.info("Updated Account is - " + accountToSave);
         return accountMapper.convertToDto(accountToSave);
+    }
+
+    public void updateAccountOnline(AccountOnlineDto accountOnlineDto) {
+        Account accountToSave = accountMapper.convertToAccount(accountMapper.convertToAccountDto(accountOnlineDto, new AccountDto()),
+                accountRepository.findById(accountOnlineDto.getId()).orElse(new Account()));
+        accountRepository.save(accountToSave);
+        log.info("Updated Account online is - " + accountToSave);
     }
 
     public String softDeleteAccount() {

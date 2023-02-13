@@ -8,7 +8,9 @@ import ru.skillbox.diplom.group32.social.service.model.dialog.message.ReadStatus
 import ru.skillbox.diplom.group32.social.service.model.dialog.message.ReadStatusDto;
 import ru.skillbox.diplom.group32.social.service.model.dialog.messageShortDto.MessageShortDto;
 
-@Mapper(componentModel = "spring")
+import java.time.ZoneOffset;
+
+@Mapper(componentModel = "spring", imports = ZoneOffset.class)
 public interface MessageMapper {
 
     @Mapping(target = "id", source = "id")
@@ -21,6 +23,7 @@ public interface MessageMapper {
 
     @Mapping(target = "id", source = "id")
     @Mapping(target = "isDeleted", constant = "false")
+    @Mapping(target = "time", expression = "java(message.getTime().toInstant().getEpochSecond())")
     MessageShortDto convertToMessageShortDto(Message message);
 
     ReadStatusDto convertReadStatusToDto(ReadStatus readStatus);
