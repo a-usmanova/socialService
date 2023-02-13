@@ -17,7 +17,7 @@ public class FriendDto extends BaseDto {
     @Schema(description = "Фото")
     private String photo;
 
-    @Schema(description = "Статус код, состояние дружбы - в друзьях, заявка, отклонено итд")
+    @Schema(description = "Статус код, состояние дружбы - в друзьях, исходящая заявка, входящая заявка, рекомендация, блокирован")
     private StatusCode statusCode;
 
     @Schema(description = "Имя")
@@ -43,7 +43,7 @@ public class FriendDto extends BaseDto {
 
     @Schema(name = "Аккаунт, к которому идет запрос")
     private Long toAccountId;
-
+//**TODO remove previous statuscode
     @Schema(name = "Предыдущий статус")
     private StatusCode previousStatusCode;
 

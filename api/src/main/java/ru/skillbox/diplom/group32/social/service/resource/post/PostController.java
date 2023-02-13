@@ -14,17 +14,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import ru.skillbox.diplom.group32.social.service.model.like.LikeDto;
 import ru.skillbox.diplom.group32.social.service.model.post.PostDto;
 import ru.skillbox.diplom.group32.social.service.model.post.PostSearchDto;
 import ru.skillbox.diplom.group32.social.service.model.post.comment.CommentDto;
 import ru.skillbox.diplom.group32.social.service.resource.base.BaseController;
 import ru.skillbox.diplom.group32.social.service.resource.utils.web.WebConstant;
-
-import java.io.IOException;
-
-import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 @Tag(name = "Post service", description = "Работа с постами и комментариями")
 @RequestMapping(value = WebConstant.VERSION_URL  + "/post")
 public interface PostController extends BaseController<PostDto, PostSearchDto> {
@@ -153,10 +148,6 @@ public interface PostController extends BaseController<PostDto, PostSearchDto> {
 //
 //    -----------***PHOTOS***-----------
 //
-
-    @PostMapping(value = "/storagePostPhoto", consumes = {MULTIPART_FORM_DATA_VALUE})
-    @Operation(summary = "Создание фото к посту")
-    ResponseEntity<PostDto> storagePostPhoto(@Schema(description = "Файл фото") @RequestParam(value = "file", required = false) MultipartFile request) throws IOException;
 
 //
 //    -----------***LIKES***-----------

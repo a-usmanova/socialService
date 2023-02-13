@@ -54,7 +54,6 @@ public class CommentService {
         CommentSearchDto commentSearchDto = new CommentSearchDto();
         commentSearchDto.setPostId(id);
         commentSearchDto.setCommentType(CommentType.POST);
-        commentSearchDto.setIsDeleted(false);
         Page<Comment> commentPage = commentRepository.findAll(getSpecification(commentSearchDto), page);
         log.info("CommentService in getAllComments: find comments: " + commentPage);
         return commentPage.map(e->{

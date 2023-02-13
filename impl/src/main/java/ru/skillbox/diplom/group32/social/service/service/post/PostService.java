@@ -1,15 +1,11 @@
 package ru.skillbox.diplom.group32.social.service.service.post;
 
-import com.cloudinary.Cloudinary;
-import com.cloudinary.Transformation;
-import com.cloudinary.utils.ObjectUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 import ru.skillbox.diplom.group32.social.service.config.Properties;
 import ru.skillbox.diplom.group32.social.service.exception.ObjectNotFoundException;
 import ru.skillbox.diplom.group32.social.service.mapper.post.PostMapper;
@@ -26,11 +22,11 @@ import ru.skillbox.diplom.group32.social.service.service.like.LikeService;
 import ru.skillbox.diplom.group32.social.service.service.tag.TagService;
 
 import javax.persistence.criteria.Join;
-import java.io.IOException;
 import java.time.ZonedDateTime;
-import java.util.Map;
+import java.util.List;
 import java.util.Set;
 
+import static ru.skillbox.diplom.group32.social.service.utils.security.SecurityUtil.getJwtUserIdFromSecurityContext;
 import static ru.skillbox.diplom.group32.social.service.utils.specification.SpecificationUtil.*;
 
 
@@ -57,7 +53,10 @@ public class PostService {
     public Page<PostDto> getAll(PostSearchDto searchDto, Pageable page) {
 
         if (searchDto.getWithFriends() != null) {
-            searchDto.setAccountIds(friendService.getFriendsIds());
+            List<Long> listFriendsIds = friendService.getFriendsIds();
+            listFriendsIds.add(getJwtUserIdFromSecurityContext());
+            searchDto.setAccountIds(listFriendsIds);
+
         }
 
         searchDto.setDateTo(ZonedDateTime.now());
@@ -117,29 +116,8 @@ public class PostService {
     }
 
 
-    public PostDto savePhoto(MultipartFile file) throws IOException {
-
-        Cloudinary cloudinary = new Cloudinary(ObjectUtils.asMap(
-                "cloud_name", properties.getCloudName(),
-                "api_key", properties.getApiKey(),
-                "api_secret", properties.getApiSecret()));
-
-
-        Map uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.asMap("transformation",
-                new Transformation()
-                        .height(400).width(400).crop("pad")));
-        log.info("PostService in savePhoto: successfully uploaded the file: " + uploadResult.get("original_filename"));
-
-        Post post = new Post();
-        post.setImagePath(uploadResult.get("url").toString());
-
-        return postMapper.convertToDto(post);
-    }
-
     private Post updatePost (PostDto postDto) {
-//    private Post updatePost (PostDto postDto, Long id) {
 
-//        Post post = postRepository.findById(id).orElseThrow(ObjectNotFoundException::new);
         Post post = postRepository.findById(postDto.getId()).orElseThrow(ObjectNotFoundException::new);
 
         post.setTags(tagService.createNonExistent(postDto.getTags()));

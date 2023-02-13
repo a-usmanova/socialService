@@ -53,13 +53,13 @@ class FriendService {
 
     public Page<FriendDto> getAll(FriendSearchDto searchDto, Pageable page) {
 
+        log.info("FriendService in getAll tried to find friends with FriendSearchDto: {} and pageable: {}", searchDto, page);
+
         if (searchDto.getFirstName() != null || searchDto.getAgeFrom() != null ||
                 searchDto.getAgeTo() != null || searchDto.getCity() != null || searchDto.getCountry() != null) {
             return accountService.searchAccount(friendMapper.friendSearchDtoToAccountSearchDto(searchDto), page)
                     .map(friendMapper::accountDtoToFriendDto);
         }
-
-        log.info("FriendService in getAll tried to find friends with FriendSearchDto: {} and pageable: {}", searchDto, page);
 
         if (searchDto.getStatusCode() == null) {
             searchDto.setStatusCode(StatusCode.NONE);
@@ -329,6 +329,24 @@ class FriendService {
         return (friendRepository.findAll(getSpecification(friendSearchDto))).stream().map(Friend::getFromAccountId).collect(Collectors.toList());
     }
 
+    public List<Long> getRequestsTo(Long id) {
+
+        FriendSearchDto friendSearchDto = new FriendSearchDto();
+        friendSearchDto.setId_from(id);
+        friendSearchDto.setStatusCode(StatusCode.REQUEST_TO);
+        return (friendRepository.findAll(getSpecification(friendSearchDto))).stream().map(Friend::getToAccountId).collect(Collectors.toList());
+
+    }
+
+    public List<Long> getRequestsFrom(Long id) {
+
+        FriendSearchDto friendSearchDto = new FriendSearchDto();
+        friendSearchDto.setId_to(id);
+        friendSearchDto.setStatusCode(StatusCode.REQUEST_TO);
+        return (friendRepository.findAll(getSpecification(friendSearchDto))).stream().map(Friend::getFromAccountId).collect(Collectors.toList());
+
+    }
+
     public void sendNotice() {
         // ??
     }
@@ -359,6 +377,8 @@ class FriendService {
         myFriendsId.add(id);
         myFriendsId.addAll(getBlockedFriendsIds(id));
         myFriendsId.addAll(getFriendsIdsWhoBlocked(id));
+        myFriendsId.addAll(getRequestsTo(id));
+        myFriendsId.addAll(getRequestsFrom(id));
         Map<Long, Long> friendsFriendsId = new TreeMap<>();
         for (Long friendId : myFriendsId) {
             List<Long> list = getFriendsIds(friendId);

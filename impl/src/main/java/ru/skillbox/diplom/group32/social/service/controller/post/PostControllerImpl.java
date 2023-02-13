@@ -6,10 +6,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 import ru.skillbox.diplom.group32.social.service.model.like.LikeDto;
 import ru.skillbox.diplom.group32.social.service.model.like.LikeType;
 import ru.skillbox.diplom.group32.social.service.model.post.PostDto;
@@ -19,10 +17,6 @@ import ru.skillbox.diplom.group32.social.service.resource.post.PostController;
 import ru.skillbox.diplom.group32.social.service.service.comment.CommentService;
 import ru.skillbox.diplom.group32.social.service.service.like.LikeService;
 import ru.skillbox.diplom.group32.social.service.service.post.PostService;
-
-import java.io.IOException;
-
-import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 
 @Slf4j
 @RestController
@@ -63,14 +57,6 @@ public class PostControllerImpl implements PostController {
     public ResponseEntity deleteById(Long id) {
         postService.deleteById(id);
         return ResponseEntity.ok().body("POST DELETED");
-    }
-
-    @PostMapping(value = "/storagePostPhoto", consumes = {MULTIPART_FORM_DATA_VALUE})
-    @ResponseStatus(code = HttpStatus.CREATED)
-    public ResponseEntity<PostDto> storagePostPhoto (MultipartFile request) throws IOException {
-
-        return ResponseEntity.ok(postService.savePhoto(request));
-
     }
 
     @Override
