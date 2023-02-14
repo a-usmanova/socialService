@@ -106,6 +106,10 @@ public class AccountService {
         return accountSearchPages.map(accountMapper::convertToDto);
     }
 
+    public List<Long> getAccountsBirthday() {
+        return accountRepository.getAccountsByBirthDateMonthAndDay(ZonedDateTime.now().toLocalDateTime().getMonthValue(), ZonedDateTime.now().toLocalDateTime().getDayOfMonth());
+    }
+
     private static Specification<Account> getSpecificationByAccountIds(AccountSearchDto accountSearchDto) {
         ArrayList<String> notInList = new ArrayList<>();
         notInList.add(SecurityUtil.getJwtUserFromSecurityContext().getEmail());
