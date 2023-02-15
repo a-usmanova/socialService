@@ -26,5 +26,6 @@ public class Message extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "read_status", nullable = false)
     private ReadStatus readStatus;
-
+    @Column(name = "dialog_id", nullable = false)
+    private Long dialogId;
 }
