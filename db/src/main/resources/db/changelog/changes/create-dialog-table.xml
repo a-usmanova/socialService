@@ -18,6 +18,12 @@
             </column>
             <column name="last_message_id" type="INTEGER">
             </column>
+            <column name="user1_id" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user2_id" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
         </createTable>
     </changeSet>
 </databaseChangeLog>

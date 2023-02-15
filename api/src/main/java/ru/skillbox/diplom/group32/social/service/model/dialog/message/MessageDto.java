@@ -22,5 +22,7 @@ public class MessageDto extends BaseDto {
     private String messageText;
     @Schema(description = "Статус прочтения: SENT, READ - отправлен, прочитан")
     private ReadStatusDto readStatusDto;
+    @Schema(description = "Id диалога")
+    private Long dialogId;
 
 }

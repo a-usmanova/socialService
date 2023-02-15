@@ -8,6 +8,7 @@ import ru.skillbox.diplom.group32.social.service.model.base.BaseSearchDto;
 @RequiredArgsConstructor
 public class MessageSearchDto extends BaseSearchDto {
 
+    private Long dialogId;
     private Long authorId;
     private Long recipientId;
     private ReadStatusDto readStatus;

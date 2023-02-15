@@ -49,17 +49,17 @@ public class DialogService {
 
         DialogSearchDto searchDto = new DialogSearchDto();
         searchDto.setIsDeleted(false);
-        searchDto.setLastMessageAuthorId(getJwtUserIdFromSecurityContext());
+        searchDto.setUserId(getJwtUserIdFromSecurityContext());
 
         log.info("DialogService in getAllDialogs tried to find all dialog with DialogSearchDto: " + searchDto);
 
         List<Dialog> dialogList = dialogRepository.findAll(getDialogSpecification(searchDto));
 
         List<DialogDto> dtoList = dialogList.stream().map(dialog -> {
-            Long conversationPartnerId = dialog.getLastMessage().getAuthorId()
+            Long conversationPartnerId = dialog.getUserId1()
                     .equals(getJwtUserIdFromSecurityContext())
-                    ? dialog.getLastMessage().getRecipientId()
-                    : dialog.getLastMessage().getAuthorId();
+                    ? dialog.getUserId2()
+                    : dialog.getUserId1();
             DialogDto dto = dialogMapper.convertToDto(dialog);
             dto.setConversationPartner(accountService.getAccountById(conversationPartnerId));
             dto.setUnreadCount(getUnreadMessageCountCurrentUser());
@@ -89,7 +89,7 @@ public class DialogService {
         response.setPerPage(itemPerPage);
         response.setTotal(messageRepository.count());
 
-        MessageSearchDto searchDto = createMessageSearch(recipientId, null);
+        MessageSearchDto searchDto = createMessageSearch(getJwtUserIdFromSecurityContext(), recipientId, null);
 
         log.info("DialogService in getAllMessages: trying to get all messages count with MessageSearchDto: " + searchDto);
 
@@ -101,7 +101,7 @@ public class DialogService {
 
     public StatusMessageReadRs setStatusMessageRead(Long companionId) {
 
-        MessageSearchDto searchDto = createMessageSearch(companionId, ReadStatusDto.SENT);
+        MessageSearchDto searchDto = createMessageSearch(getJwtUserIdFromSecurityContext(), companionId, ReadStatusDto.SENT);
         List<Message> messageList = messageRepository.findAll(getMessageSpecification(searchDto));
 
         messageList.forEach(message -> {
@@ -119,12 +119,13 @@ public class DialogService {
 
     public MessageDto createMessage(MessageDto dto) {
 
+        Dialog dialog = getDialog(dto.getAuthorId(), dto.getRecipientId());
         dto.setReadStatusDto(ReadStatusDto.SENT);
-        Message message = messageRepository.save(messageMapper.convertToEntity(dto));
+        dto.setDialogId(dialog.getId());
 
+        Message message = messageRepository.save(messageMapper.convertToEntity(dto));
         log.info("DialogService in createMessage: message was create with id: " + message.getId());
 
-        Dialog dialog = getDialog(dto.getAuthorId(), dto.getRecipientId());
         dialog.setLastMessage(message);
         dialogRepository.save(dialog);
 
@@ -133,75 +134,67 @@ public class DialogService {
     }
 
     private Long getUnreadMessageCountCurrentUser() {
+
         return messageRepository.countByRecipientIdAndReadStatus(
                 getJwtUserIdFromSecurityContext(),
                 ReadStatus.SENT);
+
     }
+
     private Dialog getDialog(Long authorId, Long companionId) {
 
         DialogSearchDto searchDto = new DialogSearchDto();
         searchDto.setIsDeleted(false);
-        searchDto.setLastMessageAuthorId(authorId);
-        searchDto.setLastMessageRecipientId(companionId);
+        searchDto.setUserId(authorId);
+        searchDto.setConversationPartnerId(companionId);
 
         List<Dialog> dialogList = dialogRepository.findAll(getDialogSpecification(searchDto));
 
         if (dialogList.size() == 0) {
             Dialog dialog = new Dialog();
             dialog.setIsDeleted(false);
-
+            dialog.setUserId1(authorId);
+            dialog.setUserId2(companionId);
             log.info("DialogService in getDialog: dialog was create with authorId: " + authorId + " and companionId " + companionId);
 
-            return dialog;
+            return dialogRepository.save(dialog);
         }
 
         return dialogList.get(0);
     }
 
+    private MessageSearchDto createMessageSearch(Long authorId, Long recipientId, ReadStatusDto status) {
+
+        Dialog dialog = getDialog(authorId, recipientId);
+
+        MessageSearchDto searchDto = new MessageSearchDto();
+        searchDto.setDialogId(dialog.getId());
+        searchDto.setIsDeleted(false);
+        searchDto.setReadStatus(status);
+        return searchDto;
+
+    }
+
     private Specification<Message> getMessageSpecification(MessageSearchDto searchDto) {
 
         return getBaseSpecification(searchDto)
-                .and((equal(Message_.authorId, searchDto.getAuthorId(), true)
-                        .and(equal(Message_.recipientId, searchDto.getRecipientId(), true)))
-                        .or(equal(Message_.authorId, searchDto.getRecipientId(), true)
-                                .and(equal(Message_.recipientId, searchDto.getAuthorId(), true))))
+                .and(equal(Message_.dialogId, searchDto.getDialogId(), true))
                 .and(equal(Message_.readStatus, messageMapper.convertReadStatusToEntity(searchDto.getReadStatus()), true));
 
     }
 
     private Specification<Dialog> getDialogSpecification(DialogSearchDto searchDto) {
 
-        return getBaseSpecification(searchDto)
-                .and((containsLastMessageAuthor(searchDto.getLastMessageAuthorId())
-                        .and(containsLastMessageRecipient(searchDto.getLastMessageRecipientId())))
-                        .or((containsLastMessageAuthor(searchDto.getLastMessageRecipientId())
-                                .and(containsLastMessageRecipient(searchDto.getLastMessageAuthorId())))));
-
-    }
-
-    private static Specification<Dialog> containsLastMessageAuthor(Long userId) {
-
-        return nullValueCheck(userId, true, () -> {
-            return (root, query, builder) -> {
-
-                Join<Dialog, Message> join = root.join(Dialog_.lastMessage);
-                return builder.equal(join.get(Message_.authorId), userId);
-
-            };
-        });
-
-    }
-
-    private static Specification<Dialog> containsLastMessageRecipient(Long userId) {
-
-        return nullValueCheck(userId, true, () -> {
-            return (root, query, builder) -> {
-
-                Join<Dialog, Message> join = root.join(Dialog_.lastMessage);
-                return builder.equal(join.get(Message_.recipientId), userId);
-
-            };
-        });
+        if (searchDto.getUserId() != null & searchDto.getConversationPartnerId() != null) {
+            return getBaseSpecification(searchDto)
+                    .and((equal(Dialog_.userId1, searchDto.getUserId(), true)
+                    .and(equal(Dialog_.userId2, searchDto.getConversationPartnerId(), true)))
+                    .or(equal(Dialog_.userId1, searchDto.getConversationPartnerId(), true)
+                            .and(equal(Dialog_.userId2, searchDto.getUserId(), true))));
+        } else {
+            return getBaseSpecification(searchDto).and(equal(Dialog_.userId1, searchDto.getUserId(), true)
+                    .or(equal(Dialog_.userId2, searchDto.getUserId(), true)));
+        }
 
     }
 
@@ -211,14 +204,4 @@ public class DialogService {
 
     }
 
-    private MessageSearchDto createMessageSearch(Long recipientId, ReadStatusDto status) {
-
-        MessageSearchDto searchDto = new MessageSearchDto();
-        searchDto.setAuthorId(getJwtUserIdFromSecurityContext());
-        searchDto.setRecipientId(recipientId);
-        searchDto.setIsDeleted(false);
-        searchDto.setReadStatus(status);
-        return searchDto;
-
-    }
 }

@@ -12,7 +12,6 @@ import java.util.List;
 public class DialogSearchDto extends BaseSearchDto {
 
     private Long conversationPartnerId;
-    private Long lastMessageAuthorId;
-    private Long lastMessageRecipientId;
+    private Long userId;
 
 }
