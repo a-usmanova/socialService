@@ -22,12 +22,12 @@ public class DialogControllerImpl implements DialogController {
     }
 
     @Override
-    public ResponseEntity<DialogsRs> getAllDialogs(Long offset, Long itemPerPage, Pageable page) {
+    public ResponseEntity<DialogsRs> getAllDialogs(Integer offset, Integer itemPerPage, Pageable page) {
         return ResponseEntity.ok(dialogService.getAllDialogs(offset, itemPerPage, page));
     }
 
     @Override
-    public ResponseEntity<MessagesRs> getAllMessages(Long companionId, Long offset, Long itemPerPage, Pageable page) {
+    public ResponseEntity<MessagesRs> getAllMessages(Long companionId, Integer offset, Integer itemPerPage, Pageable page) {
         return ResponseEntity.ok(dialogService.getAllMessages(companionId, offset, itemPerPage, page));
     }
 

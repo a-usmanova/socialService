@@ -17,6 +17,7 @@ import ru.skillbox.diplom.group32.social.service.utils.security.SecurityUtil;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -110,6 +111,9 @@ public class AccountService {
         return accountRepository.getAccountsByBirthDateMonthAndDay(ZonedDateTime.now().toLocalDateTime().getMonthValue(), ZonedDateTime.now().toLocalDateTime().getDayOfMonth());
     }
 
+    public List<AccountDto> getAccountsByIds(Collection<Long> accountIds) {
+        return accountRepository.findAllById(accountIds).stream().map(accountMapper::convertToDto).toList();
+    }
     private static Specification<Account> getSpecificationByAccountIds(AccountSearchDto accountSearchDto) {
         ArrayList<String> notInList = new ArrayList<>();
         notInList.add(SecurityUtil.getJwtUserFromSecurityContext().getEmail());
