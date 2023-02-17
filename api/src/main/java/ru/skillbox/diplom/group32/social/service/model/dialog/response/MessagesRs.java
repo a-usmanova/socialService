@@ -25,10 +25,10 @@ public class MessagesRs extends BaseResponse {
     private Long total;
 
     @Schema(description = "Отступ от начала списка", example = "0")
-    private Long offset;
+    private Integer offset;
 
     @Schema(description = "Количество сообщений диалога на страницу", example = "20")
-    private Long perPage;
+    private Integer perPage;
 
     @Schema(description = "Список сообщений диалога")
     private List<MessageShortDto> data;

@@ -2,11 +2,14 @@ package ru.skillbox.diplom.group32.social.service.service.dialog;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import ru.skillbox.diplom.group32.social.service.mapper.dialog.DialogMapper;
 import ru.skillbox.diplom.group32.social.service.mapper.dialog.message.MessageMapper;
+import ru.skillbox.diplom.group32.social.service.model.account.AccountDto;
 import ru.skillbox.diplom.group32.social.service.model.dialog.Dialog;
 import ru.skillbox.diplom.group32.social.service.model.dialog.DialogDto;
 import ru.skillbox.diplom.group32.social.service.model.dialog.DialogSearchDto;
@@ -22,9 +25,8 @@ import ru.skillbox.diplom.group32.social.service.repository.dialog.DialogReposit
 import ru.skillbox.diplom.group32.social.service.repository.dialog.message.MessageRepository;
 import ru.skillbox.diplom.group32.social.service.service.account.AccountService;
 
-import javax.persistence.criteria.Join;
 import java.time.ZonedDateTime;
-import java.util.List;
+import java.util.*;
 
 import static ru.skillbox.diplom.group32.social.service.utils.security.SecurityUtil.getJwtUserIdFromSecurityContext;
 import static ru.skillbox.diplom.group32.social.service.utils.specification.SpecificationUtil.*;
@@ -39,21 +41,24 @@ public class DialogService {
     private final DialogMapper dialogMapper;
     private final MessageMapper messageMapper;
 
-    public DialogsRs getAllDialogs(Long offset, Long itemPerPage, Pageable page) {
+    public DialogsRs getAllDialogs(Integer offset, Integer itemPerPage, Pageable page) {
 
+        Long authorId = getJwtUserIdFromSecurityContext();
         DialogsRs response = new DialogsRs("", "", getTimestamp());
         response.setOffset(offset);
         response.setPerPage(itemPerPage);
         response.setTotal(dialogRepository.count());
-        response.setCurrentUserId(getJwtUserIdFromSecurityContext());
+        response.setCurrentUserId(authorId);
 
         DialogSearchDto searchDto = new DialogSearchDto();
         searchDto.setIsDeleted(false);
-        searchDto.setUserId(getJwtUserIdFromSecurityContext());
+        searchDto.setUserId(authorId);
 
         log.info("DialogService in getAllDialogs tried to find all dialog with DialogSearchDto: " + searchDto);
 
-        List<Dialog> dialogList = dialogRepository.findAll(getDialogSpecification(searchDto));
+        List<Dialog> dialogList = dialogRepository.findAll(getDialogSpecification(searchDto)
+                , PageRequest.of(offset, itemPerPage, Sort.by(Sort.Direction.DESC, "id"))).toList();
+        HashMap<Long, AccountDto> accountHashMap = getAccountsDto(dialogList);
 
         List<DialogDto> dtoList = dialogList.stream().map(dialog -> {
             Long conversationPartnerId = dialog.getUserId1()
@@ -61,13 +66,12 @@ public class DialogService {
                     ? dialog.getUserId2()
                     : dialog.getUserId1();
             DialogDto dto = dialogMapper.convertToDto(dialog);
-            dto.setConversationPartner(accountService.getAccountById(conversationPartnerId));
+            dto.setConversationPartner(accountHashMap.get(conversationPartnerId));
             dto.setUnreadCount(getUnreadMessageCountCurrentUser());
             return dto;
         }).toList();
 
         response.setData(dtoList);
-
         return response;
 
     }
@@ -82,36 +86,38 @@ public class DialogService {
 
     }
 
-    public MessagesRs getAllMessages(Long recipientId, Long offset, Long itemPerPage, Pageable page) {
+    public MessagesRs getAllMessages(Long recipientId, Integer offset, Integer itemPerPage, Pageable page) {
 
         MessagesRs response = new MessagesRs("", "", getTimestamp());
         response.setOffset(offset);
         response.setPerPage(itemPerPage);
         response.setTotal(messageRepository.count());
 
-        MessageSearchDto searchDto = createMessageSearch(getJwtUserIdFromSecurityContext(), recipientId, null);
+        MessageSearchDto searchDto = getMessages(getJwtUserIdFromSecurityContext(), recipientId, null);
+        if (searchDto != null) {
+            List<Message> messageList = messageRepository.findAll(getMessageSpecification(searchDto)
+                    , PageRequest.of(offset, itemPerPage, Sort.by(Sort.Direction.DESC, "time"))).toList();
 
-        log.info("DialogService in getAllMessages: trying to get all messages count with MessageSearchDto: " + searchDto);
-
-        List<Message> messageList = messageRepository.findAll(getMessageSpecification(searchDto));
-        response.setData(messageList.stream().map(messageMapper::convertToMessageShortDto).toList());
+            response.setData(messageList.stream().map(messageMapper::convertToMessageShortDto).toList());
+        }
         return response;
 
     }
 
     public StatusMessageReadRs setStatusMessageRead(Long companionId) {
 
-        MessageSearchDto searchDto = createMessageSearch(getJwtUserIdFromSecurityContext(), companionId, ReadStatusDto.SENT);
-        List<Message> messageList = messageRepository.findAll(getMessageSpecification(searchDto));
+        MessageSearchDto searchDto = getMessages(getJwtUserIdFromSecurityContext(), companionId, ReadStatusDto.SENT);
 
-        messageList.forEach(message -> {
-            if (message.getRecipientId().equals(getJwtUserIdFromSecurityContext())) {
-                message.setReadStatus(ReadStatus.READ);
-                log.info("DialogService in setStatusMessageRead: trying to set READ status for message with id: " + message.getId());
-            }
-        });
-        messageRepository.saveAll(messageList);
-
+        if (searchDto != null) {
+            List<Message> messageList = messageRepository.findAll(getMessageSpecification(searchDto));
+            messageList.forEach(message -> {
+                if (message.getRecipientId().equals(getJwtUserIdFromSecurityContext())) {
+                    message.setReadStatus(ReadStatus.READ);
+                    log.info("DialogService in setStatusMessageRead: trying to set READ status for message with id: " + message.getId());
+                }
+            });
+            messageRepository.saveAll(messageList);
+        }
         StatusMessageReadRs response = new StatusMessageReadRs("", "", getTimestamp());
         return response.setData(new SetStatusMessageReadDto("ok"));
 
@@ -141,6 +147,24 @@ public class DialogService {
 
     }
 
+    private HashMap<Long, AccountDto> getAccountsDto(List<Dialog> dialogList) {
+
+        HashMap<Long, AccountDto> accountDtoHashMap = new HashMap<>();
+        Set<Long> accountsId = new HashSet<>();
+        dialogList.forEach(d -> {
+           accountsId.add(d.getUserId1());
+           accountsId.add(d.getUserId2());
+        });
+        List<AccountDto> accountList = accountService.getAccountsByIds(accountsId);
+        accountList.forEach(a -> {
+            if(!accountDtoHashMap.containsKey(a.getId())) {
+                accountDtoHashMap.put(a.getId(), a);
+            }
+        });
+        return accountDtoHashMap;
+
+    }
+
     private Dialog getDialog(Long authorId, Long companionId) {
 
         DialogSearchDto searchDto = new DialogSearchDto();
@@ -163,14 +187,26 @@ public class DialogService {
         return dialogList.get(0);
     }
 
-    private MessageSearchDto createMessageSearch(Long authorId, Long recipientId, ReadStatusDto status) {
+    private MessageSearchDto getMessages(Long authorId, Long recipientId, ReadStatusDto status) {
 
-        Dialog dialog = getDialog(authorId, recipientId);
+        DialogSearchDto dialogSearchDto = new DialogSearchDto();
+        dialogSearchDto.setIsDeleted(false);
+        dialogSearchDto.setUserId(authorId);
+        dialogSearchDto.setConversationPartnerId(recipientId);
+
+        List<Dialog> dialogList = dialogRepository.findAll(getDialogSpecification(dialogSearchDto));
+
+        if ( dialogList.size() == 0) {
+            return  null;
+        }
 
         MessageSearchDto searchDto = new MessageSearchDto();
-        searchDto.setDialogId(dialog.getId());
+        searchDto.setDialogId(dialogList.get(0).getId());
         searchDto.setIsDeleted(false);
         searchDto.setReadStatus(status);
+
+        log.info("DialogService in getAllMessages: trying to get all messages count with MessageSearchDto: " + searchDto);
+
         return searchDto;
 
     }

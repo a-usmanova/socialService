@@ -24,10 +24,10 @@ public class DialogsRs extends BaseResponse {
     private Long total;
 
     @Schema(description = "Отступ от начала списка", example = "0")
-    private Long offset;
+    private Integer offset;
 
     @Schema(description = "Количество диалогов пользователя на страницу", example = "20")
-    private Long perPage;
+    private Integer perPage;
 
     @Schema(description = "Id текущего пользователя", example = "55")
     private Long currentUserId;
