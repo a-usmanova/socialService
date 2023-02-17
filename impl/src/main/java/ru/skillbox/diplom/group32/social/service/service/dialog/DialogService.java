@@ -93,31 +93,29 @@ public class DialogService {
         response.setPerPage(itemPerPage);
         response.setTotal(messageRepository.count());
 
-        MessageSearchDto searchDto = getMessages(getJwtUserIdFromSecurityContext(), recipientId, null);
-        if (searchDto != null) {
-            List<Message> messageList = messageRepository.findAll(getMessageSpecification(searchDto)
+        MessageSearchDto searchDto = getMessageSearchDto(getJwtUserIdFromSecurityContext(), recipientId, null);
+        List<Message> messageList = messageRepository.findAll(getMessageSpecification(searchDto)
                     , PageRequest.of(offset, itemPerPage, Sort.by(Sort.Direction.DESC, "time"))).toList();
 
-            response.setData(messageList.stream().map(messageMapper::convertToMessageShortDto).toList());
-        }
+        log.info("DialogService in getAllMessages: trying to get all messages count with MessageSearchDto: " + searchDto);
+
+        response.setData(messageList.stream().map(messageMapper::convertToMessageShortDto).toList());
         return response;
 
     }
 
     public StatusMessageReadRs setStatusMessageRead(Long companionId) {
 
-        MessageSearchDto searchDto = getMessages(getJwtUserIdFromSecurityContext(), companionId, ReadStatusDto.SENT);
+        MessageSearchDto searchDto = getMessageSearchDto(getJwtUserIdFromSecurityContext(), companionId, ReadStatusDto.SENT);
 
-        if (searchDto != null) {
-            List<Message> messageList = messageRepository.findAll(getMessageSpecification(searchDto));
-            messageList.forEach(message -> {
-                if (message.getRecipientId().equals(getJwtUserIdFromSecurityContext())) {
-                    message.setReadStatus(ReadStatus.READ);
-                    log.info("DialogService in setStatusMessageRead: trying to set READ status for message with id: " + message.getId());
-                }
-            });
-            messageRepository.saveAll(messageList);
-        }
+        List<Message> messageList = messageRepository.findAll(getMessageSpecification(searchDto));
+        messageList.forEach(message -> {
+            if (message.getRecipientId().equals(getJwtUserIdFromSecurityContext())) {
+                message.setReadStatus(ReadStatus.READ);
+                log.info("DialogService in setStatusMessageRead: trying to set READ status for message with id: " + message.getId());
+            }
+        });
+        messageRepository.saveAll(messageList);
         StatusMessageReadRs response = new StatusMessageReadRs("", "", getTimestamp());
         return response.setData(new SetStatusMessageReadDto("ok"));
 
@@ -187,25 +185,13 @@ public class DialogService {
         return dialogList.get(0);
     }
 
-    private MessageSearchDto getMessages(Long authorId, Long recipientId, ReadStatusDto status) {
+    private MessageSearchDto getMessageSearchDto(Long authorId, Long recipientId, ReadStatusDto status) {
 
-        DialogSearchDto dialogSearchDto = new DialogSearchDto();
-        dialogSearchDto.setIsDeleted(false);
-        dialogSearchDto.setUserId(authorId);
-        dialogSearchDto.setConversationPartnerId(recipientId);
-
-        List<Dialog> dialogList = dialogRepository.findAll(getDialogSpecification(dialogSearchDto));
-
-        if ( dialogList.size() == 0) {
-            return  null;
-        }
-
+        Dialog dialog = getDialog(authorId, recipientId);
         MessageSearchDto searchDto = new MessageSearchDto();
-        searchDto.setDialogId(dialogList.get(0).getId());
+        searchDto.setDialogId(dialog.getId());
         searchDto.setIsDeleted(false);
         searchDto.setReadStatus(status);
-
-        log.info("DialogService in getAllMessages: trying to get all messages count with MessageSearchDto: " + searchDto);
 
         return searchDto;
 
