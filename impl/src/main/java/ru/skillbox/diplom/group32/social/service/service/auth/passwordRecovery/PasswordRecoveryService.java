@@ -37,7 +37,7 @@ public class PasswordRecoveryService {
     private final PasswordRecoveryRepository passwordRecoveryRepository;
 
     public void sendEmail(PasswordRecoveryDto passwordRecoveryDto) {
-        log.debug("PasswordRecoveryService.sendMail: Новый запрос на восстановление пароля для {}", passwordRecoveryDto.getEmail());
+        log.info("PasswordRecoveryService.sendMail: Новый запрос на восстановление пароля для {}", passwordRecoveryDto.getEmail());
 
         userRepository.findUserByEmail(passwordRecoveryDto.getEmail())
                 .orElseThrow(() -> { log.error("PasswordRecoveryService.sendMail: {} не зарегистрирован", passwordRecoveryDto.getEmail());
@@ -55,7 +55,7 @@ public class PasswordRecoveryService {
         email.setSubject("Восстановление пароля к social-service-team32");
         email.setText(text);
         asyncMailSender.sendMail(email);
-        log.debug("PasswordRecoveryService.sendMail: Письмо для восстановления пароля отправлено на {}", passwordRecoveryDto.getEmail());
+        log.info("PasswordRecoveryService.sendMail: Письмо для восстановления пароля отправлено на {}", passwordRecoveryDto.getEmail());
     }
 
     public void setPassword(String uuid, NewPasswordDto newPasswordDto) {
@@ -67,7 +67,7 @@ public class PasswordRecoveryService {
         user.setPassword(passwordEncoder.encode(newPasswordDto.getPassword()));
         userRepository.save(user);
         passwordRecoveryRepository.deleteAllByIdInBatch(List.of(UUID.fromString(uuid)));
-        log.debug("PasswordRecoveryService.setPassword: Установлен новый пароль для пользователя {}", user.getEmail());
+        log.info("PasswordRecoveryService.setPassword: Установлен новый пароль для пользователя {}", user.getEmail());
     }
 
 

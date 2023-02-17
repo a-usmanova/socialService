@@ -15,6 +15,8 @@ import org.springframework.kafka.core.*;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 import ru.skillbox.diplom.group32.social.service.model.account.AccountOnlineDto;
+import ru.skillbox.diplom.group32.social.service.model.notification.EventNotification;
+import ru.skillbox.diplom.group32.social.service.model.notification.NotificationDto;
 import ru.skillbox.diplom.group32.social.service.model.streaming.StreamingMessageDto;
 
 import java.util.HashMap;
@@ -40,7 +42,7 @@ public class KafkaConfig {
     }
 
     @Bean
-    NewTopic notificationTopic() {
+    NewTopic accountOnlineTopic() {
         return TopicBuilder
                 .name("sender-account-online")
                 .partitions(1)
@@ -159,4 +161,139 @@ public class KafkaConfig {
         return kafkaTemplate;
     }
 
+    // Notifications
+    @Bean
+    NewTopic notificationTopic() {
+        return TopicBuilder
+                .name("event-notification")
+                .partitions(1)
+                .replicas(1)
+                .build();
+    }
+
+    @Bean
+    public ProducerFactory<String, EventNotification> producerNotificationFactory() {
+        Map<String, Object> config = new HashMap<>();
+
+        config.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG,
+                bootstrapServer);
+        config.put(
+                ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG,
+                StringSerializer.class
+        );
+        config.put(
+                ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
+                JsonSerializer.class
+        );
+
+        return new DefaultKafkaProducerFactory<>(config, new StringSerializer(),
+                new JsonSerializer<>());
+    }
+
+    @Bean
+    public ConsumerFactory<String, EventNotification> consumerNotificationFactory() {
+        Map<String, Object> config = new HashMap<>();
+
+        config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,
+                bootstrapServer);
+        config.put(ConsumerConfig.GROUP_ID_CONFIG,
+                consumerGroupId);
+        config.put(
+                ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,
+                StringDeserializer.class
+        );
+        config.put(
+                ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
+                JsonDeserializer.class
+        );
+
+        return new DefaultKafkaConsumerFactory<>(config, new StringDeserializer(),
+                new JsonDeserializer<>(EventNotification.class));
+    }
+
+    @Bean
+    public KafkaTemplate<String, EventNotification> kafkaNotificationTemplate() {
+        KafkaTemplate<String, EventNotification> kafkaTemplate = new KafkaTemplate<>(producerNotificationFactory());
+        kafkaTemplate.setConsumerFactory(consumerNotificationFactory());
+        return kafkaTemplate;
+    }
+
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, EventNotification> notificationListener() {
+        ConcurrentKafkaListenerContainerFactory<String, EventNotification> factory = new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(consumerNotificationFactory());
+        return factory;
+    }
+
+    // Send-notification
+    @Bean
+    NewTopic sendNotificationTopic() {
+        return TopicBuilder
+                .name("send-notification")
+                .partitions(1)
+                .replicas(1)
+                .build();
+    }
+
+    @Bean
+    public ProducerFactory<String, StreamingMessageDto<NotificationDto>> producerSendNotificationFactory() {
+        Map<String, Object> config = new HashMap<>();
+
+        config.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG,
+                bootstrapServer);
+        config.put(
+                ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG,
+                StringSerializer.class
+        );
+        config.put(
+                ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
+                JsonSerializer.class
+        );
+        config.put(
+                ProducerConfig.BATCH_SIZE_CONFIG,
+                32768
+        );
+        config.put(
+                ProducerConfig.LINGER_MS_CONFIG,
+                10
+        );
+
+        return new DefaultKafkaProducerFactory<>(config, new StringSerializer(),
+                new JsonSerializer<>());
+    }
+
+    @Bean
+    public ConsumerFactory<String, StreamingMessageDto<NotificationDto>> consumerSendNotificationFactory() {
+        Map<String, Object> config = new HashMap<>();
+
+        config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,
+                bootstrapServer);
+        config.put(ConsumerConfig.GROUP_ID_CONFIG,
+                consumerGroupId);
+        config.put(
+                ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,
+                StringDeserializer.class
+        );
+        config.put(
+                ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
+                JsonDeserializer.class
+        );
+
+        return new DefaultKafkaConsumerFactory<>(config, new StringDeserializer(),
+                new JsonDeserializer<>(StreamingMessageDto.class));
+    }
+
+    @Bean
+    public KafkaTemplate<String, StreamingMessageDto<NotificationDto>> kafkaSendNotificationTemplate() {
+        KafkaTemplate<String, StreamingMessageDto<NotificationDto>> kafkaTemplate = new KafkaTemplate<>(producerSendNotificationFactory());
+        kafkaTemplate.setConsumerFactory(consumerSendNotificationFactory());
+        return kafkaTemplate;
+    }
+
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, StreamingMessageDto<NotificationDto>> sendNotificationListener() {
+        ConcurrentKafkaListenerContainerFactory<String, StreamingMessageDto<NotificationDto>> factory = new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(consumerSendNotificationFactory());
+        return factory;
+    }
 }
