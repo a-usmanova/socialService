@@ -67,10 +67,10 @@ class FriendService {
             searchDto.setId_from(getJwtUserIdFromSecurityContext());
         }
 
-        Page<Friend> friendPage = friendRepository.findAll(getSpecification(searchDto), page);
+        List<Friend> friendList = friendRepository.findAll(getSpecification(searchDto));
         List<FriendDto> friendDtos = new ArrayList<>();
 
-        for (Friend friend : friendPage) {
+        for (Friend friend : friendList) {
             if (searchDto.getStatusCode().equals(StatusCode.BLOCKED) || !friend.getStatusCode().equals(StatusCode.BLOCKED)) {
                 FriendDto friendDto = friendMapper.convertToDto(friend);
                 friendDto.setFirstName(accountService.getAccountById(friendDto.getToAccountId()).getFirstName());
@@ -81,7 +81,7 @@ class FriendService {
 
         }
 
-        Page<FriendDto> pageFriendDto = new PageImpl<>(friendDtos, page, page.getOffset());
+        Page<FriendDto> pageFriendDto = new PageImpl<>(friendDtos, page, friendDtos.toArray().length);
 
         return pageFriendDto;
 
@@ -171,6 +171,7 @@ class FriendService {
                 }
             }
         }
+
         return friendMapper.convertToDtoList(currentFriends);
     }
 
