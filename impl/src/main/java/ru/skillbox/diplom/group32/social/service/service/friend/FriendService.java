@@ -110,10 +110,6 @@ class FriendService {
                 .and(equal(Friend_.statusCode, searchDto.getStatusCode(), true)
                         .and(equal(Friend_.fromAccountId, searchDto.getId_from(), true))
                         .and(equal(Friend_.toAccountId, searchDto.getId_to(), true)));
-//                        .and(like(Friend_.firstName, searchDto.getFirstName(), true)));
-//                .and(between(Friend_.birthDate, searchDto.getBirthDateFrom(), searchDto.getBirthDateFrom(), true))
-//                .and(like(Friend_.city, searchDto.getCity(), true))
-//                .and(like(Friend_.country, searchDto.getCountry(), true));
     }
 
     public List<Long> getFriendsIds() {
@@ -245,7 +241,6 @@ class FriendService {
                 }
             }
         });
-//        friendRepository.saveAll(forwardFriend);
     }
 
     private void blockIfBlocked(Long id) {
@@ -352,24 +347,9 @@ class FriendService {
         // ??
     }
 
-    public void removeRecommendations(Long id) {
-
-        List<Long> myFriendsId = getFriendsIds(id);
-        myFriendsId.add(id);
-        List<Long> allIds = new ArrayList<>();
-        allIds.addAll(myFriendsId);
-
-        for (Long friendId : myFriendsId) {
-            allIds.addAll(getFriendsIds(friendId));
-        }
-
-        FriendSearchDto friendSearchDto = new FriendSearchDto();
-        friendSearchDto.setIds(allIds);
-        friendSearchDto.setStatusCode(StatusCode.RECOMMENDATION);
-        friendRepository.deleteAll(friendRepository.findAll(getSpecification(friendSearchDto)));
-
-    }
-
+    //
+    //=================================================RECOMMENDATIONS==================================================
+    //
 
     public void createRecommendations(Long id) {
 
@@ -417,12 +397,27 @@ class FriendService {
             friendRepository.save(friend);
         }
 
-//                .collect(Collectors.toMap(
-//                        Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
-
         log.info("RECOMMENDATIONS LIST" + resultList);
 
     }
+    public void removeRecommendations(Long id) {
+
+        List<Long> myFriendsId = getFriendsIds(id);
+        myFriendsId.add(id);
+        List<Long> allIds = new ArrayList<>();
+        allIds.addAll(myFriendsId);
+
+        for (Long friendId : myFriendsId) {
+            allIds.addAll(getFriendsIds(friendId));
+        }
+
+        FriendSearchDto friendSearchDto = new FriendSearchDto();
+        friendSearchDto.setIds(allIds);
+        friendSearchDto.setStatusCode(StatusCode.RECOMMENDATION);
+        friendRepository.deleteAll(friendRepository.findAll(getSpecification(friendSearchDto)));
+
+    }
+
 
     public List<FriendDto> getRecommendation() {
 
