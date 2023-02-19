@@ -2,8 +2,10 @@ package ru.skillbox.diplom.group32.social.service.mapper.post;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import ru.skillbox.diplom.group32.social.service.model.account.AccountSearchDto;
 import ru.skillbox.diplom.group32.social.service.model.post.Post;
 import ru.skillbox.diplom.group32.social.service.model.post.PostDto;
+import ru.skillbox.diplom.group32.social.service.model.post.PostSearchDto;
 
 import java.util.List;
 
@@ -38,4 +40,7 @@ public interface PostMapper {
 
     @Mapping(target = "tags", ignore = true)
     List<PostDto> convertToDtoList(List<Post> postList);
+
+    AccountSearchDto convertPostSearchDtoToAccountSearchDto(PostSearchDto searchDto);
+
 }

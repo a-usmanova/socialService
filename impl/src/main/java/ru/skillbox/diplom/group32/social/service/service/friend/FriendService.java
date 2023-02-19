@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import ru.skillbox.diplom.group32.social.service.exception.ObjectNotFoundException;
 import ru.skillbox.diplom.group32.social.service.mapper.friend.FriendMapper;
@@ -15,6 +16,8 @@ import ru.skillbox.diplom.group32.social.service.model.friend.Friend;
 import ru.skillbox.diplom.group32.social.service.model.friend.FriendDto;
 import ru.skillbox.diplom.group32.social.service.model.friend.FriendSearchDto;
 import ru.skillbox.diplom.group32.social.service.model.friend.Friend_;
+import ru.skillbox.diplom.group32.social.service.model.notification.EventNotification;
+import ru.skillbox.diplom.group32.social.service.model.notification.NotificationType;
 import ru.skillbox.diplom.group32.social.service.repository.friend.FriendRepository;
 import ru.skillbox.diplom.group32.social.service.service.account.AccountService;
 import ru.skillbox.diplom.group32.social.service.service.auth.UserService;
@@ -34,13 +37,19 @@ class FriendService {
     private AccountService accountService;
     private FriendMapper friendMapper;
     private UserService userService;
+    private final KafkaTemplate<String, EventNotification> eventNotificationKafkaTemplate;
 
     @Autowired
-    public FriendService(FriendRepository friendRepository, @Lazy AccountService accountService, FriendMapper friendMapper, UserService userService) {
+    public FriendService(FriendRepository friendRepository, @Lazy AccountService accountService,
+                         FriendMapper friendMapper, UserService userService, KafkaTemplate<String,
+            EventNotification> eventNotificationKafkaTemplate) {
+
         this.friendRepository = friendRepository;
         this.accountService = accountService;
         this.friendMapper = friendMapper;
         this.userService = userService;
+        this.eventNotificationKafkaTemplate = eventNotificationKafkaTemplate;
+
     }
 
     public FriendDto getById(Long id) {
@@ -110,10 +119,6 @@ class FriendService {
                 .and(equal(Friend_.statusCode, searchDto.getStatusCode(), true)
                         .and(equal(Friend_.fromAccountId, searchDto.getId_from(), true))
                         .and(equal(Friend_.toAccountId, searchDto.getId_to(), true)));
-//                        .and(like(Friend_.firstName, searchDto.getFirstName(), true)));
-//                .and(between(Friend_.birthDate, searchDto.getBirthDateFrom(), searchDto.getBirthDateFrom(), true))
-//                .and(like(Friend_.city, searchDto.getCity(), true))
-//                .and(like(Friend_.country, searchDto.getCountry(), true));
     }
 
     public List<Long> getFriendsIds() {
@@ -153,6 +158,12 @@ class FriendService {
         friendList.add(friendMapper.userDtoToFriendFrom(userService.getUser(id)));
         List<Friend> currentFriends = getCurrentFriendsByAccountId(id);
         if (currentFriends.isEmpty()) {
+            for (Friend friend: friendList) {
+                if (friend.getStatusCode().equals(StatusCode.REQUEST_TO)) {
+                    EventNotification eventNotification = new EventNotification(friend.getFromAccountId(), friend.getToAccountId(), NotificationType.FRIEND_REQUEST, "НОВАЯ ЗАЯВКА В ДРУЗЬЯ");
+                    eventNotificationKafkaTemplate.send("event-notification", eventNotification);
+                }
+            }
             return friendMapper.convertToDtoList(friendRepository.saveAll(friendList));
         } else {
             for (Friend friend : currentFriends) {
@@ -165,7 +176,10 @@ class FriendService {
 
                     if (friend.getFromAccountId().equals(userNow)) {
                         friend.setStatusCode(StatusCode.REQUEST_TO);
-                    } else friend.setStatusCode(StatusCode.REQUEST_FROM);
+                        EventNotification eventNotification = new EventNotification(friend.getFromAccountId(), friend.getToAccountId(), NotificationType.FRIEND_REQUEST, "НОВАЯ ЗАЯВКА В ДРУЗЬЯ");
+                        eventNotificationKafkaTemplate.send("event-notification", eventNotification);
+                    } else
+                        friend.setStatusCode(StatusCode.REQUEST_FROM);
                     friendRepository.save(friend);
 
                 }
@@ -181,6 +195,10 @@ class FriendService {
         List<Long> friendsFriendsList = new ArrayList<>();
         if (!friendList.isEmpty()) {
             friendList.forEach(e -> {
+                if (e.getStatusCode().equals(StatusCode.REQUEST_TO)) {
+                    EventNotification eventNotification = new EventNotification(e.getToAccountId(), e.getFromAccountId(), NotificationType.FRIEND_REQUEST, "ВАША ЗАЯВКА В ДРУЗЬЯ ПРИНЯТА");
+                    eventNotificationKafkaTemplate.send("event-notification", eventNotification);
+                }
                 e.setStatusCode(StatusCode.FRIEND);
                 friendRepository.save(e);
                 friendsFriendsList.addAll(getFriendsIds(e.getFromAccountId()));
@@ -245,7 +263,6 @@ class FriendService {
                 }
             }
         });
-//        friendRepository.saveAll(forwardFriend);
     }
 
     private void blockIfBlocked(Long id) {
@@ -352,24 +369,9 @@ class FriendService {
         // ??
     }
 
-    public void removeRecommendations(Long id) {
-
-        List<Long> myFriendsId = getFriendsIds(id);
-        myFriendsId.add(id);
-        List<Long> allIds = new ArrayList<>();
-        allIds.addAll(myFriendsId);
-
-        for (Long friendId : myFriendsId) {
-            allIds.addAll(getFriendsIds(friendId));
-        }
-
-        FriendSearchDto friendSearchDto = new FriendSearchDto();
-        friendSearchDto.setIds(allIds);
-        friendSearchDto.setStatusCode(StatusCode.RECOMMENDATION);
-        friendRepository.deleteAll(friendRepository.findAll(getSpecification(friendSearchDto)));
-
-    }
-
+    //
+    //=================================================RECOMMENDATIONS==================================================
+    //
 
     public void createRecommendations(Long id) {
 
@@ -417,12 +419,27 @@ class FriendService {
             friendRepository.save(friend);
         }
 
-//                .collect(Collectors.toMap(
-//                        Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
-
         log.info("RECOMMENDATIONS LIST" + resultList);
 
     }
+    public void removeRecommendations(Long id) {
+
+        List<Long> myFriendsId = getFriendsIds(id);
+        myFriendsId.add(id);
+        List<Long> allIds = new ArrayList<>();
+        allIds.addAll(myFriendsId);
+
+        for (Long friendId : myFriendsId) {
+            allIds.addAll(getFriendsIds(friendId));
+        }
+
+        FriendSearchDto friendSearchDto = new FriendSearchDto();
+        friendSearchDto.setIds(allIds);
+        friendSearchDto.setStatusCode(StatusCode.RECOMMENDATION);
+        friendRepository.deleteAll(friendRepository.findAll(getSpecification(friendSearchDto)));
+
+    }
+
 
     public List<FriendDto> getRecommendation() {
 

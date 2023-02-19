@@ -3,12 +3,14 @@ package ru.skillbox.diplom.group32.social.service.service.post;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import ru.skillbox.diplom.group32.social.service.config.Properties;
 import ru.skillbox.diplom.group32.social.service.exception.ObjectNotFoundException;
 import ru.skillbox.diplom.group32.social.service.mapper.post.PostMapper;
+import ru.skillbox.diplom.group32.social.service.model.account.AccountDto;
 import ru.skillbox.diplom.group32.social.service.model.like.LikeType;
 import ru.skillbox.diplom.group32.social.service.model.post.Post;
 import ru.skillbox.diplom.group32.social.service.model.post.PostDto;
@@ -17,12 +19,14 @@ import ru.skillbox.diplom.group32.social.service.model.post.Post_;
 import ru.skillbox.diplom.group32.social.service.model.tag.Tag;
 import ru.skillbox.diplom.group32.social.service.model.tag.Tag_;
 import ru.skillbox.diplom.group32.social.service.repository.post.PostRepository;
+import ru.skillbox.diplom.group32.social.service.service.account.AccountService;
 import ru.skillbox.diplom.group32.social.service.service.friend.FriendService;
 import ru.skillbox.diplom.group32.social.service.service.like.LikeService;
 import ru.skillbox.diplom.group32.social.service.service.tag.TagService;
 
 import javax.persistence.criteria.Join;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -35,13 +39,11 @@ import static ru.skillbox.diplom.group32.social.service.utils.specification.Spec
 @RequiredArgsConstructor
 public class PostService {
     private final PostRepository postRepository;
-
+    private final AccountService accountService;
     private final FriendService friendService;
     private final TagService tagService;
     private final PostMapper postMapper;
-
     private final LikeService likeService;
-    private final Properties properties;
 
     public PostDto getById(Long id) {
 
@@ -52,26 +54,41 @@ public class PostService {
 
     public Page<PostDto> getAll(PostSearchDto searchDto, Pageable page) {
 
+        List<Long> listFriendsIds = friendService.getFriendsIds();
+        listFriendsIds.add(getJwtUserIdFromSecurityContext());
+
         if (searchDto.getWithFriends() != null) {
-            List<Long> listFriendsIds = friendService.getFriendsIds();
-            listFriendsIds.add(getJwtUserIdFromSecurityContext());
+
             searchDto.setAccountIds(listFriendsIds);
 
         }
 
-        searchDto.setDateTo(ZonedDateTime.now());
+        if (searchDto.getAuthor() != null) {
+            List<Long> listLong = new ArrayList<>();
+            Pageable pageable = PageRequest.of(0, 1000);
+            Page<AccountDto> pageAccount = accountService.searchAccount(postMapper.convertPostSearchDtoToAccountSearchDto(searchDto), pageable);
+            for (AccountDto accountDto : pageAccount) {
+                if (listFriendsIds.contains(accountDto.getId())){
+                    listLong.add(accountDto.getId());
+                }
+            }
+            searchDto.setAccountIds(listLong);
+        }
+
+        if (searchDto.getDateTo() == null) {
+            searchDto.setDateTo(ZonedDateTime.now());
+        }
         log.info("PostService in getAll tried to find posts with postSearchDto: {} and pageable: {}", searchDto, page);
         Page<Post> postPage = postRepository.findAll(getSpecification(searchDto), page);
-        return postPage.map(e->{
+        return new PageImpl<>(postPage.map(e -> {
             PostDto postDto = postMapper.convertToDto(e);
             postDto.setTags(tagService.getNames(e.getTags()));
             postDto.setMyLike(likeService.getMyLike(postDto.getId(), LikeType.POST));
             return postDto;
-        });
+        }).toList(), page, postPage.getTotalElements());
 
     }
 
-    //*TODO брать за пример
     public PostDto create(PostDto postDto) {
 
         log.info("PostService in create has post to save: " + postDto);
@@ -87,7 +104,6 @@ public class PostService {
 
         log.info("PostService in update has post with id: {} to update: {} ", postDto.getId(), postDto);
         Post post = updatePost(postDto);
-//        Post post = updatePost(postDto, id);
         log.info("PostService in updatePost: Post updated. New Post: " + post);
 
         return postMapper.convertToDto(postRepository.save(post));
@@ -107,16 +123,14 @@ public class PostService {
                 .and(in(Post_.id, searchDto.getIds(), true))
                 .and(in(Post_.authorId, searchDto.getAccountIds(), true))
                 .and(notIn(Post_.authorId, searchDto.getBlockedIds(), true))
-// в Post нет author --- .and(equal(Post_.author, searchDto.getAuthor(), true)
                 .and(equal(Post_.title, searchDto.getTitle(), true)
                         .and(equal(Post_.postText, searchDto.getPostText(), true)
-// в Post нет withFriends --- .and(equal(Post_.withFriends, searchDto.getWithFriends(), true)
                                 .and(between(Post_.publishDate, searchDto.getDateFrom(), searchDto.getDateTo(), true))
                                 .and(containsTag(searchDto.getTags()))));
     }
 
 
-    private Post updatePost (PostDto postDto) {
+    private Post updatePost(PostDto postDto) {
 
         Post post = postRepository.findById(postDto.getId()).orElseThrow(ObjectNotFoundException::new);
 
