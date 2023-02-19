@@ -1,11 +1,12 @@
 package ru.skillbox.diplom.group32.social.service.model.notification;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class EventNotification {
     private Long authorId;
     private Long receiverId;
