@@ -71,6 +71,7 @@ white-list:
     - /**/captcha
     - /**/register
     - /**/registration
-    - /**/swagger-ui/*
+    - /**/swagger-ui/**
+    - /**/api-docs/**
 
 websocket-url: ${WEBSOCKET-URL:/api/v1/streaming/ws}
