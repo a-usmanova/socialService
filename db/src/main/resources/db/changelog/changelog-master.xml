@@ -32,5 +32,9 @@
     <include file="db/changelog/changes/change-friend--table2.xml"/>
     <include file="db/changelog/changes/create-notification-table.xml"/>
     <include file="db/changelog/changes/create-notification-settings-table.xml"/>
+    <include file="db/changelog/changes/clear-city-table.xml"/>
+    <include file="db/changelog/changes/clear-country-table.xml"/>
+    <include file="db/changelog/changes/insert-role-table.xml"/>
+
 
 </databaseChangeLog>

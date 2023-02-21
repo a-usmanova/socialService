@@ -19,7 +19,6 @@ import javax.annotation.PostConstruct;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Base64;
@@ -70,13 +69,15 @@ public class JwtTokenProvider {
 
     //TODO new JwtAuthenticationToken() instead of UsernamePasswordAuthenticationToken
     public Authentication getAuthentication(String token) {
+        Jwt jwt = jwtDecoder().decode(token);
 
-        UserDetails userDetails = jwtUserDetailsService.loadUserByEmail(getEmail(token));
+        if (jwt.getClaim("roles").toString().equals("SERVICE") && jwt.getClaim("email").toString().equals("survey@mail.ru")) {
+            UserDetails userDetails = jwtUserDetailsService.loadSurvey(jwt);
+            return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
+        }
+
+        UserDetails userDetails = jwtUserDetailsService.loadUserFromJwt(jwt);
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
-    }
-
-    public String getEmail(String token) {
-        return jwtDecoder().decode(token).getClaim("email");
     }
 
     public String resolveToken(HttpServletRequest request) {
@@ -114,10 +115,10 @@ public class JwtTokenProvider {
         return result;
     }
 
-    public Long getCurrentUserIdFromJwt(String token){
+    public Long getCurrentUserIdFromJwt(String token) {
         Jwt jwt = jwtDecoder().decode(token);
         Long id = jwt.getClaim("id");
-        log.info("Current User from JWT in WebSocketSession: {}",  id);
+        log.info("Current User from JWT in WebSocketSession: {}", id);
         return id;
     }
 }

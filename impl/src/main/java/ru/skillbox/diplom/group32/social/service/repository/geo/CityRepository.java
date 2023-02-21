@@ -9,4 +9,6 @@ import java.util.List;
 @Repository
 public interface CityRepository extends BaseRepository<City> {
     List<City> findAllByCountryId(Long id);
+
+    Boolean existsByTitle(String title);
 }

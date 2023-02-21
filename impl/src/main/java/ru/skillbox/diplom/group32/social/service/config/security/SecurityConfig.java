@@ -23,6 +23,7 @@ public class SecurityConfig {
     private final WhiteList whiteList;
     private final JwtTokenProvider jwtTokenProvider;
     private static final String LOGOUT_ENDPOINT = "/**/logout";
+    private static final String GEO_LOAD_ENDPOINT = "/**/geo/load";
 
 
     @Bean
@@ -38,12 +39,9 @@ public class SecurityConfig {
                 .and()
                 .csrf().disable()
                 .addFilterBefore(new AuthorizationFilter(), CsrfFilter.class)
-                .antMatcher("/**/swagger-ui/*").anonymous()
-                .and()
                 .authorizeRequests()
                 .antMatchers(whiteList.getLinks()).permitAll()
-                .and()
-                .authorizeRequests()
+                .antMatchers(GEO_LOAD_ENDPOINT).hasAuthority("SERVICE")
                 .anyRequest().authenticated()
                 .and()
                 .logout(
