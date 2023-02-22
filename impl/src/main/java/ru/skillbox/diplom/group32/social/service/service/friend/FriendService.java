@@ -85,6 +85,7 @@ class FriendService {
                 friendDto.setFirstName(accountService.getAccountById(friendDto.getToAccountId()).getFirstName());
                 friendDto.setLastName(accountService.getAccountById(friendDto.getToAccountId()).getLastName());
                 friendDto.setStatusCode(friendRepository.findById(friendDto.getId()).get().getStatusCode());
+                friendDto.setId(friend.getToAccountId());
                 friendDtos.add(friendDto);
             }
 
