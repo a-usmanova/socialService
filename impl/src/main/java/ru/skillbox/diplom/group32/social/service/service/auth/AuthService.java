@@ -5,10 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.skillbox.diplom.group32.social.service.config.security.JwtTokenProvider;
-import ru.skillbox.diplom.group32.social.service.config.security.exception.PasswordsAreNotMatchingException;
-import ru.skillbox.diplom.group32.social.service.config.security.exception.UserAlreadyExistsException;
-import ru.skillbox.diplom.group32.social.service.config.security.exception.UserNotFoundException;
-import ru.skillbox.diplom.group32.social.service.config.security.exception.WrongPasswordException;
+import ru.skillbox.diplom.group32.social.service.config.security.exception.*;
 import ru.skillbox.diplom.group32.social.service.mapper.auth.UserMapper;
 import ru.skillbox.diplom.group32.social.service.model.auth.*;
 import ru.skillbox.diplom.group32.social.service.repository.auth.RoleRepository;
@@ -56,8 +53,9 @@ public class AuthService {
     public UserDto register(RegistrationDto registrationDto) {
 
         if (!captchaService.passCaptcha(registrationDto)) {
-            throw new WrongPasswordException("Captcha code isn't right");
+            throw new WrongCaptchaException("Captcha code isn't right");
         }
+
 
         String email = registrationDto.getEmail();
         userRepository.findUserByEmail(email).ifPresent(x -> { throw new UserAlreadyExistsException("This email already taken");});
