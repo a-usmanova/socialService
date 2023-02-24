@@ -58,37 +58,31 @@ class FriendService {
         return friendMapper.convertToDto(friendRepository.findById(id).orElseThrow(ObjectNotFoundException::new));
 
     }
-//**TODO добавление самого себя, блокировка самого себя, удаление самого себя
 
     public Page<FriendDto> getAll(FriendSearchDto searchDto, Pageable page) {
 
         log.info("FriendService in getAll tried to find friends with FriendSearchDto: {} and pageable: {}", searchDto, page);
 
-        if (searchDto.getFirstName() != null || searchDto.getAgeFrom() != null ||
-                searchDto.getAgeTo() != null || searchDto.getCity() != null || searchDto.getCountry() != null) {
+        if (checkIfAccountSearch(searchDto)) {
             return accountService.searchAccount(friendMapper.friendSearchDtoToAccountSearchDto(searchDto), page)
                     .map(friendMapper::accountDtoToFriendDto);
         }
 
-        if (searchDto.getStatusCode() == null) {
+        if (searchDto.getStatusCode() == null)
             searchDto.setStatusCode(StatusCode.NONE);
-        } else {
-            searchDto.setId_from(getJwtUserIdFromSecurityContext());
-        }
+
+        searchDto.setId_from(getJwtUserIdFromSecurityContext());
 
         List<Friend> friendList = friendRepository.findAll(getSpecification(searchDto));
         List<FriendDto> friendDtos = new ArrayList<>();
 
         for (Friend friend : friendList) {
             if (searchDto.getStatusCode().equals(StatusCode.BLOCKED) || !friend.getStatusCode().equals(StatusCode.BLOCKED)) {
-                FriendDto friendDto = friendMapper.convertToDto(friend);
-                friendDto.setFirstName(accountService.getAccountById(friendDto.getToAccountId()).getFirstName());
-                friendDto.setLastName(accountService.getAccountById(friendDto.getToAccountId()).getLastName());
-                friendDto.setStatusCode(friendRepository.findById(friendDto.getId()).get().getStatusCode());
-                friendDto.setId(friend.getToAccountId());
+
+                FriendDto friendDto = friendMapper.accountDtoToFriendDto(accountService.getAccountById(friend.getToAccountId()));
+                friendDto.setStatusCode(friend.getStatusCode());
                 friendDtos.add(friendDto);
             }
-
         }
 
         Page<FriendDto> pageFriendDto = new PageImpl<>(friendDtos, page, friendDtos.toArray().length);
@@ -100,18 +94,20 @@ class FriendService {
     public void deleteById(Long id) {
 
         log.info("FriendService in deleteById tried to delete friend with id: " + id);
-        List<Friend> friendList = getCurrentFriendsByAccountId(id);
-        List<Long> friendsFriendsList = new ArrayList<>();
-        if (checkImBlocked(id)) {
-            friendList = getForwardFriend(id);
+
+        if (!checkIfImBlocked(id)) {
+
+            List<Friend> friendList = getCurrentFriendsByAccountId(id);
+            List<Long> friendsFriendsList = new ArrayList<>();
+
+            friendList.forEach(f -> {
+                f.setStatusCode(StatusCode.NONE);
+                friendsFriendsList.add(f.getFromAccountId());
+                friendsFriendsList.add(id);
+                friendRepository.delete(f);
+            });
+            friendsFriendsList.forEach(this::createRecommendations);
         }
-        friendList.forEach(f -> {
-            f.setStatusCode(StatusCode.NONE);
-            friendsFriendsList.add(f.getFromAccountId());
-            friendsFriendsList.add(id);
-            friendRepository.delete(f);
-        });
-        friendsFriendsList.forEach(this::createRecommendations);
     }
 
     private Specification<Friend> getSpecification(FriendSearchDto searchDto) {
@@ -191,8 +187,8 @@ class FriendService {
     }
 
     public void approveFriend(Long id) {
-        // в идеале переделать на account id
-        List<Friend> friendList = getCurrentFriendsByFriendId(id);
+
+        List<Friend> friendList = getCurrentFriendsByAccountId(id);
         List<Long> friendsFriendsList = new ArrayList<>();
         if (!friendList.isEmpty()) {
             friendList.forEach(e -> {
@@ -208,20 +204,6 @@ class FriendService {
         }
     }
 
-    private List<Friend> getCurrentFriendsByFriendId(Long id) {
-
-        Friend initialFriend = friendRepository.findById(id).orElseThrow(ObjectNotFoundException::new);
-        FriendSearchDto friendSearchDto = new FriendSearchDto();
-        friendSearchDto.setId_to(initialFriend.getFromAccountId());
-        friendSearchDto.setId_from(initialFriend.getToAccountId());
-        List<Friend> list = friendRepository.findAll(getSpecification(friendSearchDto));
-        friendSearchDto.setId_to(initialFriend.getToAccountId());
-        friendSearchDto.setId_from(initialFriend.getFromAccountId());
-        list.addAll(friendRepository.findAll(getSpecification(friendSearchDto)));
-
-        return list;
-
-    }
 
     private List<Friend> getCurrentFriendsByAccountId(Long id) {
 
@@ -240,7 +222,7 @@ class FriendService {
             blockIfNoConnection(id);
         }
         if (forwardFriend.isEmpty()) {
-            if (checkImBlocked(id)) {
+            if (checkIfImBlocked(id)) {
                 blockIfBlocked(id);
             }
             ;
@@ -252,7 +234,7 @@ class FriendService {
                     deleteById(id);
                 }
                 default -> {
-                    if (!checkImBlocked(id)) {
+                    if (!checkIfImBlocked(id)) {
 
                         deleteById(id);
                         blockIfNoConnection(id);
@@ -264,6 +246,17 @@ class FriendService {
                 }
             }
         });
+    }
+
+    //
+    //==================================================================================================================
+    //
+
+    private boolean checkIfAccountSearch(FriendSearchDto searchDto) {
+
+        return (searchDto.getFirstName() != null || searchDto.getAgeFrom() != null ||
+                searchDto.getAgeTo() != null || searchDto.getCity() != null || searchDto.getCountry() != null);
+
     }
 
     private void blockIfBlocked(Long id) {
@@ -317,7 +310,7 @@ class FriendService {
 
     }
 
-    private Boolean checkImBlocked(Long id) {
+    private Boolean checkIfImBlocked(Long id) {
 
         FriendSearchDto searchDto = new FriendSearchDto();
         searchDto.setId_from(id);
@@ -364,10 +357,6 @@ class FriendService {
         friendSearchDto.setStatusCode(StatusCode.REQUEST_TO);
         return (friendRepository.findAll(getSpecification(friendSearchDto))).stream().map(Friend::getFromAccountId).collect(Collectors.toList());
 
-    }
-
-    public void sendNotice() {
-        // ??
     }
 
     //
@@ -427,8 +416,7 @@ class FriendService {
 
         List<Long> myFriendsId = getFriendsIds(id);
         myFriendsId.add(id);
-        List<Long> allIds = new ArrayList<>();
-        allIds.addAll(myFriendsId);
+        List<Long> allIds = new ArrayList<>(myFriendsId);
 
         for (Long friendId : myFriendsId) {
             allIds.addAll(getFriendsIds(friendId));
@@ -453,8 +441,6 @@ class FriendService {
         friendDtos.sort(Comparator.comparing(FriendDto::getRating));
 
         return friendDtos;
-
-        //**TODO сделать пэйдж и таблицу recommendation
     }
 
     private List<Friend> getRecommendationsFromDB(Long id) {
@@ -466,5 +452,6 @@ class FriendService {
         return friendRepository.findAll(getSpecification(friendSearchDto));
 
     }
+
 
 }
