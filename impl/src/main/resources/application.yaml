@@ -73,5 +73,7 @@ white-list:
     - /**/registration
     - /**/swagger-ui/**
     - /**/api-docs/**
+    - /**/password/**
+    - /**/forgot
 
 websocket-url: ${WEBSOCKET-URL:/api/v1/streaming/ws}
