@@ -9,6 +9,6 @@ import java.util.List;
 
 @Repository
 public interface AccountRepository extends BaseRepository<Account> {
-    @Query(value = "SELECT account.id FROM account WHERE extract(MONTH FROM birth_date) = :month AND extract(DAY FROM birth_date) = :day", nativeQuery = true)
+    @Query(value = "SELECT account.id FROM account WHERE extract(MONTH FROM account.birth_date) = :month AND extract(DAY FROM account.birth_date) = :day", nativeQuery = true)
     List<Long> getAccountsByBirthDateMonthAndDay(Integer month, Integer day);
 }
