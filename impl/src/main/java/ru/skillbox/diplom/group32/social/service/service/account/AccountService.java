@@ -6,11 +6,15 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import ru.skillbox.diplom.group32.social.service.mapper.account.AccountMapper;
 import ru.skillbox.diplom.group32.social.service.model.account.*;
 import ru.skillbox.diplom.group32.social.service.model.auth.User;
 import ru.skillbox.diplom.group32.social.service.model.auth.User_;
+import ru.skillbox.diplom.group32.social.service.model.notification.EventNotification;
+import ru.skillbox.diplom.group32.social.service.model.notification.NotificationType;
 import ru.skillbox.diplom.group32.social.service.repository.account.AccountRepository;
 import ru.skillbox.diplom.group32.social.service.service.friend.FriendService;
 import ru.skillbox.diplom.group32.social.service.service.notification.NotificationService;
@@ -34,15 +38,19 @@ public class AccountService {
     private FriendService friendService;
     private NotificationService notificationService;
 
+    private KafkaTemplate<String, EventNotification> kafkaNotificationTemplate;
+
     @Autowired
     public AccountService(AccountRepository accountRepository,
                           AccountMapper accountMapper,
                           @Lazy FriendService friendService,
-                          NotificationService notificationService) {
+                          NotificationService notificationService,
+                          KafkaTemplate<String, EventNotification> kafkaNotificationTemplate) {
         this.accountRepository = accountRepository;
         this.accountMapper = accountMapper;
         this.friendService = friendService;
         this.notificationService = notificationService;
+        this.kafkaNotificationTemplate = kafkaNotificationTemplate;
     }
 
     public void createAccount(User user) {
@@ -115,8 +123,16 @@ public class AccountService {
         return accountSearchPages.map(accountMapper::convertToDto);
     }
 
-    public List<Long> getAccountsBirthday() {
-        return accountRepository.getAccountsByBirthDateMonthAndDay(ZonedDateTime.now().toLocalDateTime().getMonthValue(), ZonedDateTime.now().toLocalDateTime().getDayOfMonth());
+    @Scheduled(cron = "@daily")
+    public void getAccountsBirthday() {
+        List<Long> birthdayTodayIds = accountRepository.getAccountsByBirthDateMonthAndDay(ZonedDateTime.now().toLocalDateTime().getMonthValue(),
+                ZonedDateTime.now().toLocalDateTime().getDayOfMonth());
+
+        birthdayTodayIds.forEach(acc -> {
+            EventNotification birthday = new EventNotification(acc, null,
+                                NotificationType.FRIEND_BIRTHDAY, "ДЕНЬ РОЖДЕНИЯ ДРУГА ");
+            kafkaNotificationTemplate.send("event-notification", birthday);
+        });
     }
 
     public List<AccountDto> getAccountsByIds(Collection<Long> accountIds) {
