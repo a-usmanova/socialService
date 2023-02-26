@@ -33,7 +33,7 @@ public interface PostController extends BaseController<PostDto, PostSearchDto> {
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
                             schema = @Schema(allOf = {PostDto.class}))),
             @ApiResponse(responseCode = "400", content = @Content(mediaType = "")),
-            @ApiResponse(responseCode = "404", content = @Content(mediaType = ""))})
+            @ApiResponse(responseCode = "404", description = "Пост не найден", content = @Content(mediaType = ""))})
     ResponseEntity<PostDto> getById(@Schema(description = "id поста") @PathVariable Long id);
 
     @Override
@@ -45,7 +45,7 @@ public interface PostController extends BaseController<PostDto, PostSearchDto> {
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
                             schema = @Schema(allOf = {Pageable.class, PostDto.class}))),
             @ApiResponse(responseCode = "400", content = @Content(mediaType = "")),
-            @ApiResponse(responseCode = "404", content = @Content(mediaType = ""))})
+            @ApiResponse(responseCode = "404", description = "Посты не найдены", content = @Content(mediaType = ""))})
     ResponseEntity<Page<PostDto>> getAll(PostSearchDto searchDto, Pageable page);
 
     @Override
@@ -66,7 +66,8 @@ public interface PostController extends BaseController<PostDto, PostSearchDto> {
                     description = "Пост обновлен",
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
                             schema = @Schema(allOf = {PostDto.class}))),
-            @ApiResponse(responseCode = "400", content = @Content(mediaType = ""))})
+            @ApiResponse(responseCode = "400", content = @Content(mediaType = "")),
+            @ApiResponse(responseCode = "404", description = "Посты не найдены", content = @Content(mediaType = ""))})
     ResponseEntity<PostDto> update(@Schema(description = "id Поста для обновления") @RequestBody PostDto dto);
 
     @Override
@@ -77,8 +78,8 @@ public interface PostController extends BaseController<PostDto, PostSearchDto> {
                     description = "Пост удален",
                     content = @Content(mediaType = "")),
             @ApiResponse(responseCode = "400", content = @Content(mediaType = "")),
-            @ApiResponse(responseCode = "404", content = @Content(mediaType = ""))})
-    ResponseEntity deleteById(@Schema(description = "id Поста для удаления") @PathVariable Long id);
+            @ApiResponse(responseCode = "404", description = "Посты не найдены", content = @Content(mediaType = ""))})
+    ResponseEntity<PostDto> deleteById(@Schema(description = "id Поста для удаления") @PathVariable Long id);
 
 //
 //    -----------***COMMENTS***-----------
@@ -92,7 +93,7 @@ public interface PostController extends BaseController<PostDto, PostSearchDto> {
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
                             schema = @Schema(allOf = {Pageable.class, CommentDto.class}))),
             @ApiResponse(responseCode = "400", content = @Content(mediaType = "")),
-            @ApiResponse(responseCode = "404", content = @Content(mediaType = ""))})
+            @ApiResponse(responseCode = "404", description = "Комменты не найдены", content = @Content(mediaType = ""))})
     ResponseEntity<Page<CommentDto>> getComment(@Schema(description = "id поста")
                               @PathVariable Long id, Pageable page);
 
@@ -104,7 +105,7 @@ public interface PostController extends BaseController<PostDto, PostSearchDto> {
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
                             schema = @Schema(allOf = {Pageable.class, CommentDto.class}))),
             @ApiResponse(responseCode = "400", content = @Content(mediaType = "")),
-            @ApiResponse(responseCode = "404", content = @Content(mediaType = ""))})
+            @ApiResponse(responseCode = "404", description = "Субкомменты не найдены", content = @Content(mediaType = ""))})
     ResponseEntity<Page<CommentDto>> getSubcomment(@Schema(description = "id поста") @PathVariable Long id,
                                  @Schema(description = "id коммента") @PathVariable Long commentId,
                                  @PageableDefault(sort = {"parentId"}, direction = Sort.Direction.DESC) Pageable page);
@@ -117,7 +118,7 @@ public interface PostController extends BaseController<PostDto, PostSearchDto> {
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
                             schema = @Schema(allOf = {CommentDto.class}))),
             @ApiResponse(responseCode = "400", content = @Content(mediaType = "")),
-            @ApiResponse(responseCode = "404", content = @Content(mediaType = ""))})
+            @ApiResponse(responseCode = "404", description = "Пост не найден", content = @Content(mediaType = ""))})
     ResponseEntity<CommentDto> createComment(@Schema(description = "id поста") @PathVariable Long id, @RequestBody CommentDto commentDto);
 
     @PutMapping(value = "{id}/comment/{commentId}")
@@ -129,7 +130,7 @@ public interface PostController extends BaseController<PostDto, PostSearchDto> {
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
                             schema = @Schema(allOf = {CommentDto.class}))),
             @ApiResponse(responseCode = "400", content = @Content(mediaType = "")),
-            @ApiResponse(responseCode = "404", content = @Content(mediaType = ""))})
+            @ApiResponse(responseCode = "404", description = "Коммент не найден", content = @Content(mediaType = ""))})
     ResponseEntity<CommentDto> updateComment(@Schema(description = "id поста") @PathVariable Long id,
                                  @Schema(description = "id комментария")
                                  @RequestBody CommentDto commentDto,
@@ -142,12 +143,8 @@ public interface PostController extends BaseController<PostDto, PostSearchDto> {
                     description = "Коммент удален",
                     content = @Content(mediaType = "")),
             @ApiResponse(responseCode = "400", content = @Content(mediaType = "")),
-            @ApiResponse(responseCode = "404", content = @Content(mediaType = ""))})
-    ResponseEntity deleteComment(@Schema(description = "id Поста") @PathVariable Long id, @Schema(description = "id комментария для удаления") @PathVariable Long commentId);
-
-//
-//    -----------***PHOTOS***-----------
-//
+            @ApiResponse(responseCode = "404", description = "Коммент не найден", content = @Content(mediaType = ""))})
+    ResponseEntity<CommentDto> deleteComment(@Schema(description = "id Поста") @PathVariable Long id, @Schema(description = "id комментария для удаления") @PathVariable Long commentId);
 
 //
 //    -----------***LIKES***-----------

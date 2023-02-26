@@ -168,10 +168,10 @@ class FriendService {
         }
     }
 
-    public Integer getCount() {
+    public Long getCount() {
 
         log.info("FriendService in getCount count friends requests for friend with id: " + getJwtUserIdFromSecurityContext());
-        return friendRepository.findAll(getSpecification(new FriendSearchDto(getJwtUserIdFromSecurityContext(), StatusCode.REQUEST_FROM))).size();
+        return (long) friendRepository.findAll(getSpecification(new FriendSearchDto(getJwtUserIdFromSecurityContext(), StatusCode.REQUEST_FROM))).size();
 
     }
 

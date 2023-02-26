@@ -29,6 +29,7 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static ru.skillbox.diplom.group32.social.service.utils.security.SecurityUtil.getJwtUserIdFromSecurityContext;
 import static ru.skillbox.diplom.group32.social.service.utils.specification.SpecificationUtil.*;
@@ -54,9 +55,13 @@ public class PostService {
 
     public Page<PostDto> getAll(PostSearchDto searchDto, Pageable page) {
 
+        log.info("PostService in getAll tried to find posts with postSearchDto: {} and pageable: {}", searchDto, page);
+
         List<Long> listFriendsIds = friendService.getFriendsIds();
         listFriendsIds.add(getJwtUserIdFromSecurityContext());
-
+        List<Long> listBlockedIds = friendService.getBlockedFriendsIds();
+        if (!listBlockedIds.isEmpty()) {
+        searchDto.setBlockedIds(listBlockedIds);}
         if (searchDto.getWithFriends() != null) {
             searchDto.setAccountIds(listFriendsIds);
         }
@@ -72,10 +77,17 @@ public class PostService {
             searchDto.setAccountIds(listLong);
         }
 
+        if (searchDto.getAccountIds() == null) {
+            searchDto.setIds(postRepository.findAll(getSpecification(new PostSearchDto()))
+                    .stream()
+                    .map(Post::getId)
+                    .collect(Collectors.toList()));
+        }
+
         if (searchDto.getDateTo() == null) {
             searchDto.setDateTo(ZonedDateTime.now());
         }
-        log.info("PostService in getAll tried to find posts with postSearchDto: {} and pageable: {}", searchDto, page);
+
         Page<Post> postPage = postRepository.findAll(getSpecification(searchDto), page);
         return new PageImpl<>(postPage.map(e -> {
             PostDto postDto = postMapper.convertToDto(e);
@@ -83,7 +95,6 @@ public class PostService {
             postDto.setMyLike(likeService.getMyLike(postDto.getId(), LikeType.POST));
             return postDto;
         }).toList(), page, postPage.getTotalElements());
-
     }
 
     public PostDto create(PostDto postDto) {
@@ -120,10 +131,8 @@ public class PostService {
                 .and(in(Post_.id, searchDto.getIds(), true))
                 .and(in(Post_.authorId, searchDto.getAccountIds(), true))
                 .and(notIn(Post_.authorId, searchDto.getBlockedIds(), true))
-                .and(equal(Post_.title, searchDto.getTitle(), true)
-                        .and(equal(Post_.postText, searchDto.getPostText(), true)
                                 .and(between(Post_.publishDate, searchDto.getDateFrom(), searchDto.getDateTo(), true))
-                                .and(containsTag(searchDto.getTags()))));
+                                .and(containsTag(searchDto.getTags()));
     }
 
 
@@ -136,6 +145,7 @@ public class PostService {
         post.setPostText(postDto.getPostText());
         post.setImagePath(postDto.getImagePath());
         post.setTimeChanged(ZonedDateTime.now());
+        post.setCommentsCount(postDto.getCommentsCount());
 
         return post;
 
