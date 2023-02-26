@@ -14,9 +14,9 @@ import java.util.List;
 public class FriendSearchDto extends BaseSearchDto {
 
     private List<Long> ids;
-    private Long id_from;
+    private Long idFrom;
     private StatusCode statusCode;
-    private Long id_to;
+    private Long idTo;
     private String firstName;
     private ZonedDateTime birthDateFrom;
     private ZonedDateTime birthDateTo;
@@ -26,5 +26,19 @@ public class FriendSearchDto extends BaseSearchDto {
     private Long ageTo;
     private StatusCode previousStatusCode;
 
+    public FriendSearchDto(Long idFrom, StatusCode statusCode, Long idTo) {
+        this.idFrom = idFrom;
+        this.statusCode = statusCode;
+        this.idTo = idTo;
+    }
+
+    public FriendSearchDto(Long idFrom, StatusCode statusCode) {
+        this.idFrom = idFrom;
+        this.statusCode = statusCode;
+    }
+
+    public FriendSearchDto(StatusCode statusCode) {
+        this.statusCode = statusCode;
+    }
 
 }

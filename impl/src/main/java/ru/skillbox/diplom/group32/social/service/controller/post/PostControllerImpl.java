@@ -48,11 +48,6 @@ public class PostControllerImpl implements PostController {
         return ResponseEntity.ok(postService.getAll(searchDto, page));
     }
 
-    @ResponseStatus(code = HttpStatus.CREATED)
-    public ResponseEntity<PostDto> updatePost(PostDto dto) {
-        return ResponseEntity.ok(postService.update(dto));
-    }
-
     @Override
     public ResponseEntity deleteById(Long id) {
         postService.deleteById(id);

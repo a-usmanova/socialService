@@ -58,15 +58,12 @@ public class PostService {
         listFriendsIds.add(getJwtUserIdFromSecurityContext());
 
         if (searchDto.getWithFriends() != null) {
-
             searchDto.setAccountIds(listFriendsIds);
-
         }
 
         if (searchDto.getAuthor() != null) {
             List<Long> listLong = new ArrayList<>();
-            Pageable pageable = PageRequest.of(0, 1000);
-            Page<AccountDto> pageAccount = accountService.searchAccount(postMapper.convertPostSearchDtoToAccountSearchDto(searchDto), pageable);
+            Page<AccountDto> pageAccount = accountService.searchAccount(postMapper.convertPostSearchDtoToAccountSearchDto(searchDto), PageRequest.of(0, 1000));
             for (AccountDto accountDto : pageAccount) {
                 if (listFriendsIds.contains(accountDto.getId())){
                     listLong.add(accountDto.getId());

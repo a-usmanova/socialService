@@ -59,15 +59,15 @@ public interface PostController extends BaseController<PostDto, PostSearchDto> {
             @ApiResponse(responseCode = "400", content = @Content(mediaType = ""))})
     ResponseEntity<PostDto> create(@RequestBody PostDto dto);
 
-    @PutMapping(value = "{id}")
-    @Operation(summary = "Обновление поста - временное решение")
+    @PutMapping
+    @Operation(summary = "Обновление поста")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201",
                     description = "Пост обновлен",
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
                             schema = @Schema(allOf = {PostDto.class}))),
             @ApiResponse(responseCode = "400", content = @Content(mediaType = ""))})
-    ResponseEntity updatePost(@Schema(description = "id Поста для обновления") @RequestBody PostDto postDto);
+    ResponseEntity<PostDto> update(@Schema(description = "id Поста для обновления") @RequestBody PostDto dto);
 
     @Override
     @DeleteMapping(value = "/{id}")
