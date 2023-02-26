@@ -1,7 +1,7 @@
 swagger-api:
   version: "1.0"
 
-host: "212.22.94.79"
+host: "82.202.214.42"
 
 server:
   error:
