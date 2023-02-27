@@ -8,10 +8,14 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import ru.skillbox.diplom.group32.social.service.exception.ObjectNotFoundException;
 import ru.skillbox.diplom.group32.social.service.mapper.comment.CommentMapper;
+import ru.skillbox.diplom.group32.social.service.mapper.post.PostMapper;
 import ru.skillbox.diplom.group32.social.service.model.like.LikeType;
+import ru.skillbox.diplom.group32.social.service.model.post.PostDto;
 import ru.skillbox.diplom.group32.social.service.model.post.comment.*;
 import ru.skillbox.diplom.group32.social.service.repository.post.comment.CommentRepository;
 import ru.skillbox.diplom.group32.social.service.service.like.LikeService;
+import ru.skillbox.diplom.group32.social.service.service.post.PostService;
+import ru.skillbox.diplom.group32.social.service.service.tag.TagService;
 
 import java.time.ZonedDateTime;
 
@@ -26,6 +30,9 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final CommentMapper commentMapper;
     private final LikeService likeService;
+    private final PostService postService;
+    private final PostMapper postMapper;
+    private final TagService tagService;
 
 
     public CommentDto createComment(CommentDto commentDto, Long id) {
@@ -33,6 +40,10 @@ public class CommentService {
         log.info("CommentService in createComment: for the post with id - {} Comment to save - {}", id, commentDto);
         commentDto.setPostId(id);
         if (commentDto.getParentId() == null) {
+            PostDto postDto = postService.getById(id);
+            postDto.setCommentsCount(postDto.getCommentsCount() + 1L);
+            postDto.setTags(tagService.getNames(postMapper.convertToEntity(postDto).getTags()));
+            postService.update(postDto);
             commentDto.setCommentType(CommentType.POST);
         } else {
             commentDto.setCommentType(CommentType.COMMENT);
@@ -51,10 +62,7 @@ public class CommentService {
 
         log.info("CommentService in getAllComments: tried to find all comments for the post with id: {} and pageable: {}", id, page);
 
-        CommentSearchDto commentSearchDto = new CommentSearchDto();
-        commentSearchDto.setPostId(id);
-        commentSearchDto.setCommentType(CommentType.POST);
-        Page<Comment> commentPage = commentRepository.findAll(getSpecification(commentSearchDto), page);
+        Page<Comment> commentPage = commentRepository.findAll(getSpecification(new CommentSearchDto(id, CommentType.POST)), page);
         log.info("CommentService in getAllComments: find comments: " + commentPage);
         return commentPage.map(e->{
             CommentDto commentDto = commentMapper.convertToDto(e);
@@ -87,6 +95,11 @@ public class CommentService {
             parentComment.setCommentsCount(parentComment.getCommentsCount() - 1L);
             commentRepository.save(parentComment);
 
+        } else {
+            PostDto postDto = postService.getById(id);
+            postDto.setCommentsCount(postDto.getCommentsCount() - 1L);
+            postDto.setTags(tagService.getNames(postMapper.convertToEntity(postDto).getTags()));
+            postService.update(postDto);
         }
 
         commentRepository.delete(commentRepository.findById(commentId).orElseThrow(ObjectNotFoundException::new));
@@ -97,12 +110,7 @@ public class CommentService {
 
         log.info("CommentService in getSubcomments: tried to find all subcomments for the post with id: {} " +
                 "and comment with id: {} and pageable: {}", id, commentId, page);
-        CommentSearchDto commentSearchDto = new CommentSearchDto();
-        commentSearchDto.setPostId(id);
-        commentSearchDto.setParentId(commentId);
-        commentSearchDto.setCommentType(CommentType.COMMENT);
-        commentSearchDto.setIsDeleted(false);
-        Page<Comment> commentPage = commentRepository.findAll(getSpecification(commentSearchDto), page);
+        Page<Comment> commentPage = commentRepository.findAll(getSpecification(new CommentSearchDto(id, commentId, CommentType.COMMENT)), page);
         log.info("CommentService in getSubcomments: find comments: " + commentPage);
         return commentPage.map(commentMapper::convertToDto);
 

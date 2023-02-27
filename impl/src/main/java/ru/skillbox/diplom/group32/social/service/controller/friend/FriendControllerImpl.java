@@ -1,5 +1,6 @@
 package ru.skillbox.diplom.group32.social.service.controller.friend;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -41,7 +42,7 @@ public class FriendControllerImpl implements FriendController {
     }
 
     @Override
-    public ResponseEntity count() {
+    public ResponseEntity<Long> count() {
         return ResponseEntity.ok(friendService.getCount());
     }
 
@@ -51,39 +52,41 @@ public class FriendControllerImpl implements FriendController {
     }
 
     @Override
-    public ResponseEntity addFriend(Long id) {
+    public ResponseEntity<List<FriendDto>> addFriend(Long id) {
         return ResponseEntity.ok(friendService.addFriend(id));
     }
 
     @Override
-    public ResponseEntity addSubscription(Long id) {
+    public ResponseEntity<List<FriendDto>> addSubscription(Long id) {
         return null;
     }
 
     @Override
-    public ResponseEntity approveFriend(Long id)  {
+    public ResponseEntity<String> approveFriend(Long id)  {
         friendService.approveFriend(id);
         return ResponseEntity.ok().body("ok");
     }
 
     @Override
-    public ResponseEntity blockFriend(Long id) {
+    public ResponseEntity<String> blockFriend(Long id) {
         friendService.blockFriend(id);
         return ResponseEntity.ok().body("ok");
     }
 
     @Override
+    @Hidden
     public ResponseEntity<FriendDto> create(FriendDto dto) {
         return new ResponseEntity<>(HttpStatus.METHOD_NOT_ALLOWED);
     }
 
     @Override
+    @Hidden
     public ResponseEntity<FriendDto> update(FriendDto dto) {
         return new ResponseEntity<>(HttpStatus.METHOD_NOT_ALLOWED);
     }
 
     @Override
-    public ResponseEntity deleteById(Long id) {
+    public ResponseEntity<String> deleteById(Long id) {
         friendService.deleteById(id);
         return ResponseEntity.ok().body("FRIEND DELETED");
     }

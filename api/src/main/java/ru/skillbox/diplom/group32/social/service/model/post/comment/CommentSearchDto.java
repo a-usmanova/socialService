@@ -1,25 +1,34 @@
 package ru.skillbox.diplom.group32.social.service.model.post.comment;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import ru.skillbox.diplom.group32.social.service.model.base.BaseSearchDto;
 
-import java.time.ZonedDateTime;
-
 @Data
+@NoArgsConstructor
+@Schema(description = "Дто для поиска комментов")
 public class CommentSearchDto extends BaseSearchDto {
 
+    @Schema(description = "Тип коммента: коммент к посту или субкоммент")
     private CommentType commentType;
-    private ZonedDateTime time;
-    private ZonedDateTime timeChanged;
+    @Schema(description = "Айди автора")
     private Long authorId;
+    @Schema(description = "Айди коммента")
     private Long parentId;
-    private String commentText;
+    @Schema(description = "айди поста")
     private Long postId;
-    private Boolean isBlocked;
-    private Boolean isDeleted;
-    private Long likeAmount;
-    private Boolean myLike;
-    private Long commentsCount;
-    private String imagePath;
 
+    public CommentSearchDto(Long postId, CommentType commentType) {
+        setIsDeleted(false);
+        this.commentType = commentType;
+        this.postId = postId;
+    }
+
+    public CommentSearchDto(Long postId, Long parentId, CommentType commentType ) {
+        setIsDeleted(false);
+        this.commentType = commentType;
+        this.parentId = parentId;
+        this.postId = postId;
+    }
 }
