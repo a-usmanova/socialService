@@ -8,9 +8,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Schema(description = "Дто фото из StorageServices")
 public class StorageDto {
-    @Schema(description = "Путь до фото")
+    @Schema(description = "Путь до фото", example = "http://res.cloudinary.com/duvaewonz/image/upload/v1677442010/xfaazue6lvk7ilrkkycl.jpg")
     private String photoPath;
-    @Schema(description = "Имя фото")
+    @Schema(description = "Имя фото", name = "аватарка v1")
     private String photoName;
 
 }

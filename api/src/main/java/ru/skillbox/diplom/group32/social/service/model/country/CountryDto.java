@@ -8,10 +8,10 @@ import ru.skillbox.diplom.group32.social.service.model.base.BaseDto;
 import ru.skillbox.diplom.group32.social.service.model.city.CityDto;
 
 @Data
-@Schema(description = "Дто аккаунта")
+@Schema(description = "Дто страны")
 public class CountryDto extends BaseDto {
-  @Schema(description = "Наименование страны")
+  @Schema(description = "Наименование страны", example = "Россия")
   private String title;
-  @Schema(description = "Города страны")
+  @Schema(description = "Города страны", example = "Россия: [Москва, Санкт-Петербург, Волгоград]" )
   private List<CityDto> cities;
 }

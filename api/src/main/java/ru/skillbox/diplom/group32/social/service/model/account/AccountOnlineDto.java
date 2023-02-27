@@ -13,11 +13,11 @@ import java.time.ZonedDateTime;
 @Schema(description = "Дто для отслеживания аккаунта онлайн")
 public class AccountOnlineDto {
 
-    @Schema(description = "Идентификатор аккаунта")
+    @Schema(description = "Идентификатор аккаунта", example = "21313")
     private Long id;
-    @Schema(description = "Время последнего появления онлайн")
+    @Schema(description = "Время последнего появления онлайн", example = "2023-02-26 19:02:29.110138 +00:00")
     private ZonedDateTime lastOnlineTime;
-    @Schema(description = "Онлайн?")
+    @Schema(description = "Онлайн?", example = "true")
     private Boolean isOnline;
 
 }

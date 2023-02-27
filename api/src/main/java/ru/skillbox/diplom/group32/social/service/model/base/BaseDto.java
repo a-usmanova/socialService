@@ -10,9 +10,9 @@ import java.io.Serializable;
 @Setter
 @Schema(description = "Базовый ДТО")
 public abstract class BaseDto implements Serializable {
-    @Schema(description = "Автоматически сгенерированный идентификатор")
+    @Schema(description = "Автоматически сгенерированный идентификатор", example = "42352")
     private Long id;
-    @Schema(description = "Объект удален?")
+    @Schema(description = "Объект удален?", example = "false")
     private Boolean isDeleted;
 
 

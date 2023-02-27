@@ -6,25 +6,21 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import ru.skillbox.diplom.group32.social.service.model.base.BaseDto;
-import ru.skillbox.diplom.group32.social.service.model.friend.FriendDto;
-
-import java.util.List;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Schema(description = "Дто для пользователя")
-public class UserDto extends BaseDto { //TODO Можно в принципе сделать RegistrationDto и не привязыватьс к userDto и как в свагере ее сделать
+public class UserDto extends BaseDto {
 
-    @Schema(description = "Фамилия")
+    @Schema(description = "Фамилия", example = "Foma")
     private String firstName;
-    @Schema(description = "Имя")
+    @Schema(description = "Имя", example = "Kinyaev")
     private String lastName;
-    @Schema(description = "Электронная почта пользователя")
+    @Schema(description = "Электронная почта пользователя", example = "fkinyaev@something.ru")
     private String email;
-    @Schema(description = "Пароль пользователя")
+    @Schema(description = "Пароль пользователя", example = "Qwerty!321341")
     private String password;
 
-    private List<FriendDto> friends;
 }

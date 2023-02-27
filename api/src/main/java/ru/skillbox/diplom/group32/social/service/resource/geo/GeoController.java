@@ -48,7 +48,7 @@ public interface GeoController {
     @Operation(summary = "Загрузка стран и городов")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200",
-                    description = "Страны загружены"),
+                    description = "Страны и города загружены"),
             @ApiResponse(responseCode = "400", content = @Content(mediaType = "")),
             @ApiResponse(responseCode = "401", content = @Content(mediaType = ""))})
     void loadGeo();

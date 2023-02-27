@@ -67,7 +67,6 @@ public class JwtTokenProvider {
 
     }
 
-    //TODO new JwtAuthenticationToken() instead of UsernamePasswordAuthenticationToken
     public Authentication getAuthentication(String token) {
         Jwt jwt = jwtDecoder().decode(token);
 
