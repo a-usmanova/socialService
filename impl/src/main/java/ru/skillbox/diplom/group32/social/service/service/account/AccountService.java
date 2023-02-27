@@ -30,7 +30,6 @@ import static ru.skillbox.diplom.group32.social.service.utils.specification.Spec
 
 @Slf4j
 @Service
-//@RequiredArgsConstructor
 public class AccountService {
 
     private AccountRepository accountRepository;
@@ -107,6 +106,7 @@ public class AccountService {
     public Page<AccountDto> searchAccount(AccountSearchDto accountSearchDto, Pageable page) {
         Long currentUser = SecurityUtil.getJwtUserIdFromSecurityContext();
         List<Long> blockedByIds = friendService.getBlockedFriendsIds(currentUser);
+        blockedByIds.addAll(friendService.getFriendsIdsWhoBlockedByMe(currentUser));
         if (blockedByIds.size() != 0) {
             accountSearchDto.setBlockedByIds(blockedByIds);
         }

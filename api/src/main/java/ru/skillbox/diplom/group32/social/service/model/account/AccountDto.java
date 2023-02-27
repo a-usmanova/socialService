@@ -13,37 +13,37 @@ import java.time.ZonedDateTime;
 @AllArgsConstructor
 @Schema(description = "Дто для аккаунта")
 public class AccountDto extends UserDto {
-    @Schema(description = "Телефонный номер аккаунта")
+    @Schema(description = "Телефонный номер аккаунта", example = "79996662233")
     private String phone;
-    @Schema(description = "Ссылка на фото аккаунта")
+    @Schema(description = "Ссылка на фото аккаунта", example = "http://res.cloudinary.com/duvaewonz/image/upload/v1677442010/xfaazue6lvk7ilrkkycl.jpg")
     private String photo;
-    @Schema(description = "Описание аккаунта")
+    @Schema(description = "Описание аккаунта", example = "Отличное описание аккаунта")
     private String about;
-    @Schema(description = "Город")
+    @Schema(description = "Город", example = "Москва")
     private String city;
-    @Schema(description = "Страна")
+    @Schema(description = "Страна", example = "Россия")
     private String country;
-    @Schema(description = "StatusCode аккаунта")
+    @Schema(description = "StatusCode аккаунта", example = "StatusCode.FRIEND")
     private StatusCode statusCode;
-    @Schema(description = "Дата регистрации")
+    @Schema(description = "Дата регистрации", example = "2023-02-26 19:02:29.110138 +00:00")
     private ZonedDateTime regDate;
-    @Schema(description = "Дата рождения")
+    @Schema(description = "Дата рождения", example = "2023-02-26 19:02:29.110138 +00:00")
     private ZonedDateTime birthDate;
     @Schema(description = "Разрешения сообщения")
     private String messagePermission;
-    @Schema(description = "Время последнего появления онлайн")
+    @Schema(description = "Время последнего появления онлайн", example = "2023-02-26 19:02:29.110138 +00:00")
     private ZonedDateTime lastOnlineTime;
-    @Schema(description = "Онлайн?")
+    @Schema(description = "Онлайн?", example = "true")
     private Boolean isOnline;
-    @Schema(description = "Заблокирован?")
+    @Schema(description = "Заблокирован?", example = "false")
     private Boolean isBlocked;
     @Schema(description = "Идентификатор фото")
     private String photoId;
-    @Schema(description = "Имя фото")
+    @Schema(description = "Имя фото", example = "Аватарка v1")
     private String photoName;
-    @Schema(description = "Дата создания аккаунта")
+    @Schema(description = "Дата создания аккаунта", example = "2023-02-26 19:02:29.110138 +00:00")
     private ZonedDateTime createdOn;
-    @Schema(description = "Дата обновления аккаунта")
+    @Schema(description = "Дата обновления аккаунта", example = "2023-02-26 19:02:29.110138 +00:00")
     private ZonedDateTime updatedOn;
 
 
