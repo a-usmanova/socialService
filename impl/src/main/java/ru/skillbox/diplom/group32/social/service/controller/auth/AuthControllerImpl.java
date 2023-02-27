@@ -47,15 +47,6 @@ public class AuthControllerImpl implements AuthController {
         return ResponseEntity.ok(captchaService.getCaptcha());
     }
 
-    /* Можно добавить данное искючение и спринг сам преобразует все как надо
-    * @ResponseStatus(code = HttpStatus.NOT_FOUND, reason = UserNotFoundException.REASON_RU)
-public class UserNotFoundException extends RuntimeException {
-
-    public static final String REASON_RU = "Сущность пользователя не найдена в бд";
-    public static final String REASON_EN = "User entity not found in db";
-
-}*/
-
     @Override
     public void getPasswordRecoveryMail(PasswordRecoveryDto passwordRecoveryDto) {
         passwordRecoveryService.sendEmail(passwordRecoveryDto);
