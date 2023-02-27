@@ -1,7 +1,6 @@
 package ru.skillbox.diplom.group32.social.service.controller.dialog;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import ru.skillbox.diplom.group32.social.service.model.dialog.response.DialogsRs;
@@ -22,13 +21,13 @@ public class DialogControllerImpl implements DialogController {
     }
 
     @Override
-    public ResponseEntity<DialogsRs> getAllDialogs(Integer offset, Integer itemPerPage, Pageable page) {
-        return ResponseEntity.ok(dialogService.getAllDialogs(offset, itemPerPage, page));
+    public ResponseEntity<DialogsRs> getAllDialogs(Integer offset, Integer itemPerPage) {
+        return ResponseEntity.ok(dialogService.getAllDialogs(offset, itemPerPage));
     }
 
     @Override
-    public ResponseEntity<MessagesRs> getAllMessages(Long companionId, Integer offset, Integer itemPerPage, Pageable page) {
-        return ResponseEntity.ok(dialogService.getAllMessages(companionId, offset, itemPerPage, page));
+    public ResponseEntity<MessagesRs> getAllMessages(Long companionId, Integer offset, Integer itemPerPage) {
+        return ResponseEntity.ok(dialogService.getAllMessages(companionId, offset, itemPerPage));
     }
 
     @Override

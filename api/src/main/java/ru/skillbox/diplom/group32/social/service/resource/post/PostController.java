@@ -153,11 +153,45 @@ public interface PostController extends BaseController<PostDto, PostSearchDto> {
 //    -----------***LIKES***-----------
 //
   @PostMapping(value = "{id}/like")
+  @Operation(summary = "Создание лайка к посту")
+  @ApiResponses(value = {
+          @ApiResponse(responseCode = "201",
+                  description = "Лайк к посту создан",
+                  content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                          schema = @Schema(allOf = {LikeDto.class}))),
+          @ApiResponse(responseCode = "400", content = @Content(mediaType = "")),
+          @ApiResponse(responseCode = "404", content = @Content(mediaType = ""))})
   ResponseEntity<LikeDto> createPostLike(@PathVariable Long id);
+
   @DeleteMapping(value = "{id}/like")
+  @Operation(summary = "Удаление лайка поста")
+  @ApiResponses(value = {
+          @ApiResponse(responseCode = "200",
+                  description = "Лайк поста удален",
+                  content = @Content(mediaType = "")),
+          @ApiResponse(responseCode = "400", content = @Content(mediaType = "")),
+          @ApiResponse(responseCode = "404", content = @Content(mediaType = ""))})
   ResponseEntity deletePostLike(@PathVariable Long id);
+
   @PostMapping(value = "{id}/comment/{commentId}/like")
+  @Operation(summary = "Создание лайка к комментарию")
+  @ApiResponses(value = {
+          @ApiResponse(responseCode = "201",
+                  description = "Лайк комментария создан",
+                  content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                          schema = @Schema(allOf = {LikeDto.class}))),
+          @ApiResponse(responseCode = "400", content = @Content(mediaType = "")),
+          @ApiResponse(responseCode = "404", content = @Content(mediaType = ""))})
   ResponseEntity<LikeDto> createCommentLike(@PathVariable Long id, @PathVariable Long commentId);
+
   @DeleteMapping(value = "{id}/comment/{commentId}/like")
+  @Operation(summary = "Удаление лайка комментария")
+  @ApiResponses(value = {
+          @ApiResponse(responseCode = "200",
+                  description = "Лайк комментария удален",
+                  content = @Content(mediaType = "")),
+          @ApiResponse(responseCode = "400", content = @Content(mediaType = "")),
+          @ApiResponse(responseCode = "404", content = @Content(mediaType = ""))})
    ResponseEntity deleteCommentLike(@PathVariable Long id, @PathVariable Long commentId);
+
 }

@@ -26,8 +26,6 @@ public interface MessageMapper {
     @Mapping(target = "time", expression = "java(message.getTime().toInstant().getEpochSecond())")
     MessageShortDto convertToMessageShortDto(Message message);
 
-    ReadStatusDto convertReadStatusToDto(ReadStatus readStatus);
-
     ReadStatus convertReadStatusToEntity(ReadStatusDto readStatusDto);
 
 }

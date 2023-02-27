@@ -16,12 +16,12 @@ import ru.skillbox.diplom.group32.social.service.config.security.JwtTokenProvide
 import ru.skillbox.diplom.group32.social.service.mapper.dialog.streaming.StreamingMapper;
 import ru.skillbox.diplom.group32.social.service.model.account.AccountOnlineDto;
 import ru.skillbox.diplom.group32.social.service.model.dialog.message.MessageDto;
+import ru.skillbox.diplom.group32.social.service.model.dialog.messageShortDto.MessageShortDto;
 import ru.skillbox.diplom.group32.social.service.model.notification.NotificationDto;
 import ru.skillbox.diplom.group32.social.service.model.streaming.StreamingDataDto;
 import ru.skillbox.diplom.group32.social.service.model.streaming.StreamingMessageDto;
 import ru.skillbox.diplom.group32.social.service.service.account.AccountService;
 import ru.skillbox.diplom.group32.social.service.service.dialog.DialogService;
-import ru.skillbox.diplom.group32.social.service.service.notification.NotificationService;
 import ru.skillbox.diplom.group32.social.service.utils.websocket.WebsocketContextUtil;
 
 import java.io.IOException;
@@ -125,10 +125,10 @@ public class WebSocketHandler extends TextWebSocketHandler {
 
             StreamingMessageDto streamingMessageDto = objectMapper.readValue(payload, StreamingMessageDto.class);
 
-            MessageDto messageDtoFromData = streamingMapper.convertToMessageDto((objectMapper.readValue(jsonNode.get("data").toString(), StreamingDataDto.class)));
+            MessageDto messageDto = streamingMapper.convertToMessageDto((objectMapper.readValue(jsonNode.get("data").toString(), StreamingDataDto.class)));
+            MessageShortDto messageShortDto = dialogService.createMessage(messageDto);
 
-            MessageDto messageDto = dialogService.createMessage(messageDtoFromData);
-            streamingMessageDto.setData(objectMapper.convertValue(messageDto, HashMap.class));
+            streamingMessageDto.setData(objectMapper.convertValue(messageShortDto, HashMap.class));
             receiveMessage(streamingMessageDto);
 
         }

@@ -11,9 +11,10 @@ import ru.skillbox.diplom.group32.social.service.model.post.comment.Comment;
 import ru.skillbox.diplom.group32.social.service.repository.like.LikeRepository;
 import ru.skillbox.diplom.group32.social.service.repository.post.PostRepository;
 import ru.skillbox.diplom.group32.social.service.repository.post.comment.CommentRepository;
-import ru.skillbox.diplom.group32.social.service.utils.security.SecurityUtil;
 
 import java.time.ZonedDateTime;
+
+import static ru.skillbox.diplom.group32.social.service.utils.security.SecurityUtil.getJwtUserIdFromSecurityContext;
 
 @Slf4j
 @Service
@@ -28,7 +29,9 @@ public class LikeService {
         LikeDto likeDto = createDto(itemId, type);
         log.info("LikeService in createPostLike has like to save: " + likeDto);
         likeRepository.findByTypeAndItemIdAndAuthorId(likeDto.getType(), itemId, likeDto.getAuthorId()).ifPresent(like -> likeDto.setId(like.getId()));
-        changeLikeAmount(likeDto.getItemId(), likeDto.getType(), 1);
+        if(likeDto.getId() == null) {
+            changeLikeAmount(likeDto.getItemId(), likeDto.getType(), 1);
+        }
         return likeMapper.convertToDto(likeRepository.save(likeMapper.convertToEntity(likeDto)));
 
     }
@@ -37,15 +40,17 @@ public class LikeService {
 
         log.info("LikeService in deletePostLike: trying to del like with itemId: " + itemId);
         LikeDto likeDto = createDto(itemId, type);
-        Like like = likeRepository.findByTypeAndItemIdAndAuthorId(likeDto.getType(), itemId, likeDto.getAuthorId()).orElseThrow(ObjectNotFoundException::new);
-        changeLikeAmount(likeDto.getItemId(), likeDto.getType(), -1);
-        likeRepository.deleteById(like.getId());
+        Like like = likeRepository.findByTypeAndItemIdAndAuthorId(likeDto.getType(), itemId, likeDto.getAuthorId()).orElse(null);
+        if(like != null) {
+            changeLikeAmount(likeDto.getItemId(), likeDto.getType(), -1);
+            likeRepository.deleteById(like.getId());
+        }
 
     }
 
     public Boolean getMyLike(Long itemId, LikeType type) {
 
-        Like like = likeRepository.findByTypeAndItemIdAndAuthorId(type, itemId, SecurityUtil.getJwtUserIdFromSecurityContext()).orElse(null);
+        Like like = likeRepository.findByTypeAndItemIdAndAuthorId(type, itemId, getJwtUserIdFromSecurityContext()).orElse(null);
         if (like == null) {
             return false;
         }
@@ -59,7 +64,7 @@ public class LikeService {
         likeDto.setTime(ZonedDateTime.now());
         likeDto.setItemId(itemId);
         likeDto.setType(type);
-        likeDto.setAuthorId(SecurityUtil.getJwtUserIdFromSecurityContext());
+        likeDto.setAuthorId(getJwtUserIdFromSecurityContext());
         return likeDto;
 
     }
@@ -71,11 +76,13 @@ public class LikeService {
                 Post post = postRepository.findById(itemId).orElseThrow(ObjectNotFoundException::new);
                 post.setLikeAmount(post.getLikeAmount() + amount);
                 postRepository.save(post);
+                log.info("LikeService in changeLikeAmount: likeAmount changed for " + type + " id - " + post.getId());
             }
             case COMMENT -> {
                 Comment comment = commentRepository.findById(itemId).orElseThrow(ObjectNotFoundException::new);
                 comment.setLikeAmount(comment.getLikeAmount() + amount);
                 commentRepository.save(comment);
+                log.info("LikeService in changeLikeAmount: likeAmount changed for " + type + " id - " + comment.getId());
             }
         }
 

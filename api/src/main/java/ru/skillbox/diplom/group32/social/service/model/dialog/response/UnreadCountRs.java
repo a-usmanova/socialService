@@ -2,7 +2,6 @@ package ru.skillbox.diplom.group32.social.service.model.dialog.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -19,6 +18,7 @@ public class UnreadCountRs extends BaseResponse {
     public UnreadCountRs(String error, String errorDescription, Long timestamp) {
         super(error, errorDescription, timestamp);
     }
+    @Schema(description = "Дто количества непрочитанных сообщений")
     private UnreadCountDto data;
 
 }
