@@ -7,11 +7,14 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import ru.skillbox.diplom.group32.social.service.exception.ObjectNotFoundException;
 import ru.skillbox.diplom.group32.social.service.mapper.post.PostMapper;
 import ru.skillbox.diplom.group32.social.service.model.account.AccountDto;
 import ru.skillbox.diplom.group32.social.service.model.like.LikeType;
+import ru.skillbox.diplom.group32.social.service.model.notification.EventNotification;
+import ru.skillbox.diplom.group32.social.service.model.notification.NotificationType;
 import ru.skillbox.diplom.group32.social.service.model.post.Post;
 import ru.skillbox.diplom.group32.social.service.model.post.PostDto;
 import ru.skillbox.diplom.group32.social.service.model.post.PostSearchDto;
@@ -45,6 +48,7 @@ public class PostService {
     private final TagService tagService;
     private final PostMapper postMapper;
     private final LikeService likeService;
+    private final KafkaTemplate<String, EventNotification> eventNotificationKafkaTemplate;
 
     public PostDto getById(Long id) {
 
@@ -103,6 +107,7 @@ public class PostService {
         Post postEntity = postMapper.convertToEntityCreated(postDto);
         postEntity.setTags(tagService.createNonExistent(postDto.getTags()));
         Post post = postRepository.save(postEntity);
+        sendNotification(postEntity, "ОПУБЛИКОВАН НОВЫЙ ПОСТ");
         log.info("PostService in create: Post saved to db: " + postDto);
 
         return postMapper.convertToDto(post);
@@ -123,6 +128,14 @@ public class PostService {
         postRepository.deleteById(id);
         Post post = postRepository.findById(id).orElseThrow(ObjectNotFoundException::new);
         tagService.deleteAll(post.getTags());
+
+    }
+
+    private void sendNotification(Post post, String text) {
+
+        text = post.getTitle();
+        EventNotification eventNotification = new EventNotification(post.getAuthorId(), null, NotificationType.POST, text.length() < 20 ? text : text.substring(0, 20) + "...");
+        eventNotificationKafkaTemplate.send("event-notification", eventNotification);
 
     }
 
