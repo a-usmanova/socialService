@@ -2,6 +2,7 @@ package ru.skillbox.diplom.group32.social.service.service.account;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -36,8 +37,9 @@ public class AccountService {
     private AccountMapper accountMapper;
     private FriendService friendService;
     private NotificationService notificationService;
-
     private KafkaTemplate<String, EventNotification> kafkaNotificationTemplate;
+    @Value("${image-account-delete}")
+    private String imageAccountDeletePath;
 
     @Autowired
     public AccountService(AccountRepository accountRepository,
@@ -93,7 +95,10 @@ public class AccountService {
 
     public String softDeleteAccount() {
         Long userId = SecurityUtil.getJwtUserIdFromSecurityContext();
-        accountRepository.deleteById(userId);
+        Account account = accountRepository.findById(userId).get();
+        account.setPhoto(imageAccountDeletePath);
+        account.setIsDeleted(true);
+        accountRepository.save(account);
         log.info("Account with id - " + userId + " soft deleted.");
         return "Account with id - " + userId + " deleted.";
     }

@@ -77,3 +77,4 @@ white-list:
     - /**/forgot
 
 websocket-url: ${WEBSOCKET-URL:/api/v1/streaming/ws}
+image-account-delete: "http://res.cloudinary.com/duvaewonz/image/upload/v1677505489/rkh7wgkwtjcxcf9hya0v.jpg"
