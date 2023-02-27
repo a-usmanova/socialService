@@ -3,7 +3,6 @@ package ru.skillbox.diplom.group32.social.service.service.dialog;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -15,6 +14,7 @@ import ru.skillbox.diplom.group32.social.service.model.dialog.DialogDto;
 import ru.skillbox.diplom.group32.social.service.model.dialog.DialogSearchDto;
 import ru.skillbox.diplom.group32.social.service.model.dialog.Dialog_;
 import ru.skillbox.diplom.group32.social.service.model.dialog.message.*;
+import ru.skillbox.diplom.group32.social.service.model.dialog.messageShortDto.MessageShortDto;
 import ru.skillbox.diplom.group32.social.service.model.dialog.response.DialogsRs;
 import ru.skillbox.diplom.group32.social.service.model.dialog.response.MessagesRs;
 import ru.skillbox.diplom.group32.social.service.model.dialog.response.StatusMessageReadRs;
@@ -41,7 +41,7 @@ public class DialogService {
     private final DialogMapper dialogMapper;
     private final MessageMapper messageMapper;
 
-    public DialogsRs getAllDialogs(Integer offset, Integer itemPerPage, Pageable page) {
+    public DialogsRs getAllDialogs(Integer offset, Integer itemPerPage) {
 
         Long authorId = getJwtUserIdFromSecurityContext();
         DialogsRs response = new DialogsRs("", "", getTimestamp());
@@ -86,7 +86,7 @@ public class DialogService {
 
     }
 
-    public MessagesRs getAllMessages(Long recipientId, Integer offset, Integer itemPerPage, Pageable page) {
+    public MessagesRs getAllMessages(Long recipientId, Integer offset, Integer itemPerPage) {
 
         MessagesRs response = new MessagesRs("", "", getTimestamp());
         response.setOffset(offset);
@@ -121,7 +121,7 @@ public class DialogService {
 
     }
 
-    public MessageDto createMessage(MessageDto dto) {
+    public MessageShortDto createMessage(MessageDto dto) {
 
         Dialog dialog = getDialog(dto.getAuthorId(), dto.getRecipientId());
         dto.setReadStatusDto(ReadStatusDto.SENT);
@@ -133,7 +133,7 @@ public class DialogService {
         dialog.setLastMessage(message);
         dialogRepository.save(dialog);
 
-        return messageMapper.convertToDto(message);
+        return messageMapper.convertToMessageShortDto(message);
 
     }
 

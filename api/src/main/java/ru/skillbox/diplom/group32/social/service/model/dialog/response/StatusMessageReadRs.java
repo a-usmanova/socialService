@@ -19,6 +19,7 @@ public class StatusMessageReadRs extends BaseResponse {
         super(error, errorDescription, timestamp);
     }
 
+    @Schema(description = "Дто сообщения о выполнении")
     private SetStatusMessageReadDto data;
 
 }
