@@ -5,11 +5,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import ru.skillbox.diplom.group32.social.service.exception.ObjectNotFoundException;
 import ru.skillbox.diplom.group32.social.service.mapper.comment.CommentMapper;
 import ru.skillbox.diplom.group32.social.service.mapper.post.PostMapper;
 import ru.skillbox.diplom.group32.social.service.model.like.LikeType;
+import ru.skillbox.diplom.group32.social.service.model.notification.EventNotification;
+import ru.skillbox.diplom.group32.social.service.model.notification.NotificationType;
 import ru.skillbox.diplom.group32.social.service.model.post.PostDto;
 import ru.skillbox.diplom.group32.social.service.model.post.comment.*;
 import ru.skillbox.diplom.group32.social.service.repository.post.comment.CommentRepository;
@@ -33,6 +36,7 @@ public class CommentService {
     private final PostService postService;
     private final PostMapper postMapper;
     private final TagService tagService;
+    private final KafkaTemplate<String, EventNotification> eventNotificationKafkaTemplate;
 
 
     public CommentDto createComment(CommentDto commentDto, Long id) {
@@ -53,6 +57,7 @@ public class CommentService {
         }
 
         Comment comment = commentRepository.save(commentMapper.convertToEntity(commentDto));
+        sendNotification(comment, "НОВЫЙ КОММЕНТ");
         log.info("CommentService in createComment:" + commentDto);
 
         return commentMapper.convertToDto(comment);
@@ -113,6 +118,14 @@ public class CommentService {
         Page<Comment> commentPage = commentRepository.findAll(getSpecification(new CommentSearchDto(id, commentId, CommentType.COMMENT)), page);
         log.info("CommentService in getSubcomments: find comments: " + commentPage);
         return commentPage.map(commentMapper::convertToDto);
+
+    }
+
+    private void sendNotification(Comment comment, String text) {
+
+        text = comment.getCommentText();
+        EventNotification eventNotification = new EventNotification(comment.getAuthorId(), postService.getById(comment.getPostId()).getAuthorId(), NotificationType.POST_COMMENT, text.length() < 20 ? text : text.substring(0, 20) + "...");
+        eventNotificationKafkaTemplate.send("event-notification", eventNotification);
 
     }
 
