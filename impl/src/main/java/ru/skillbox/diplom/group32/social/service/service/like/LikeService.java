@@ -26,23 +26,26 @@ public class LikeService {
     private final LikeMapper likeMapper;
     public LikeDto createLike(Long itemId, LikeType type) {
 
-        LikeDto likeDto = createDto(itemId, type);
-        log.info("LikeService in createPostLike has like to save: " + likeDto);
-        likeRepository.findByTypeAndItemIdAndAuthorId(likeDto.getType(), itemId, likeDto.getAuthorId()).ifPresent(like -> likeDto.setId(like.getId()));
-        if(likeDto.getId() == null) {
-            changeLikeAmount(likeDto.getItemId(), likeDto.getType(), 1);
+        Like like = likeRepository.findByTypeAndItemIdAndAuthorId(type, itemId, getJwtUserIdFromSecurityContext()).orElse(new Like());
+        if(like.getId() == null || like.getIsDeleted()) {
+            like.setAuthorId(getJwtUserIdFromSecurityContext());
+            like.setType(type);
+            like.setItemId(itemId);
+            like.setIsDeleted(false);
+            like.setTime(ZonedDateTime.now());
+            changeLikeAmount(itemId, type, 1);
         }
-        return likeMapper.convertToDto(likeRepository.save(likeMapper.convertToEntity(likeDto)));
+        log.info("LikeService in createPostLike has like to save: " + like);
+        return likeMapper.convertToDto(likeRepository.save(like));
 
     }
 
     public void deleteLike(Long itemId, LikeType type) {
 
         log.info("LikeService in deletePostLike: trying to del like with itemId: " + itemId);
-        LikeDto likeDto = createDto(itemId, type);
-        Like like = likeRepository.findByTypeAndItemIdAndAuthorId(likeDto.getType(), itemId, likeDto.getAuthorId()).orElse(null);
-        if(like != null) {
-            changeLikeAmount(likeDto.getItemId(), likeDto.getType(), -1);
+        Like like = likeRepository.findByTypeAndItemIdAndAuthorId(type, itemId, getJwtUserIdFromSecurityContext()).orElseThrow(ObjectNotFoundException::new);
+        if(like.getId() != null) {
+            changeLikeAmount(itemId, type, -1);
             likeRepository.deleteById(like.getId());
         }
 
@@ -55,17 +58,6 @@ public class LikeService {
             return false;
         }
         return !like.getIsDeleted();
-
-    }
-    private LikeDto createDto(Long itemId, LikeType type) {
-
-        LikeDto likeDto = new LikeDto();
-        likeDto.setIsDeleted(false);
-        likeDto.setTime(ZonedDateTime.now());
-        likeDto.setItemId(itemId);
-        likeDto.setType(type);
-        likeDto.setAuthorId(getJwtUserIdFromSecurityContext());
-        return likeDto;
 
     }
 
